@@ -4,6 +4,31 @@
   
   
   <entry>
+    <title>记一次小程序“零元购”漏洞挖掘</title>
+    <link href="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/"/>
+    <url>/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/</url>
+    
+    <content type="html"><![CDATA[<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>一次简单的微信小程序漏洞挖掘。在选中商品进行支付的时候，会get一个请求，这个请求主题部分进行了url编码，当我们解码之后就可以看到商品的id号，支付金额等信息，并且没有做安全校验，只需要修改成我们想要修改的金额，直接发送数据包，就可以支付，从而达到“零元购”的危害，考虑到漏洞还没修复，所以做了厚码保护处理</p><p>声明：本文所涉及到的漏洞均已提交CNVD，切勿做违法测试!</p><h2 id="演示"><a href="#演示" class="headerlink" title="演示"></a>演示</h2><p>首先进行环境准备，考虑到微信不能直接走系统代理，为了方便抓数据包，做了三层代理：proxypin + burpsuite + 手机网络设置<br>打开小程序抓包，选中一个商品</p><img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/3f49779d8e794ca3bbaae4f98242580.jpg" class="" title="3f49779d8e794ca3bbaae4f98242580.jpg"><p>当我们支付的时候，会GET一个&#x2F;<em><strong>&#x2F;</strong></em>&#x2F;pay.php一个请求，里面是url编码，当我们解码就可以看到我们的支付金额的位置，只需要修改成我们想要的金额，接着发包就会弹出一个二维码，支付就好了</p><img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/90bbb441dffa24cdc3fdd8981288bb0.jpg" class="" title="90bbb441dffa24cdc3fdd8981288bb0.jpg"><img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/46a15724cb0af21361d0a008431e310.jpg" class="" title="46a15724cb0af21361d0a008431e310.jpg"><img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/4edbac588f3d7c06e65bc87fe186be3.jpg" class="" title="4edbac588f3d7c06e65bc87fe186be3.jpg"><img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/4af9118c44e585f7e6a01f785c78895.jpg" class="" title="4af9118c44e585f7e6a01f785c78895.jpg"><img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/6de7f1a907df9acaddc4ab2c5cc21a5.jpg" class="" title="6de7f1a907df9acaddc4ab2c5cc21a5.jpg"><p>仅作为漏洞挖掘测试，漏洞验证后第一时间选择了退款，遵守网络安全法律</p><img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/b5330591e5a598557846d46a138f870.jpg" class="" title="b5330591e5a598557846d46a138f870.jpg"><img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/1913f76c114876f130db9cbd2cda8c0.jpg" class="" title="1913f76c114876f130db9cbd2cda8c0.jpg"><h2 id="防范措施"><a href="#防范措施" class="headerlink" title="防范措施"></a>防范措施</h2><p>从代码层面进行安全检测，存储用户密码的地方进行严格的过滤，再一个就是敏感的信息在传输过程，以及显示到网站里的时候都要进行加密，MD5加密，数据SSL加密传输，重要的数据尽可能的使用POST的提交方式进行，用户密码要使用加强的加密方式MD5+base64特殊编码的方式进行加密，对于网站的一些报错页面也要禁止掉回显</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>渗透测试</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>挖洞</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
     <title>ldap配合基于资源的约束委派</title>
     <link href="/2024/02/01/ldap%E9%85%8D%E5%90%88%E5%9F%BA%E4%BA%8E%E8%B5%84%E6%BA%90%E7%9A%84%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE/"/>
     <url>/2024/02/01/ldap%E9%85%8D%E5%90%88%E5%9F%BA%E4%BA%8E%E8%B5%84%E6%BA%90%E7%9A%84%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE/</url>
