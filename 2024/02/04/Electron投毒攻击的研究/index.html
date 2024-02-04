@@ -32,9 +32,10 @@
 <meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-39_1.png">
 <meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-42.png">
 <meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-59.png">
-<meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_11-05.png">
+<meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_11-03.png">
+<meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_11-03.png">
 <meta property="article:published_time" content="2024-02-04T07:35:54.000Z">
-<meta property="article:modified_time" content="2024-02-04T11:32:17.893Z">
+<meta property="article:modified_time" content="2024-02-04T12:56:04.207Z">
 <meta property="article:author" content="liuty">
 <meta property="article:tag" content="test">
 <meta name="twitter:card" content="summary_large_image">
@@ -336,17 +337,17 @@
 <h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-17.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_10-17.png">
 <h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>typora安装目录下的resources文件夹有一个node_modules.asar，对它进行解包</p>
 <img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-19.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_10-19.png">
-
-<img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_10-29.png">
-<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><p>然后在raven库中植入恶意代码，因为这个库会在打开typora时会被加载，这里我们通过触发计算器来模拟演示执行恶意代码的效果</p>
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_10-29.png">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><p>然后在raven库中植入恶意代码，因为这个库会在打开typora时会被加载，这里我们通过触发计算器来模拟演示执行恶意代码的效果</p>
 <img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-39_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_10-39_1.png">
-<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><p>保存后通过ASAR再打包回去<br>asar pack .&#x2F;node_modules_extract node_modules.asar<br>当我们重启typora的时候发现执行了恶意代码</p>
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>保存后通过ASAR再打包回去<br>asar pack .&#x2F;node_modules_extract node_modules.asar<br>当我们重启typora的时候发现执行了恶意代码</p>
 <img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_10-42.png">
-<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><h3 id="入口文件投毒"><a href="#入口文件投毒" class="headerlink" title="入口文件投毒"></a>入口文件投毒</h3><p>攻击者可以在应用的入口文件（如main.js等）中注入恶意代码，当应用程序启动时，这些代码会被执行。下面我以程序员常用的代码编辑器vscode来演示，找到vscode的应用配置文件package.json，通过查看main字段，发现入口文件为out目录下面的main</p>
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><h3 id="入口文件投毒"><a href="#入口文件投毒" class="headerlink" title="入口文件投毒"></a>入口文件投毒</h3><p>攻击者可以在应用的入口文件（如main.js等）中注入恶意代码，当应用程序启动时，这些代码会被执行。下面我以程序员常用的代码编辑器vscode来演示，找到vscode的应用配置文件package.json，通过查看main字段，发现入口文件为out目录下面的main</p>
 <img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-59.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_10-59.png">
-<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><p>随后我们找到out目录下面的main,并植入恶意代码，保存完同样用ASAR再打包回去，重启vscode可以发现触发了恶意代码</p>
-<img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_11-05.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_11-05.png">
-<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><h3 id="调试模式注入"><a href="#调试模式注入" class="headerlink" title="调试模式注入"></a>调试模式注入</h3><p>通过chrome的inspect功能实现在调试模式下注入恶意代码,可以直接参考开源项目：<a target="_blank" rel="noopener" href="https://github.com/djerryz/electron_shell">https://github.com/djerryz/electron_shell</a></p>
+<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>随后我们找到out目录下面的main,并植入恶意代码，保存完同样用ASAR再打包回去，重启vscode可以发现触发了恶意代码</p>
+<img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_11-03.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_11-03.png">
+<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_11-03.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_11-03.png">
+<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><h3 id="调试模式注入"><a href="#调试模式注入" class="headerlink" title="调试模式注入"></a>调试模式注入</h3><p>通过chrome的inspect功能实现在调试模式下注入恶意代码,可以直接参考开源项目：<a target="_blank" rel="noopener" href="https://github.com/djerryz/electron_shell">https://github.com/djerryz/electron_shell</a></p>
 
                 
               </div>
