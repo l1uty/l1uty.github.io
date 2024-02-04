@@ -24,8 +24,17 @@
 <meta property="og:description" content="什么是Electron？Electron是由Github开发，用HTML，CSS和JavaScript来构建跨平台桌面应用程序的一个开源库。 Electron通过将Chromium和Node.js合并到同一个运行时环境中，并将其打包为Mac，Windows和Linux系统下的应用来实现这一目的。通过Node它提供了通常浏览器所不能提供的能力。一个基础的Electron包含三个文件：package.">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/Electron_20.0.3_screenshot.png">
+<meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/20230620170908414.png">
+<meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-18.png">
+<meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-17.png">
+<meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-19.png">
+<meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-29.png">
+<meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-39_1.png">
+<meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-42.png">
+<meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-59.png">
+<meta property="og:image" content="http://example.com/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_11-05.png">
 <meta property="article:published_time" content="2024-02-04T07:35:54.000Z">
-<meta property="article:modified_time" content="2024-02-04T08:55:58.247Z">
+<meta property="article:modified_time" content="2024-02-04T11:22:16.733Z">
 <meta property="article:author" content="liuty">
 <meta property="article:tag" content="test">
 <meta name="twitter:card" content="summary_large_image">
@@ -251,7 +260,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          430 字
+          1k 字
         
       </span>
     
@@ -262,7 +271,7 @@
         
         
         
-          4 分钟
+          9 分钟
         
       </span>
     
@@ -318,6 +327,27 @@
 <p>跨域：你可以直接使用Node提供的request模块进行网络请求，这意味着你无需再被跨域所困扰</p>
 <p>强大的扩展性：借助node-ffi，为应用程序提供强大的扩展性</p>
 <img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/Electron_20.0.3_screenshot.png" srcset="/img/loading.gif" lazyload class="" title="Electron_20.0.3_screenshot.png">
+<h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>现在市面上已经有非常多的应用在使用Electron进行开发了，包括我们熟悉的VS Code客户端、GitHub客户端、Atom客户端等等</p>
+<img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/20230620170908414.png" srcset="/img/loading.gif" lazyload class="" title="20230620170908414.png">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>参考文章：<br><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/69109695">https://zhuanlan.zhihu.com/p/69109695</a><br><a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/Electron#">https://zh.wikipedia.org/wiki/Electron#</a></p>
+<h2 id="Electron投毒原理"><a href="#Electron投毒原理" class="headerlink" title="Electron投毒原理"></a>Electron投毒原理</h2><p>Electron通常是通过ASAR进行打包以及分发应用程序的。因为ASAR可以将与应用程序相关的所有文件以及目录单独打包成一个独立的文件，也就是.asar文件（通常在resources文件夹下面），所以它最大的优势在与可以在多平台运行。而Electron投毒则是通过对ASAR文件进行解包之后在源代码以及依赖中植入恶意代码，或者调试模式注入代码，从而实现恶意命令执行、植入后门木马等行为，而且Electron通常带有可信的数字签名，所以植入的恶意代码不会破坏签名校验</p>
+<h2 id="攻击常用手法"><a href="#攻击常用手法" class="headerlink" title="攻击常用手法"></a>攻击常用手法</h2><h3 id="node-modules投毒"><a href="#node-modules投毒" class="headerlink" title="node_modules投毒"></a>node_modules投毒</h3><p>通过对Electron应用程序中的node_modules依赖项中植入恶意代码，应用程序运行时会被加载并执行恶意操作，接下来我以typora为例，typora为例是一款非常好用的markdown编辑器</p>
+<img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-18.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_10-18.png">
+
+<img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-17.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_10-17.png">
+<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>typora安装目录下的resources文件夹有一个node_modules.asar，对它进行解包</p>
+<img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-19.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_10-19.png">
+
+<img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_10-29.png">
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>然后在raven库中植入恶意代码，因为这个库会在打开typora时会被加载，这里我们通过触发计算器来模拟演示执行恶意代码的效果</p>
+<img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-39_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_10-39_1.png">
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><p>保存后通过ASAR再打包回去<br>asar pack .&#x2F;node_modules_extract node_modules.asar<br>当我们重启typora的时候发现执行了恶意代码</p>
+<img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_10-42.png">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><h3 id="入口文件投毒"><a href="#入口文件投毒" class="headerlink" title="入口文件投毒"></a>入口文件投毒</h3><p>攻击者可以在应用的入口文件（如main.js等）中注入恶意代码，当应用程序启动时，这些代码会被执行。下面我以程序员常用的代码编辑器vscode来演示，找到vscode的应用配置文件package.json，通过查看main字段，发现入口文件为out目录下面的main</p>
+<img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_10-59.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_10-59.png">
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>随后我们找到out目录下面的main,并植入恶意代码，保存完同样用ASAR再打包回去，重启vscode可以发现触发了恶意代码</p>
+<img src="/2024/02/04/Electron%E6%8A%95%E6%AF%92%E6%94%BB%E5%87%BB%E7%9A%84%E7%A0%94%E7%A9%B6/2024-02-04_11-05.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-04_11-05.png">
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><h3 id="调试模式注入"><a href="#调试模式注入" class="headerlink" title="调试模式注入"></a>调试模式注入</h3><p>通过chrome的inspect功能实现在调试模式下注入恶意代码,可以直接参考开源项目：<a target="_blank" rel="noopener" href="https://github.com/djerryz/electron_shell">https://github.com/djerryz/electron_shell</a></p>
 
                 
               </div>
