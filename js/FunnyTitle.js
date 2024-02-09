@@ -4,7 +4,7 @@
  document.addEventListener('visibilitychange', function () {
      if (document.hidden) {
          $('[rel="icon"]').attr('href', "/img/trhx2.png");
-         document.title = 'ヽ(●-`Д´-)ノ就这么走了？';
+         document.title = '(●-`Д´-)就这么走了？';
          clearTimeout(titleTime);
      }
      else {
