@@ -42,7 +42,7 @@
 <meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_15-07.png">
 <meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_15-09.png">
 <meta property="article:published_time" content="2024-02-13T13:07:44.000Z">
-<meta property="article:modified_time" content="2024-02-13T15:05:14.307Z">
+<meta property="article:modified_time" content="2024-02-13T15:12:55.033Z">
 <meta property="article:author" content="liuty">
 <meta property="article:tag" content="漏洞总结">
 <meta name="twitter:card" content="summary_large_image">
@@ -363,7 +363,7 @@
 <img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_14-57_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-13_14-57_1.png">
 <h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><p>从对抗的层面上，不建议将逃逸的行为当成可以写入宿主机特定文件 (如 &#x2F;etc&#x2F;cron*, &#x2F;root&#x2F;.ssh&#x2F;authorized_keys 等文件) 的行为，应该根据目标选择更趋近与业务行为的手法</p>
 <h4 id="挂载宿主机-procfs-逃逸"><a href="#挂载宿主机-procfs-逃逸" class="headerlink" title="挂载宿主机 procfs 逃逸"></a>挂载宿主机 procfs 逃逸</h4><p>挂载宿主机 procfs 逃逸,其本质上因为宿主机挂载了procfs,导致我们可以像宿主机内写入一段恶意的payload,比如反弹shell,然后利用代码制造崩溃,触发内存转储,就会执行我们恶意的payload</p>
-<p>Procfs 是进程文件系统的缩写，包含一个伪文件系统（启动时动态生成的文件系统），用于通过内核访问进程信息。linux这个文件系统通常被挂载到 &#x2F;proc 目录。由于 &#x2F;proc 不是一个真正的文件系统(概念参考本文2.1.12节)，它也就不占用存储空间，只是占用有限的内存。&#x2F;proc中的文件可以被修改，但一般不可以被删除</p>
+<p>Procfs 是进程文件系统的缩写，包含一个伪文件系统（启动时动态生成的文件系统），用于通过内核访问进程信息。linux这个文件系统通常被挂载到 &#x2F;proc 目录。由于 &#x2F;proc 不是一个真正的文件系统，它也就不占用存储空间，只是占用有限的内存。&#x2F;proc中的文件可以被修改，但一般不可以被删除</p>
 <img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/561614e85933b4d01a5dbf10d2715922.png" srcset="/img/loading.gif" lazyload class="" title="561614e85933b4d01a5dbf10d2715922.png">
 <h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>如果返回了两个 core_pattern 文件，那么很可能就是挂载了宿主机的 procfs</p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros"><span class="hljs-built_in">find</span> / -name core_pattern<br></code></pre></td></tr></table></figure>
