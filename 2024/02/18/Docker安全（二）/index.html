@@ -54,7 +54,7 @@
 <meta property="og:image" content="http://example.com/2024/02/18/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%BA%8C%EF%BC%89/2024-02-18_14-32.png">
 <meta property="og:image" content="http://example.com/2024/02/18/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%BA%8C%EF%BC%89/2024-02-17_23-00.png">
 <meta property="article:published_time" content="2024-02-18T05:31:32.000Z">
-<meta property="article:modified_time" content="2024-02-18T06:42:23.960Z">
+<meta property="article:modified_time" content="2024-02-18T06:44:51.333Z">
 <meta property="article:author" content="liuty">
 <meta property="article:tag" content="漏洞总结">
 <meta name="twitter:card" content="summary_large_image">
@@ -415,7 +415,7 @@
 <p>利用的限制：<br>1、第一个字节不可修改，并且单次写入不能大于 4k<br>2、只能单纯覆盖，不能调整文件大小<br>3、由于漏洞基于内存页，所以不会对磁盘有影响</p>
 <h3 id="与Docker的关系"><a href="#与Docker的关系" class="headerlink" title="与Docker的关系"></a>与Docker的关系</h3><p>由于 Docker 和宿主机是共享内核，尽管与其他进程资源是隔离开的，内核漏洞也很可能会对 Docker 容器造成安全问题<br>对于容器的影响：<br>假设我们有两个容器：liu1和liu2，由于 Docker 本质上是由一组互相重叠的层所组层的，然后容器引擎将其合并到一起，原本这些层都是只读的，但由于脏管道漏洞的影响，我们可以在 liu1 容器里修改 &#x2F;etc&#x2F;passwd 使得 liu2 容器的 &#x2F;etc&#x2F;passwd 被修改</p>
 <img src="/2024/02/18/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%BA%8C%EF%BC%89/2024-02-17_11-13.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-17_11-13.png">
-<h6 id="-20"><a href="#-20" class="headerlink" title=""></a></h6><h2 id="docker用户组特性导致的权限提升"><a href="#docker用户组特性导致的权限提升" class="headerlink" title="docker用户组特性导致的权限提升"></a>docker用户组特性导致的权限提升</h2><p>Docker 需要 root 权限才能跑起来,其运行的所有命令都是需要 sudo 来运行，因此 Docker 监护进程有一个特性，它能被允许访问 root 用户或者是在 docker 组里面的所有用户，这就如同拥有 root 的访问权限。简而言之,如果我们拿到了一个docker组内用户的权限,就可以提升到root权限</p>
+<h6 id="-20"><a href="#-20" class="headerlink" title=""></a></h6><h2 id="docker用户组提权"><a href="#docker用户组提权" class="headerlink" title="docker用户组提权"></a>docker用户组提权</h2><p>Docker 需要 root 权限才能跑起来,其运行的所有命令都是需要 sudo 来运行，因此 Docker 监护进程有一个特性，它能被允许访问 root 用户或者是在 docker 组里面的所有用户，这就如同拥有 root 的访问权限。简而言之,如果我们拿到了一个docker组内用户的权限,就可以提升到root权限</p>
 <h3 id="漏洞复现-2"><a href="#漏洞复现-2" class="headerlink" title="漏洞复现"></a>漏洞复现</h3><p>如果一个服务器有一个普通的用户，并且这个用户加入了 docker 组，则这个用户已经是 root 了<br>方法一：<br>环境搭建</p>
 <figure class="highlight mipsasm"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs mipsasm"><span class="hljs-keyword">adduser </span><span class="hljs-keyword">joker</span><br><span class="hljs-keyword"></span>usermod -G docker <span class="hljs-keyword">joker</span><br><span class="hljs-keyword"></span>newgrp docker<br></code></pre></td></tr></table></figure>
 <img src="/2024/02/18/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%BA%8C%EF%BC%89/2024-02-17_15-03.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-17_15-03.png">
