@@ -37,7 +37,7 @@
 <meta property="og:image" content="http://example.com/2024/03/03/fastjson%E6%BC%8F%E6%B4%9E%E6%80%BB%E7%BB%93/2024-03-03_20-36.png">
 <meta property="og:image" content="http://example.com/2024/03/03/fastjson%E6%BC%8F%E6%B4%9E%E6%80%BB%E7%BB%93/2024-03-03_20-50.png">
 <meta property="article:published_time" content="2024-03-03T13:15:38.000Z">
-<meta property="article:modified_time" content="2024-03-03T15:44:10.317Z">
+<meta property="article:modified_time" content="2024-03-03T15:48:05.130Z">
 <meta property="article:author" content="liuty">
 <meta property="article:tag" content="漏洞总结">
 <meta name="twitter:card" content="summary_large_image">
@@ -328,7 +328,7 @@
 <figure class="highlight prolog"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs prolog">&#123;<br>        <span class="hljs-string">&quot;name&quot;</span>:<span class="hljs-string">&quot;LiutyBlog&quot;</span>,<br>        <span class="hljs-string">&quot;age&quot;</span>:<span class="hljs-number">23</span>,<br>        <span class="hljs-string">&quot;media&quot;</span>:[<span class="hljs-string">&quot;CSDN&quot;</span>,<span class="hljs-string">&quot;bilibili&quot;</span>,<span class="hljs-string">&quot;Github&quot;</span>]<br>&#125;<br></code></pre></td></tr></table></figure>
 <img src="/2024/03/03/fastjson%E6%BC%8F%E6%B4%9E%E6%80%BB%E7%BB%93/2024-03-03_21-02.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-03_21-02.png">
 <h6 id=""><a href="#" class="headerlink" title=""></a></h6><h2 id="相关概念"><a href="#相关概念" class="headerlink" title="相关概念"></a>相关概念</h2><p>在进行fastjson的漏洞复现学习之前需要了解几个概念</p>
-<h3 id="JNDI"><a href="#JNDI" class="headerlink" title="JNDI"></a>JNDI</h3><p>JNDI (Java Naming and Directory Interface)是一组应用程序接口，提供了查找和访问命名和目录服务的通用、统一的接口，用于定位网络、用户、对象和服务等资源，是J2EE规范中是重要的规范之一。（可以理解为JNDI在J2EE中是一台交换机，将组件、资源、服务取了名字，再通过名字来查找）JNDI底层支持RMI远程对象，JNDI接口可以访问和调用RMI注册过的服务，JNDI根据名字动态加载数据，支持的服务有DNS、LDAP、CORBA、RMI</p>
+<h3 id="JNDI"><a href="#JNDI" class="headerlink" title="JNDI"></a>JNDI</h3><p>JNDI是一组应用程序接口，提供了查找和访问命名和目录服务的通用、统一的接口，用于定位网络、用户、对象和服务等资源，是J2EE规范中是重要的规范之一，JNDI底层支持RMI远程对象，JNDI接口可以访问和调用RMI注册过的服务，JNDI根据名字动态加载数据，支持的服务有DNS、LDAP、CORBA、RMI</p>
 <h3 id="JNDI注入"><a href="#JNDI注入" class="headerlink" title="JNDI注入"></a>JNDI注入</h3><p>简单来说，JNDI接口在初始化时，可以将RMI URL作为参数传入，而JNDI注入就出现在客户端的lookup()函数中，如果lookup()的参数可控就可能被攻击，例如</p>
 <figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs haxe">Hashtable env = <span class="hljs-keyword">new</span><span class="hljs-type">Hashtable</span>();<br>env.put(Context.INITIAL_CONTEXT_FACTORY, <span class="hljs-string">&quot;com.sun.jndi.rmi.registry.RegistryContextFactory&quot;</span>);<br><span class="hljs-comment">//com.sun.jndi.rmi.registry.RegistryContextFactory 是RMI Registry Service Provider对应的Factory</span><br>env.put(Context.PROVIDER_URL, <span class="hljs-string">&quot;rmi://liuty_ip:8080&quot;</span>);<br>Context ctx = <span class="hljs-keyword">new</span><span class="hljs-type">InitialContext</span>(env);<br>Object local_obj = ctx.lookup(<span class="hljs-string">&quot;rmi://liuty_ip:8080/test&quot;</span>);<br></code></pre></td></tr></table></figure>
 
