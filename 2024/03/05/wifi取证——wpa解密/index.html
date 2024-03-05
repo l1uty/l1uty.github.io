@@ -16,41 +16,34 @@
   <meta name="author" content="liuty">
   <meta name="keywords" content="">
   
-    <meta name="description" content="前言Downloader是一类计算机病毒程序，按照国际上的病毒命名惯例为“Trojan-Downloader”一类，这类木马程序的主要内容为：指引中毒用户的计算机到攻击者指定的url地址去下载更多的病毒文件并运行，使得攻击者获得更大操作权限  拿到样本，可以从这几个角度入手： 字符串：有几率可以获得程序功能相关的提示查壳：查看程序是否有进行加密加壳压缩等PE文件格式：从PE头中可以获取程序的一些信">
+    <meta name="description" content="好久没碰CTF了，闲来无事，最近刷了刷题找找手感 拿到题目之后可以看到，有三个文件，一个服务器流量包（pcapng），一个客户端流量包(cap)，一个内存镜像；首先先看服务器流量，在第27个数据包中发现了上传木马  并且通过预览数据包可以基本判断为哥斯拉的php_eval_xor_base64流量，通过追踪一下该数据流，可以发现一串密文  我们拿去解密  拿到了shell的连接密码:pass，这就">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Downloader病毒样本分析">
-<meta property="og:url" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/index.html">
+<meta property="og:title" content="Wifi取证——WPA解密">
+<meta property="og:url" content="http://example.com/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/index.html">
 <meta property="og:site_name" content="liuty&#39;s blog">
-<meta property="og:description" content="前言Downloader是一类计算机病毒程序，按照国际上的病毒命名惯例为“Trojan-Downloader”一类，这类木马程序的主要内容为：指引中毒用户的计算机到攻击者指定的url地址去下载更多的病毒文件并运行，使得攻击者获得更大操作权限  拿到样本，可以从这几个角度入手： 字符串：有几率可以获得程序功能相关的提示查壳：查看程序是否有进行加密加壳压缩等PE文件格式：从PE头中可以获取程序的一些信">
+<meta property="og:description" content="好久没碰CTF了，闲来无事，最近刷了刷题找找手感 拿到题目之后可以看到，有三个文件，一个服务器流量包（pcapng），一个客户端流量包(cap)，一个内存镜像；首先先看服务器流量，在第27个数据包中发现了上传木马  并且通过预览数据包可以基本判断为哥斯拉的php_eval_xor_base64流量，通过追踪一下该数据流，可以发现一串密文  我们拿去解密  拿到了shell的连接密码:pass，这就">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_11-06.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_12-42.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_12-42_1.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_12-43.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_12-50.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_12-48.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_13-01.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_13-09.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_13-13.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_13-28.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_14-03.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_14-06.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_14-34.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_14-41.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_14-54.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_14-59.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_15-09.png">
-<meta property="og:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_15-15.png">
-<meta property="article:published_time" content="2024-03-04T07:18:51.000Z">
-<meta property="article:modified_time" content="2024-03-04T08:21:04.713Z">
+<meta property="og:image" content="http://example.com/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/1.jpg">
+<meta property="og:image" content="http://example.com/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/2.png">
+<meta property="og:image" content="http://example.com/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/3.png">
+<meta property="og:image" content="http://example.com/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/4.jpg">
+<meta property="og:image" content="http://example.com/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/5.jpg">
+<meta property="og:image" content="http://example.com/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/6.jpg">
+<meta property="og:image" content="http://example.com/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/7.png">
+<meta property="og:image" content="http://example.com/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/8.jpg">
+<meta property="og:image" content="http://example.com/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/9.png">
+<meta property="og:image" content="http://example.com/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/10.png">
+<meta property="og:image" content="http://example.com/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/12.png">
+<meta property="article:published_time" content="2024-03-05T10:47:22.000Z">
+<meta property="article:modified_time" content="2024-03-05T11:08:22.630Z">
 <meta property="article:author" content="liuty">
-<meta property="article:tag" content="样本分析">
+<meta property="article:tag" content="电子取证">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_11-06.png">
+<meta name="twitter:image" content="http://example.com/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/1.jpg">
   
   
   
-  <title>Downloader病毒样本分析 - liuty&#39;s blog</title>
+  <title>Wifi取证——WPA解密 - liuty&#39;s blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -244,7 +237,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="Downloader病毒样本分析"></span>
+            <span id="subtitle" data-typed-text="Wifi取证——WPA解密"></span>
           
         </div>
 
@@ -255,8 +248,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-03-04 15:18" pubdate>
-          2024年3月4日 下午
+        <time datetime="2024-03-05 18:47" pubdate>
+          2024年3月5日 晚上
         </time>
       </span>
     
@@ -267,7 +260,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          1.1k 字
+          589 字
         
       </span>
     
@@ -278,7 +271,7 @@
         
         
         
-          10 分钟
+          5 分钟
         
       </span>
     
@@ -323,49 +316,37 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">Downloader病毒样本分析</h1>
+            <h1 id="seo-header">Wifi取证——WPA解密</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Downloader是一类计算机病毒程序，按照国际上的病毒命名惯例为“Trojan-Downloader”一类，这类木马程序的主要内容为：指引中毒用户的计算机到攻击者指定的url地址去下载更多的病毒文件并运行，使得攻击者获得更大操作权限</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_11-06.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_11-06.png">
-<h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>拿到样本，可以从这几个角度入手：</p>
-<p>字符串：有几率可以获得程序功能相关的提示<br>查壳：查看程序是否有进行加密加壳压缩等<br>PE文件格式：从PE头中可以获取程序的一些信息，例如编译信息、空间要求等<br>链接库和函数：从程序的链接库中可以初步推断程序的功能，查看DLL，导入表</p>
-<h2 id="样本分析"><a href="#样本分析" class="headerlink" title="样本分析"></a>样本分析</h2><h3 id="基础分析"><a href="#基础分析" class="headerlink" title="基础分析"></a>基础分析</h3><p>分析PE格式与查壳，发现无壳，编译时间是2002-05-09，算是比较老的一个病毒样本，是个GUI程序</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_12-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_12-42.png">
-<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>分析字符串，除了调用的函数名和动态链接库之外，字符串里包含了以下关键信息：<br>一个网址：dload.ipbill.com，还有个URI：<a target="_blank" rel="noopener" href="http://dload.ipbill.com/del/cmb_211826.exe">http://dload.ipbill.com/del/cmb_211826.exe</a><br>还有HTTP请求头的字符串<br>文件相关：c:\dialler.exe<br>可以认为结合这些内容可以初步猜测，该程序会从网站上下载一个文件cmb_211826.exe，保存到C:\dialler.exe</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_12-42_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_12-42_1.png">
-<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>分析相关函数，发现了有文件操作相关API：WriteFile和CreateFile,应该是写入文件的，还有个CreateThread，应该用来创建功能线程使用，ShellExecuteA，用来执行下载的程序，到这里已经可以摸清一个大概行为了，这个程序的功能就是从网上下载一个exe执行</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_12-43.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_12-43.png">
-<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><h3 id="逆向分析"><a href="#逆向分析" class="headerlink" title="逆向分析"></a>逆向分析</h3><h4 id="定位关键函数"><a href="#定位关键函数" class="headerlink" title="定位关键函数"></a>定位关键函数</h4><p>首先是程序OEP：程序首先是通过xor eax,eax的操作将eax赋值为0，然后四个push分别将0入栈，最后通过call sub_401499这里。从反汇编代码中，可以看到并没有将返回地址入栈的操作，程序其实是通过call执行此操作的，call指令我们可以理解为函数调用，call指令后面会跟一个地址，这里是sub_401499表示call会跳转到401499这个地址，这里调用了主函数，然后执行完之后退出进程，参数是4个0</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_12-50.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_12-50.png">
-<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_12-48.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_12-48.png">
-<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><p>进入主程序sub_401499：功能还是很简单的，是常见的注册窗口类，创建窗口，创建成功就进入消息循环，否则就退出程序，这一层没啥恶意行为出现，但是调用了两个自写函数</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_13-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_13-01.png">
-<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>第一个自写函数sub_401437功能就是注册窗口类，然后接着就返回</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_13-09.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_13-09.png">
-<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><p>第二个自写函数sub_4013A3：这个函数首先是查询了一个系统参数，然后调用CreateWindowExA去创建窗口，如果创建失败就返回，创建成功后接着往下跑</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_13-13.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_13-13.png">
-<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>窗口创建成功之后，调用ShowWindow显示窗口，然后调用CreateThread创建了一个线程，线程函数是这个StartAddress，嗯..就觉得这个线程怪怪的</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_13-28.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_13-28.png">
-<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><h4 id="下载行为分析"><a href="#下载行为分析" class="headerlink" title="下载行为分析"></a>下载行为分析</h4><p>持续追踪这个线程函数，可以发现它首先调用了一个自写函数sub_401068，功能是从指定URI下载内容，保存到缓冲区</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_14-03.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_14-03.png">
-<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><p>随后分析这个子函数发现，只是一些循环操作，不明白是什么意思，估计可能应该是延时的目的</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_14-06.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_14-06.png">
-<h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><p>往下分析发现开始初始化Windows的Socket，并初始化socket连接用的参数，端口地址，网络地址，随后去判断这个网络地址是否存活，成功了就向下跳转</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_14-34.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_14-34.png">
-<h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><p>后面就是发送数据了，不难发现，发送一个GET的HTTP请求，请求的地址应该就是那个exe的URL</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_14-41.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_14-41.png">
-<h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><p>看到最后可以发现，接收服务器返回的数据时，会将数据保存参数里，并且接收的长度也保存了进来</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_14-54.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_14-54.png">
-<h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><h4 id="创建文件行为分析"><a href="#创建文件行为分析" class="headerlink" title="创建文件行为分析"></a>创建文件行为分析</h4><p>再往下定位就是这里，这里的功能是定位接收缓冲区里需要写入到文件的位置</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_14-59.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_14-59.png">
-<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><p>定位完要写入的位置之后，紧接着就是创建文件和写入文件了，写入位置是C:\dialler.exe</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_15-09.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_15-09.png">
-<h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><h4 id="执行文件行为分析"><a href="#执行文件行为分析" class="headerlink" title="执行文件行为分析"></a>执行文件行为分析</h4><p>最后调用的是ShellExecuteA，并打开这个文件，参数是REFID，工作目录是C:\</p>
-<img src="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-03-04_15-15.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-04_15-15.png">
-<h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6>
+                <p>好久没碰CTF了，闲来无事，最近刷了刷题找找手感</p>
+<p>拿到题目之后可以看到，有三个文件，一个服务器流量包（pcapng），一个客户端流量包(cap)，一个内存镜像；首先先看服务器流量，在第27个数据包中发现了上传木马</p>
+<img src="/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/1.jpg" srcset="/img/loading.gif" lazyload class="" title="1.jpg">
+<h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>并且通过预览数据包可以基本判断为哥斯拉的php_eval_xor_base64流量，通过追踪一下该数据流，可以发现一串密文</p>
+<img src="/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/2.png" srcset="/img/loading.gif" lazyload class="" title="2.png">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>我们拿去解密</p>
+<img src="/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/3.png" srcset="/img/loading.gif" lazyload class="" title="3.png">
+<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>拿到了shell的连接密码:pass，这就更加证实了我的推断，因为哥斯拉的默认连接密码就是pass，还有一个key，一会可能会用的到，先做好记录；随后看了一下客户端流量（.cap），发现做了WPA加密，想解密的话，需要找到SSID和密码，而我们通过已知的数据包可以看到SSID，SSID为My_Wifi</p>
+<img src="/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/4.jpg" srcset="/img/loading.gif" lazyload class="" title="4.jpg">
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>其他的再无可利用的信息，然后我们去取证分析一下那个内存镜像文件，看看能不能找到一些有价值的东西，是个win7</p>
+<img src="/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/5.jpg" srcset="/img/loading.gif" lazyload class="" title="5.jpg">
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><p>去找一下My_Wifi相关文件，发现有一个zip压缩包文件，我们将他提取出来</p>
+<img src="/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/6.jpg" srcset="/img/loading.gif" lazyload class="" title="6.jpg">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><p>提取出来之后，尝试解压，发现需要密码，并且密码提示说是网卡的GUID，而我们知道windows操作系统中网卡的GUID和接口Interfaces绑定，于是我们过滤关键字“Interfaces”进行文件搜索</p>
+<img src="/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/7.png" srcset="/img/loading.gif" lazyload class="" title="7.png">
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>得到了GUID：{529B7D2A-05D1-4F21-A001-8F4FF817FC3A}，也就得到了压缩包的密码，我们尝试进行解压，解压成功，解压出来了一个xml文件，在xml文件里扒到了SSID和密码</p>
+<img src="/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/8.jpg" srcset="/img/loading.gif" lazyload class="" title="8.jpg">
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><p>拿到SSID和密码之后，我们就可以进行Airdecap-ng进行无线攻击破解</p>
+<img src="/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/9.png" srcset="/img/loading.gif" lazyload class="" title="9.png">
+<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>破解之后就会出现一个全新的数据包，在最后一个tcp数据流的末尾找到了一串新的密文</p>
+<img src="/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/10.png" srcset="/img/loading.gif" lazyload class="" title="10.png">
+<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>再加上前面我们已经获取到哥斯拉的key，所以只需要对这一串密文进行哥斯拉解密，就可以拿到flag<br>解密脚本：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">encode</span>(<span class="hljs-params"><span class="hljs-variable">$D</span>,<span class="hljs-variable">$K</span></span>)</span>&#123;<br>    <span class="hljs-keyword">for</span>(<span class="hljs-variable">$i</span>=<span class="hljs-number">0</span>;<span class="hljs-variable">$i</span>&lt;<span class="hljs-title function_ invoke__">strlen</span>(<span class="hljs-variable">$D</span>);<span class="hljs-variable">$i</span>++) &#123;<br>        <span class="hljs-variable">$c</span> = <span class="hljs-variable">$K</span>[<span class="hljs-variable">$i</span>+<span class="hljs-number">1</span>&amp;<span class="hljs-number">15</span>];<br>        <span class="hljs-variable">$D</span>[<span class="hljs-variable">$i</span>] = <span class="hljs-variable">$D</span>[<span class="hljs-variable">$i</span>]^<span class="hljs-variable">$c</span>;<br>    &#125;<br>    <span class="hljs-keyword">return</span> <span class="hljs-variable">$D</span>;<br>&#125;<br><br><span class="hljs-variable">$key</span>=<span class="hljs-string">&#x27;3c6e0b8a9c15224a&#x27;</span>;<br><span class="hljs-variable">$key1</span>=<span class="hljs-string">&quot;密文&quot;</span>;<br><span class="hljs-variable">$str</span>=<span class="hljs-title function_ invoke__">substr</span>(<span class="hljs-variable">$key1</span>,<span class="hljs-number">16</span>,-<span class="hljs-number">16</span>);<br><span class="hljs-variable">$str</span>=<span class="hljs-title function_ invoke__">gzdecode</span>(<span class="hljs-title function_ invoke__">encode</span>(<span class="hljs-title function_ invoke__">base64_decode</span>(<span class="hljs-variable">$str</span>),<span class="hljs-variable">$key</span>));<br><span class="hljs-keyword">echo</span> <span class="hljs-variable">$str</span>;<br> <span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+<p>解密即可拿到flag</p>
+<img src="/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/12.png" srcset="/img/loading.gif" lazyload class="" title="12.png">
+
                 
               </div>
             
@@ -383,7 +364,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E9%80%86%E5%90%91%E5%B7%A5%E7%A8%8B/" class="category-chain-item">逆向工程</a>
+  <a href="/categories/CTF/" class="category-chain-item">CTF</a>
   
   
 
@@ -398,7 +379,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/" class="print-no-link">#样本分析</a>
+        <a href="/tags/%E7%94%B5%E5%AD%90%E5%8F%96%E8%AF%81/" class="print-no-link">#电子取证</a>
       
     </div>
   
@@ -410,8 +391,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>Downloader病毒样本分析</div>
-      <div>http://example.com/2024/03/04/Downloader病毒样本分析/</div>
+      <div>Wifi取证——WPA解密</div>
+      <div>http://example.com/2024/03/05/wifi取证——wpa解密/</div>
     </div>
     <div class="license-meta">
       
@@ -423,7 +404,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年3月4日</div>
+          <div>2024年3月5日</div>
         </div>
       
       
@@ -455,18 +436,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/" title="Wifi取证——WPA解密">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">Wifi取证——WPA解密</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/03/03/fastjson%E6%BC%8F%E6%B4%9E%E6%80%BB%E7%BB%93/" title="fastjson漏洞总结">
-                        <span class="hidden-mobile">fastjson漏洞总结</span>
+                      <a href="/2024/03/04/Downloader%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/" title="Downloader病毒样本分析">
+                        <span class="hidden-mobile">Downloader病毒样本分析</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
