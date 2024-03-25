@@ -1,0 +1,866 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="liuty">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言聊到取证，可以分为活取证和死取证，我们通常所说的活取证是指在主机存活时发现系统被入侵,直接快速的把机器的运行内存dump下来，对运行内存进行分析取证，手机犯罪证据；而死取证通常是指对机器的磁盘做镜像之后分析的取证方法，用于在关机后制作硬盘镜像,通过分析镜像来做取证工作，相比于死取证,活取证是更加的重要,能够获取到当前系统第一手资料与证据,对于整个案件起到了至关重要的作用。一般情况下，在案件现场">
+<meta property="og:type" content="article">
+<meta property="og:title" content="取证闲谈">
+<meta property="og:url" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/index.html">
+<meta property="og:site_name" content="liuty&#39;s blog">
+<meta property="og:description" content="前言聊到取证，可以分为活取证和死取证，我们通常所说的活取证是指在主机存活时发现系统被入侵,直接快速的把机器的运行内存dump下来，对运行内存进行分析取证，手机犯罪证据；而死取证通常是指对机器的磁盘做镜像之后分析的取证方法，用于在关机后制作硬盘镜像,通过分析镜像来做取证工作，相比于死取证,活取证是更加的重要,能够获取到当前系统第一手资料与证据,对于整个案件起到了至关重要的作用。一般情况下，在案件现场">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-37.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-38.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_11-46.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_13-01.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-01.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-25.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-28.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-29.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-31.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-33.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-34.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-42.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-44.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-45.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-47.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-48.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-50.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-14.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_11-09.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_11-21.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_19-57.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_11-27.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-54.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_19-42.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_11-00.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24_17-41.png">
+<meta property="article:published_time" content="2024-03-25T07:13:02.000Z">
+<meta property="article:modified_time" content="2024-03-25T12:45:52.851Z">
+<meta property="article:author" content="liuty">
+<meta property="article:tag" content="电子取证">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-37.png">
+  
+  
+  
+  <title>取证闲谈 - liuty&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":90,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"hCaWnJI7fVuWUvqb3FgzqfKD-gzGzoHsz","app_key":"NJZ1v4tGwTre1rcW3Qdw1WYU","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>liuty&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="取证闲谈"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-03-25 15:13" pubdate>
+          2024年3月25日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          21 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">取证闲谈</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>聊到取证，可以分为活取证和死取证，我们通常所说的活取证是指在主机存活时发现系统被入侵,直接快速的把机器的运行内存dump下来，对运行内存进行分析取证，手机犯罪证据；而死取证通常是指对机器的磁盘做镜像之后分析的取证方法，用于在关机后制作硬盘镜像,通过分析镜像来做取证工作，相比于死取证,活取证是更加的重要,能够获取到当前系统第一手资料与证据,对于整个案件起到了至关重要的作用。一般情况下，在案件现场中，大多数还是windows系统的普通机器，不论是个人笔记本还是办公机房主机等等，但是涉案如果是服务器，则大多数可能以linux系统为主，并且如果现场涉案机器是关机状态下直接做磁盘镜像等操作就可以，但如果是开机状态下，在保护现场的情况下，还要考虑提取系统的网络、进程等数据，以及制作内存镜像等操作</p>
+<h2 id="Linux服务器取证"><a href="#Linux服务器取证" class="headerlink" title="Linux服务器取证"></a>Linux服务器取证</h2><p>首先需要提取系统的网络，进程，日志等数据</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs stylus">提取所有的IPv4、v6数据：lsof -i&gt;lsof-<span class="hljs-selector-tag">i</span><span class="hljs-selector-class">.txt</span><br>提取所有的进程数据：lsof -K&gt;lsof-K<span class="hljs-selector-class">.txt</span><br>截获当前正在运行的机器<span class="hljs-number">1000</span>帧（根据实际情况而定）数据包：tcpdump -<span class="hljs-selector-tag">i</span> any -c <span class="hljs-number">1000</span> -w capture01.cap<br></code></pre></td></tr></table></figure>
+
+<h6 id=""><a href="#" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-37.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_10-37.png">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-38.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_10-38.png">
+<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs arcade">打包/<span class="hljs-keyword">var</span>/<span class="hljs-built_in">log</span>下的所有数据：tar -zcPf <span class="hljs-keyword">var</span>-<span class="hljs-built_in">log</span>.tar /<span class="hljs-keyword">var</span>/<span class="hljs-built_in">log</span><span class="hljs-comment">/*</span><br><span class="hljs-comment">打包root用户：tar -zcPf bash-history.tar /root/.bash_history</span><br></code></pre></td></tr></table></figure>
+
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>然后需要采集设备的内存镜像，如果是CentOS,Red Hat系列的Linux系统，推荐使用LiME，它是是一种可加载的内核模块（LKM），如果是Debian和Ubuntu系列的Linux系统，推荐使用fmem<br>LiME下载地址：<a target="_blank" rel="noopener" href="https://github.com/504ensicsLabs/LiME">https://github.com/504ensicsLabs/LiME</a><br>fmem下载地址：<a target="_blank" rel="noopener" href="https://github.com/NateBrune/fmem">https://github.com/NateBrune/fmem</a></p>
+
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_11-46.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_11-46.png">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><p>最后制作设备的磁盘镜像，可以使用dd进行制作，不过dd只能做raw格式的镜像文件，并且需要考虑磁盘的剩余空间，如果空间不足可以保存到外置的USB设备里面</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">1、本地取数据<br><br>fdisk -l    <span class="hljs-comment"># 查看磁盘及分区</span><br><span class="hljs-built_in">dd</span> <span class="hljs-keyword">if</span>=需要拷贝的磁盘 of=/存储目录/镜像文件 （确保存储目录有足够的空间） <span class="hljs-comment"># 获取整个磁盘镜像文件</span><br><br>2、远程取硬盘数据<br><br><span class="hljs-comment"># 取证机器 B 上运行</span><br>nc -l -p 4445 | <span class="hljs-built_in">dd</span> of=/tmp/sda2.<span class="hljs-built_in">dd</span><br><br><span class="hljs-comment"># 受害机器 A 上执行传输，即可完成从受害机器 A 克隆 sda 硬盘到取证机器 B 的任务：</span><br><span class="hljs-built_in">dd</span> <span class="hljs-keyword">if</span>=/dev/sda2 | nc 192.168.10.11 4445<br></code></pre></td></tr></table></figure>
+
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>也可以使用ftkimager，可以制作DD和E01格式的镜像文件<br>工具下载地址<a target="_blank" rel="noopener" href="https://accessdata.com/product-download">https://accessdata.com/product-download</a></p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_13-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_13-01.png">
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><h2 id="内存取证"><a href="#内存取证" class="headerlink" title="内存取证"></a>内存取证</h2><p>接下来聊聊内存取证，获取到物理内存之后,接下来的工作就是要对镜像文件进行取证分析，从中提取有用的证据，常使用的工具是Volatility，Volatility是一款开源的，并且基于Python开发的内存取证工具集，可以分析内存中的各种数据，Volatility支持对32位或64位Wnidows、Linux、Mac、Android操作系统的RAM数据进行提取与分析，下面是一些常用的命令参数</p>
+<p>imageinfo：识别操作系统、服务包以及硬件架构（32位或64位），并且还能收集DTB地址和样本收集的时间等</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_14-01.png">
+<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>kpcrscan：扫描潜在的KPCR（内核进程控制区域）结构，在多核系统中，每个处理器都有自己的KPCR，所以通过kpcrscan，可以看到每个处理器的详细信息，包括IDT（中断描述符表）和GDT（全局描述符表）地址；以及当前、空闲和下一个线程；CPU编号、供应商和速度；以及CR3值等等</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-25.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_14-25.png">
+<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>pslist：可以提取系统中的进程，这个命令会遍历由 PsActiveProcessHead指向的双向链表，并显示进程的偏移量、进程名称、进程ID、父进程ID、线程数量、句柄数量以及进程启动和退出的日期&#x2F;时间等</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-28.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_14-28.png">
+<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><p>psscan：可以枚举进程，不过和pslist相比，可以找到之前已终止（非活动）的进程以及被rootkit隐藏或解除链接的进程</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_14-29.png">
+<h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><p>dlllist：提取进程加载的DLL列表</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-31.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_14-31.png">
+<h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><p>getsids：可以查看与进程关联的SID（安全标识符），可以帮助识别恶意提升权限的进程以及属于特定用户的进程</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-33.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_14-33.png">
+<h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><p>cmdscan：用于了解攻击者在受害者系统上的行为</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-34.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_14-34.png">
+<h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><p>consoles：用于查找攻击者在cmd.exe中输入或通过后门执行的命令，相比于cmdscan，不仅打印出攻击者输入的命令，还可以收集整个屏幕缓冲区（输入和输出）</p>
+
+<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><p>modscan：可以扫描物理内存中的池标记来查找 LDR_DATA_TABLE_ENTRY结构，有助于捕获之前卸载的驱动程序以及被rootkits隐藏&#x2F;解除链接的驱动程序</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_14-42.png">
+<h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><p>filescan：用于查找文件</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-44.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_14-44.png">
+<h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6><p>connections：可以查看在内存获取时处于活动状态的TCP连接</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-45.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_14-45.png">
+<h6 id="-18"><a href="#-18" class="headerlink" title=""></a></h6><p>hivescan：查找内存中注册表文件的物理地址</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-47.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_14-47.png">
+<h6 id="-19"><a href="#-19" class="headerlink" title=""></a></h6><p>hivelist：用于定位内存中注册表文件的虚拟地址以及相应文件在磁盘上的完整路径</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-48.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_14-48.png">
+<h6 id="-20"><a href="#-20" class="headerlink" title=""></a></h6><p>printkey：提取注册表键中的子键、值、数据和数据类型</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-50.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_14-50.png">
+<h6 id="-21"><a href="#-21" class="headerlink" title=""></a></h6><p>总之，Volatility命令参数很多，功能强大，不再一一演示</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br></pre></td><td class="code"><pre><code class="hljs routeros">Usage: Volatility - A memory forensics analysis platform.<br><br>Options:<br>  -h, --help            list all available options <span class="hljs-keyword">and</span> their<span class="hljs-built_in"> default </span>values.<br>                       <span class="hljs-built_in"> Default </span>values may be <span class="hljs-built_in">set</span> <span class="hljs-keyword">in</span> the configuration file<br>                        (/etc/volatilityrc)<br>  <span class="hljs-attribute">--conf-file</span>=/home/liuty/.volatilityrc<br>                       <span class="hljs-built_in"> User </span>based configuration file<br>  -d, --<span class="hljs-built_in">debug</span>           <span class="hljs-built_in">Debug</span> volatility<br>  <span class="hljs-attribute">--plugins</span>=PLUGINS     Additional plugin directories <span class="hljs-keyword">to</span> use (colon separated)<br>  --<span class="hljs-built_in">info</span>                <span class="hljs-built_in">Print</span> information about all registered objects<br>  <span class="hljs-attribute">--cache-directory</span>=/home/liuty/.cache/volatility<br>                        Directory where cache files are stored<br>  --cache               Use caching<br>  <span class="hljs-attribute">--tz</span>=TZ               Sets the (Olson) timezone <span class="hljs-keyword">for</span> displaying timestamps<br>                        using pytz (<span class="hljs-keyword">if</span> installed) <span class="hljs-keyword">or</span> tzset<br>  -f FILENAME, <span class="hljs-attribute">--filename</span>=FILENAME<br>                        Filename <span class="hljs-keyword">to</span> use when opening an image<br>  <span class="hljs-attribute">--profile</span>=WinXPSP2x86<br>                        Name of the<span class="hljs-built_in"> profile </span><span class="hljs-keyword">to</span> load (use --<span class="hljs-built_in">info</span> <span class="hljs-keyword">to</span> see a list<br>                        of supported profiles)<br>  -l LOCATION, <span class="hljs-attribute">--location</span>=LOCATION<br>                        A URN location <span class="hljs-keyword">from</span> which <span class="hljs-keyword">to</span> load an<span class="hljs-built_in"> address </span>space<br>  -w, --write           <span class="hljs-built_in">Enable</span> write support<br>  <span class="hljs-attribute">--dtb</span>=DTB             DTB<span class="hljs-built_in"> Address</span><br><span class="hljs-built_in"></span>  <span class="hljs-attribute">--shift</span>=SHIFT         Mac KASLR shift<span class="hljs-built_in"> address</span><br><span class="hljs-built_in"></span>  <span class="hljs-attribute">--output</span>=text         Output <span class="hljs-keyword">in</span> this format (support is module specific, see<br>                        the Module Output Options below)<br>  <span class="hljs-attribute">--output-file</span>=OUTPUT_FILE<br>                        Write output <span class="hljs-keyword">in</span> this file<br>  -v, --verbose         Verbose information<br>  <span class="hljs-attribute">--physical_shift</span>=PHYSICAL_SHIFT<br>                        Linux kernel physical shift<span class="hljs-built_in"> address</span><br><span class="hljs-built_in"></span>  <span class="hljs-attribute">--virtual_shift</span>=VIRTUAL_SHIFT<br>                        Linux kernel virtual shift<span class="hljs-built_in"> address</span><br><span class="hljs-built_in"></span>  -g KDBG, <span class="hljs-attribute">--kdbg</span>=KDBG  Specify a KDBG virtual<span class="hljs-built_in"> address </span>(Note: <span class="hljs-keyword">for</span> 64-bit<br>                        Windows 8 <span class="hljs-keyword">and</span> above this is the<span class="hljs-built_in"> address </span>of<br>                        KdCopyDataBlock)<br>  --force               Force utilization of suspect<span class="hljs-built_in"> profile</span><br><span class="hljs-built_in"></span>  <span class="hljs-attribute">--cookie</span>=COOKIE       Specify the<span class="hljs-built_in"> address </span>of nt!ObHeaderCookie (valid <span class="hljs-keyword">for</span><br>                        Windows 10 only)<br>  -k KPCR, <span class="hljs-attribute">--kpcr</span>=KPCR  Specify a specific KPCR<span class="hljs-built_in"> address</span><br><span class="hljs-built_in"></span><br>        Supported Plugin Commands:<br><br>                amcache         <span class="hljs-built_in">Print</span> AmCache information<br>                apihooks        Detect API hooks <span class="hljs-keyword">in</span> process <span class="hljs-keyword">and</span> kernel memory<br>                atoms           <span class="hljs-built_in">Print</span> session <span class="hljs-keyword">and</span> window station atom tables<br>                atomscan       <span class="hljs-built_in"> Pool </span>scanner <span class="hljs-keyword">for</span> atom tables<br>                auditpol        Prints out the Audit Policies <span class="hljs-keyword">from</span> HKLM\SECURITY\Policy\PolAdtEv<br>                bigpools        Dump the big<span class="hljs-built_in"> page </span>pools using BigPagePoolScanner<br>                bioskbd         Reads the keyboard buffer <span class="hljs-keyword">from</span> Real Mode memory<br>                cachedump       Dumps cached domain hashes <span class="hljs-keyword">from</span> memory<br>                callbacks       <span class="hljs-built_in">Print</span> system-wide notification routines<br>                clipboard       Extract the contents of the windows clipboard<br>                cmdline         Display process command-line arguments<br>                cmdscan         Extract command history by scanning <span class="hljs-keyword">for</span> _COMMAND_HISTORY<br>                connections     <span class="hljs-built_in">Print</span> list of open connections [Windows XP <span class="hljs-keyword">and</span> 2003 Only]<br>                connscan       <span class="hljs-built_in"> Pool </span>scanner <span class="hljs-keyword">for</span> tcp connections<br>                consoles        Extract command history by scanning <span class="hljs-keyword">for</span> _CONSOLE_INFORMATION<br>                crashinfo       Dump crash-dump information<br>                deskscan        Poolscaner <span class="hljs-keyword">for</span> tagDESKTOP (desktops)<br>                devicetree      Show device tree<br>                dlldump         Dump DLLs <span class="hljs-keyword">from</span> a process<span class="hljs-built_in"> address </span>space<br>                dlllist         <span class="hljs-built_in">Print</span> list of loaded dlls <span class="hljs-keyword">for</span> each process<br>                driverirp       Driver IRP hook detection<br>                drivermodule    Associate driver objects <span class="hljs-keyword">to</span> kernel modules<br>                driverscan     <span class="hljs-built_in"> Pool </span>scanner <span class="hljs-keyword">for</span> driver objects<br>                dumpcerts       Dump RSA private <span class="hljs-keyword">and</span> public SSL keys<br>                dumpfiles       Extract memory mapped <span class="hljs-keyword">and</span> cached files<br>                dumpregistry    Dumps registry files out <span class="hljs-keyword">to</span> disk<br>                editbox         Displays information about <span class="hljs-built_in">Edit</span> controls. (Listbox experimental.)<br>                envars          Display process environment variables<br>                eventhooks      <span class="hljs-built_in">Print</span> details on windows event hooks<br>                evtlogs         Extract Windows Event Logs (XP/2003 only)<br>                filescan       <span class="hljs-built_in"> Pool </span>scanner <span class="hljs-keyword">for</span> file objects<br>                gahti           Dump the<span class="hljs-built_in"> USER </span>handle<span class="hljs-built_in"> type </span>information<br>                gditimers       <span class="hljs-built_in">Print</span> installed GDI timers <span class="hljs-keyword">and</span> callbacks<br>                gdt             Display Global Descriptor Table<br>                getservicesids  <span class="hljs-built_in">Get</span> the names of services <span class="hljs-keyword">in</span> the Registry <span class="hljs-keyword">and</span> return Calculated SID<br>                getsids         <span class="hljs-built_in">Print</span> the SIDs owning each process<br>                handles         <span class="hljs-built_in">Print</span> list of open handles <span class="hljs-keyword">for</span> each process<br>                hashdump        Dumps passwords hashes (LM/NTLM) <span class="hljs-keyword">from</span> memory<br>                hibinfo         Dump hibernation file information<br>                hivedump        Prints out a hive<br>                hivelist        <span class="hljs-built_in">Print</span> list of registry hives.<br>                hivescan       <span class="hljs-built_in"> Pool </span>scanner <span class="hljs-keyword">for</span> registry hives<br>                hpakextract     Extract physical memory <span class="hljs-keyword">from</span> an HPAK file<br>                hpakinfo        <span class="hljs-built_in">Info</span> on an HPAK file<br>                idt             Display Interrupt Descriptor Table<br>                iehistory       Reconstruct Internet Explorer cache / history<br>                imagecopy       Copies a physical<span class="hljs-built_in"> address </span>space out as a<span class="hljs-built_in"> raw </span>DD image<br>                imageinfo       Identify information <span class="hljs-keyword">for</span> the image<br>                impscan         Scan <span class="hljs-keyword">for</span> calls <span class="hljs-keyword">to</span> imported functions<br>                joblinks        <span class="hljs-built_in">Print</span> process job link information<br>                kdbgscan        Search <span class="hljs-keyword">for</span> <span class="hljs-keyword">and</span> dump potential KDBG values<br>                kpcrscan        Search <span class="hljs-keyword">for</span> <span class="hljs-keyword">and</span> dump potential KPCR values<br>                ldrmodules      Detect unlinked DLLs<br>                lsadump         Dump (decrypted) LSA secrets <span class="hljs-keyword">from</span> the registry<br>                machoinfo       Dump Mach-O file format information<br>                malfind         <span class="hljs-built_in">Find</span> hidden <span class="hljs-keyword">and</span> injected code<br>                mbrparser       Scans <span class="hljs-keyword">for</span> <span class="hljs-keyword">and</span> parses potential Master Boot Records (MBRs)<br>                memdump         Dump the addressable memory <span class="hljs-keyword">for</span> a process<br>                memmap          <span class="hljs-built_in">Print</span> the memory map<br>                messagehooks    List desktop <span class="hljs-keyword">and</span> thread window message hooks<br>                mftparser       Scans <span class="hljs-keyword">for</span> <span class="hljs-keyword">and</span> parses potential MFT entries<br>                moddump         Dump a kernel driver <span class="hljs-keyword">to</span> an executable file sample<br>                modscan        <span class="hljs-built_in"> Pool </span>scanner <span class="hljs-keyword">for</span> kernel modules<br>                modules         <span class="hljs-built_in">Print</span> list of loaded modules<br>                multiscan       Scan <span class="hljs-keyword">for</span> various objects at once<br>                mutantscan     <span class="hljs-built_in"> Pool </span>scanner <span class="hljs-keyword">for</span> mutex objects<br>                notepad         List currently displayed notepad text<br>                objtypescan     Scan <span class="hljs-keyword">for</span> Windows object<span class="hljs-built_in"> type </span>objects<br>                patcher         Patches memory based on<span class="hljs-built_in"> page </span>scans<br>                poolpeek        Configurable<span class="hljs-built_in"> pool </span>scanner plugin<br>                printkey        <span class="hljs-built_in">Print</span> a registry key, <span class="hljs-keyword">and</span> its subkeys <span class="hljs-keyword">and</span> values<br>                privs           Display process privileges<br>                procdump        Dump a process <span class="hljs-keyword">to</span> an executable file sample<br>                pslist          <span class="hljs-built_in">Print</span> all running processes by following the EPROCESS lists<br>                psscan         <span class="hljs-built_in"> Pool </span>scanner <span class="hljs-keyword">for</span> process objects<br>                pstree          <span class="hljs-built_in">Print</span> process list as a tree<br>                psxview         <span class="hljs-built_in">Find</span> hidden processes with various process listings<br>                qemuinfo        Dump Qemu information<br>                raw2dmp         Converts a physical memory sample <span class="hljs-keyword">to</span> a windbg crash dump<br>                screenshot      Save a pseudo-screenshot based on GDI windows<br>                servicediff     List Windows services (ala Plugx)<br>                sessions        List details on _MM_SESSION_SPACE (user logon sessions)<br>                shellbags       Prints ShellBags <span class="hljs-built_in">info</span><br>                shimcache       Parses the Application Compatibility Shim Cache registry key<br>                shutdowntime    <span class="hljs-built_in">Print</span> ShutdownTime of machine <span class="hljs-keyword">from</span> registry<br>                sockets         <span class="hljs-built_in">Print</span> list of open sockets<br>                sockscan       <span class="hljs-built_in"> Pool </span>scanner <span class="hljs-keyword">for</span> tcp socket objects<br>                ssdt            Display SSDT entries<br>                strings         Match physical offsets <span class="hljs-keyword">to</span> virtual addresses (may take a <span class="hljs-keyword">while</span>, VERY verbose)<br>                svcscan         Scan <span class="hljs-keyword">for</span> Windows services<br>                symlinkscan    <span class="hljs-built_in"> Pool </span>scanner <span class="hljs-keyword">for</span> symlink objects<br>                thrdscan       <span class="hljs-built_in"> Pool </span>scanner <span class="hljs-keyword">for</span> thread objects<br>                threads         Investigate _ETHREAD <span class="hljs-keyword">and</span> _KTHREADs<br>                timeliner       Creates a timeline <span class="hljs-keyword">from</span> various artifacts <span class="hljs-keyword">in</span> memory<br>                timers          <span class="hljs-built_in">Print</span> kernel timers <span class="hljs-keyword">and</span> associated module DPCs<br>                truecryptmaster Recover TrueCrypt 7.1a Master Keys<br>                truecryptpassphrase     TrueCrypt Cached Passphrase Finder<br>                truecryptsummary        TrueCrypt Summary<br>                unloadedmodules <span class="hljs-built_in">Print</span> list of unloaded modules<br>                userassist      <span class="hljs-built_in">Print</span> userassist registry keys <span class="hljs-keyword">and</span> information<br>                userhandles     Dump the<span class="hljs-built_in"> USER </span>handle tables<br>                vaddump         Dumps out the vad sections <span class="hljs-keyword">to</span> a file<br>                vadinfo         Dump the VAD <span class="hljs-built_in">info</span><br>                vadtree         Walk the VAD tree <span class="hljs-keyword">and</span> display <span class="hljs-keyword">in</span> tree format<br>                vadwalk         Walk the VAD tree<br>                vboxinfo        Dump virtualbox information<br>                verinfo         Prints out the version information <span class="hljs-keyword">from</span> PE images<br>                vmwareinfo      Dump VMware VMSS/VMSN information<br>                volshell        Shell <span class="hljs-keyword">in</span> the memory image<br>                windows         <span class="hljs-built_in">Print</span> Desktop Windows (verbose details)<br>                wintree         <span class="hljs-built_in">Print</span> Z-Order Desktop Windows Tree<br>                wndscan        <span class="hljs-built_in"> Pool </span>scanner <span class="hljs-keyword">for</span> window stations<br>                yarascan        Scan process <span class="hljs-keyword">or</span> kernel memory with Yara signatures<br></code></pre></td></tr></table></figure>
+<h2 id="USB流量数据取证"><a href="#USB流量数据取证" class="headerlink" title="USB流量数据取证"></a>USB流量数据取证</h2><p>关于鼠标流量取证，每个数据包的数据区有四个字节。第一个字节代表按钮。取0x00时，表示没有按钮。为0x01时，表示左键，当它是0x02时，表示当前按钮是右键，第二个字节可以被认为是带符号的字节类型，最高位是符号位，当该值为正时，表示鼠标水平向右移动多少像素，当它为负数时，表示向左移动了多少像素。第三个字节类似于第二个字节，代表垂直向上和向下移动的偏移量，我们可以先看一个数据包</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-14.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_10-14.png">
+<h6 id="-22"><a href="#-22" class="headerlink" title=""></a></h6><p>可以看到认证等的信息，我们也可以从里面看到这个设备的信息，应该是罗技的鼠标，然后我们用tshark对usb数据进行提取</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stylus">tshark -r capture<span class="hljs-selector-class">.pcapng</span> -T fields -e usb<span class="hljs-selector-class">.capdata</span> &gt; data2.txt<br></code></pre></td></tr></table></figure>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_11-09.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_11-09.png">
+<h6 id="-23"><a href="#-23" class="headerlink" title=""></a></h6><p>可以看到数据是四个字节的，那么我们基本可以判断是usb鼠标流量，然后将第二个和第三个字节转换为坐标，并生成一个坐标文件</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_11-21.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_11-21.png">
+<h6 id="-24"><a href="#-24" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_19-57.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_19-57.png">
+<h6 id="-25"><a href="#-25" class="headerlink" title=""></a></h6><p>最后将数据绘制到 Gnuplot 中，就可以复原鼠标行动轨迹</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_11-27.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_11-27.png">
+<h6 id="-26"><a href="#-26" class="headerlink" title=""></a></h6><p>当然对于鼠标usb的取证也有一些脚本可以使用，比如 <a target="_blank" rel="noopener" href="https://github.com/WangYihang/UsbMiceDataHacker">https://github.com/WangYihang/UsbMiceDataHacker</a></p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-54.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_10-54.png">
+<h6 id="-27"><a href="#-27" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_19-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_19-42.png">
+<h6 id="-28"><a href="#-28" class="headerlink" title=""></a></h6><p>对于键盘流量取证，键盘数据包的数据长度为8个字节，和击键信息被集中在第三个字节，每次key stroke都会产生一个keyboard event usb packet,通过下面这张图可以找到这个值与具体键位的对应关系</p>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_11-00.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_11-00.png">
+<h6 id="-29"><a href="#-29" class="headerlink" title=""></a></h6><h2 id="windows系统下Bitlocker加密问题"><a href="#windows系统下Bitlocker加密问题" class="headerlink" title="windows系统下Bitlocker加密问题"></a>windows系统下Bitlocker加密问题</h2><p>Windows专业版&#x2F;企业版&#x2F;教育版的操作系统支持开启和使用Bitlocker加密，而家庭版不支持，不过家庭版可以通过”设备加密”那里启动磁盘保护，启动Bitlocker的方式为：控制面板-&gt;Bitlocker驱动器加密-&gt;启用Bitlocker</p>
+
+<h6 id="-30"><a href="#-30" class="headerlink" title=""></a></h6><p>对于加密，有三种解锁方式可选，分别是使用密码解锁、使用智能卡解锁以及在此计算机上自动解锁，不过有些系统版本只显示两种，比如我的</p>
+
+<h6 id="-31"><a href="#-31" class="headerlink" title=""></a></h6>
+<h6 id="-32"><a href="#-32" class="headerlink" title=""></a></h6><p>Bitlocker加密后的表现，会显示有一把锁标志</p>
+
+<h6 id="-33"><a href="#-33" class="headerlink" title=""></a></h6><p>如果想查属于哪种加密类型，可通过manage-bde管理工具来查看Bitlocker保护类型</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs fortran">manage-bde-<span class="hljs-keyword">status</span> x:<br></code></pre></td></tr></table></figure>
+
+<h6 id="-34"><a href="#-34" class="headerlink" title=""></a></h6><p>被Bitlocker保护的驱动器，其DBR特征非常明显，通过XWF或者winhex可查看标志头位，典型特征：“FVE-FS”</p>
+
+<h6 id="-35"><a href="#-35" class="headerlink" title=""></a></h6><p>而不同磁盘的标志头位是”NTFS”</p>
+
+<h6 id="-36"><a href="#-36" class="headerlink" title=""></a></h6><p>对于启用Bitlocker保护的硬盘在进行证据固定时不可做全盘镜像，因为做下来的镜像还是加密状态，如果以物理驱动器的方式将整块硬盘添加到案件中，是可以明显看到硬盘处于Bitlocker加密状态</p>
+
+<h6 id="-37"><a href="#-37" class="headerlink" title=""></a></h6>
+<h6 id="-38"><a href="#-38" class="headerlink" title=""></a></h6><p>但是如果以添加逻辑驱动器的形式将分区添加到案件中，是可以解析出完整的分区结构和目录的，所以在不知道密码或者恢复密钥的情况下，是无法对硬盘镜像进行解密的</p>
+
+<h6 id="-39"><a href="#-39" class="headerlink" title=""></a></h6><p>那我们怎么得到恢复密钥？在系统下可直接使用manage-bde将加密卷的恢复密钥读取出来</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">manage-bde -protectors -<span class="hljs-built_in">get</span> x:<br></code></pre></td></tr></table></figure>
+
+<h6 id="-40"><a href="#-40" class="headerlink" title=""></a></h6><p>有时候，常规手段不行那就上强度，爆破！推荐Passware Kit Forensic</p>
+
+<h6 id="-41"><a href="#-41" class="headerlink" title=""></a></h6>
+<h6 id="-42"><a href="#-42" class="headerlink" title=""></a></h6>
+<h6 id="-43"><a href="#-43" class="headerlink" title=""></a></h6><p>或者也可以从内存中提取密钥，假设一个情况，涉案机器处于开机状态且允许进入桌面，这个时候内存中会包含大量有价值的数据，比如软件进程，网络连接情况还有历史系统命令操作记录等等，易失性数据要优先固定留存，方便后面的取证工作，这个时候我们通过分析内存镜像尝试寻找Bitlocker的密钥数据，可以借助Elcomsoft Forensic Disk Decryptor工具，它支持导出内存镜像中的各种密钥数据，当然也可以直接进行破解任务</p>
+
+<h6 id="-44"><a href="#-44" class="headerlink" title=""></a></h6>
+<h6 id="-45"><a href="#-45" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24_17-41.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24_17-41.png">
+<h6 id="-46"><a href="#-46" class="headerlink" title=""></a></h6>
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%95%B0%E5%AD%97%E5%8F%96%E8%AF%81/" class="category-chain-item">数字取证</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E7%94%B5%E5%AD%90%E5%8F%96%E8%AF%81/" class="print-no-link">#电子取证</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>取证闲谈</div>
+      <div>http://example.com/2024/03/25/取证闲谈/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>liuty</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年3月25日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="一次通过组合拳拿到cookie的学习记录">
+                        <span class="hidden-mobile">一次通过组合拳拿到cookie的学习记录</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"hCaWnJI7fVuWUvqb3FgzqfKD-gzGzoHsz","appKey":"NJZ1v4tGwTre1rcW3Qdw1WYU","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://l1uty.github.io/" target="_blank" rel="nofollow noopener"><span>liuty</span></a> <i class="iconfont icon-love"></i> <a href="https://www.mps.gov.cn/" target="_blank" rel="nofollow noopener"><span>???</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         次
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <script type="text/javascript" src="\js\FunnyTitle.js"></script>
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/diy/love.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+
+  <link rel="stylesheet" href="/dist/APlayer.min.css">
+  <div id="aplayer"></div>
+  <script type="text/javascript" src="/dist/APlayer.min.js"></script>
+  <script type="text/javascript" src="/dist/music.js"></script>
+
+  <script type="text/javascript"
+color="220,220,220" opacity='0.7' zIndex="-2" count="200" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js">
+  </script>
+
+  <script type="text/javascript" src="\js\snow.js"></script>
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
