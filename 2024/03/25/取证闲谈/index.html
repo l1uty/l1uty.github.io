@@ -23,9 +23,13 @@
 <meta property="og:site_name" content="liuty&#39;s blog">
 <meta property="og:description" content="前言聊到取证，可以分为活取证和死取证，我们通常所说的活取证是指在主机存活时发现系统被入侵,直接快速的把机器的运行内存dump下来，对运行内存进行分析取证，手机犯罪证据；而死取证通常是指对机器的磁盘做镜像之后分析的取证方法，用于在关机后制作硬盘镜像,通过分析镜像来做取证工作，相比于死取证,活取证是更加的重要,能够获取到当前系统第一手资料与证据,对于整个案件起到了至关重要的作用。一般情况下，在案件现场">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-203116.png">
 <meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-37.png">
 <meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-38.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-203321.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-203510.png">
 <meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_11-46.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25-125841.png">
 <meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_13-01.png">
 <meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-01.png">
 <meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_14-25.png">
@@ -48,13 +52,29 @@
 <meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-54.png">
 <meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_19-42.png">
 <meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_11-00.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-160737.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-160838.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-160938.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-161223.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-161343.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-170846.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-170907.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-171406.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-171456.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-171820.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-172013.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-172619.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-172634.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-172656.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-173156.png">
+<meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-173302.png">
 <meta property="og:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24_17-41.png">
 <meta property="article:published_time" content="2024-03-25T07:13:02.000Z">
-<meta property="article:modified_time" content="2024-03-25T12:45:52.851Z">
+<meta property="article:modified_time" content="2024-03-25T13:04:18.841Z">
 <meta property="article:author" content="liuty">
 <meta property="article:tag" content="电子取证">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-37.png">
+<meta name="twitter:image" content="http://example.com/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-203116.png">
   
   
   
@@ -339,17 +359,17 @@
                 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>聊到取证，可以分为活取证和死取证，我们通常所说的活取证是指在主机存活时发现系统被入侵,直接快速的把机器的运行内存dump下来，对运行内存进行分析取证，手机犯罪证据；而死取证通常是指对机器的磁盘做镜像之后分析的取证方法，用于在关机后制作硬盘镜像,通过分析镜像来做取证工作，相比于死取证,活取证是更加的重要,能够获取到当前系统第一手资料与证据,对于整个案件起到了至关重要的作用。一般情况下，在案件现场中，大多数还是windows系统的普通机器，不论是个人笔记本还是办公机房主机等等，但是涉案如果是服务器，则大多数可能以linux系统为主，并且如果现场涉案机器是关机状态下直接做磁盘镜像等操作就可以，但如果是开机状态下，在保护现场的情况下，还要考虑提取系统的网络、进程等数据，以及制作内存镜像等操作</p>
 <h2 id="Linux服务器取证"><a href="#Linux服务器取证" class="headerlink" title="Linux服务器取证"></a>Linux服务器取证</h2><p>首先需要提取系统的网络，进程，日志等数据</p>
 <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs stylus">提取所有的IPv4、v6数据：lsof -i&gt;lsof-<span class="hljs-selector-tag">i</span><span class="hljs-selector-class">.txt</span><br>提取所有的进程数据：lsof -K&gt;lsof-K<span class="hljs-selector-class">.txt</span><br>截获当前正在运行的机器<span class="hljs-number">1000</span>帧（根据实际情况而定）数据包：tcpdump -<span class="hljs-selector-tag">i</span> any -c <span class="hljs-number">1000</span> -w capture01.cap<br></code></pre></td></tr></table></figure>
-
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-203116.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-203116.png">
 <h6 id=""><a href="#" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-37.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_10-37.png">
 <h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_10-38.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_10-38.png">
 <h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs arcade">打包/<span class="hljs-keyword">var</span>/<span class="hljs-built_in">log</span>下的所有数据：tar -zcPf <span class="hljs-keyword">var</span>-<span class="hljs-built_in">log</span>.tar /<span class="hljs-keyword">var</span>/<span class="hljs-built_in">log</span><span class="hljs-comment">/*</span><br><span class="hljs-comment">打包root用户：tar -zcPf bash-history.tar /root/.bash_history</span><br></code></pre></td></tr></table></figure>
-
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-203321.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-203321.png">
 <h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>然后需要采集设备的内存镜像，如果是CentOS,Red Hat系列的Linux系统，推荐使用LiME，它是是一种可加载的内核模块（LKM），如果是Debian和Ubuntu系列的Linux系统，推荐使用fmem<br>LiME下载地址：<a target="_blank" rel="noopener" href="https://github.com/504ensicsLabs/LiME">https://github.com/504ensicsLabs/LiME</a><br>fmem下载地址：<a target="_blank" rel="noopener" href="https://github.com/NateBrune/fmem">https://github.com/NateBrune/fmem</a></p>
-
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-203510.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-203510.png">
 <h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_11-46.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_11-46.png">
 <h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><p>最后制作设备的磁盘镜像，可以使用dd进行制作，不过dd只能做raw格式的镜像文件，并且需要考虑磁盘的剩余空间，如果空间不足可以保存到外置的USB设备里面</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><code class="hljs bash">1、本地取数据<br><br>fdisk -l    <span class="hljs-comment"># 查看磁盘及分区</span><br><span class="hljs-built_in">dd</span> <span class="hljs-keyword">if</span>=需要拷贝的磁盘 of=/存储目录/镜像文件 （确保存储目录有足够的空间） <span class="hljs-comment"># 获取整个磁盘镜像文件</span><br><br>2、远程取硬盘数据<br><br><span class="hljs-comment"># 取证机器 B 上运行</span><br>nc -l -p 4445 | <span class="hljs-built_in">dd</span> of=/tmp/sda2.<span class="hljs-built_in">dd</span><br><br><span class="hljs-comment"># 受害机器 A 上执行传输，即可完成从受害机器 A 克隆 sda 硬盘到取证机器 B 的任务：</span><br><span class="hljs-built_in">dd</span> <span class="hljs-keyword">if</span>=/dev/sda2 | nc 192.168.10.11 4445<br></code></pre></td></tr></table></figure>
-
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25-125841.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25-125841.png">
 <h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>也可以使用ftkimager，可以制作DD和E01格式的镜像文件<br>工具下载地址<a target="_blank" rel="noopener" href="https://accessdata.com/product-download">https://accessdata.com/product-download</a></p>
 <img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_13-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_13-01.png">
 <h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><h2 id="内存取证"><a href="#内存取证" class="headerlink" title="内存取证"></a>内存取证</h2><p>接下来聊聊内存取证，获取到物理内存之后,接下来的工作就是要对镜像文件进行取证分析，从中提取有用的证据，常使用的工具是Volatility，Volatility是一款开源的，并且基于Python开发的内存取证工具集，可以分析内存中的各种数据，Volatility支持对32位或64位Wnidows、Linux、Mac、Android操作系统的RAM数据进行提取与分析，下面是一些常用的命令参数</p>
@@ -399,34 +419,34 @@
 <h6 id="-28"><a href="#-28" class="headerlink" title=""></a></h6><p>对于键盘流量取证，键盘数据包的数据长度为8个字节，和击键信息被集中在第三个字节，每次key stroke都会产生一个keyboard event usb packet,通过下面这张图可以找到这个值与具体键位的对应关系</p>
 <img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-25_11-00.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-25_11-00.png">
 <h6 id="-29"><a href="#-29" class="headerlink" title=""></a></h6><h2 id="windows系统下Bitlocker加密问题"><a href="#windows系统下Bitlocker加密问题" class="headerlink" title="windows系统下Bitlocker加密问题"></a>windows系统下Bitlocker加密问题</h2><p>Windows专业版&#x2F;企业版&#x2F;教育版的操作系统支持开启和使用Bitlocker加密，而家庭版不支持，不过家庭版可以通过”设备加密”那里启动磁盘保护，启动Bitlocker的方式为：控制面板-&gt;Bitlocker驱动器加密-&gt;启用Bitlocker</p>
-
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-160737.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-160737.png">
 <h6 id="-30"><a href="#-30" class="headerlink" title=""></a></h6><p>对于加密，有三种解锁方式可选，分别是使用密码解锁、使用智能卡解锁以及在此计算机上自动解锁，不过有些系统版本只显示两种，比如我的</p>
-
-<h6 id="-31"><a href="#-31" class="headerlink" title=""></a></h6>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-160838.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-160838.png">
+<h6 id="-31"><a href="#-31" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-160938.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-160938.png">
 <h6 id="-32"><a href="#-32" class="headerlink" title=""></a></h6><p>Bitlocker加密后的表现，会显示有一把锁标志</p>
-
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-161223.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-161223.png">
 <h6 id="-33"><a href="#-33" class="headerlink" title=""></a></h6><p>如果想查属于哪种加密类型，可通过manage-bde管理工具来查看Bitlocker保护类型</p>
 <figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs fortran">manage-bde-<span class="hljs-keyword">status</span> x:<br></code></pre></td></tr></table></figure>
-
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-161343.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-161343.png">
 <h6 id="-34"><a href="#-34" class="headerlink" title=""></a></h6><p>被Bitlocker保护的驱动器，其DBR特征非常明显，通过XWF或者winhex可查看标志头位，典型特征：“FVE-FS”</p>
-
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-170846.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-170846.png">
 <h6 id="-35"><a href="#-35" class="headerlink" title=""></a></h6><p>而不同磁盘的标志头位是”NTFS”</p>
-
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-170907.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-170907.png">
 <h6 id="-36"><a href="#-36" class="headerlink" title=""></a></h6><p>对于启用Bitlocker保护的硬盘在进行证据固定时不可做全盘镜像，因为做下来的镜像还是加密状态，如果以物理驱动器的方式将整块硬盘添加到案件中，是可以明显看到硬盘处于Bitlocker加密状态</p>
-
-<h6 id="-37"><a href="#-37" class="headerlink" title=""></a></h6>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-171406.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-171406.png">
+<h6 id="-37"><a href="#-37" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-171456.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-171456.png">
 <h6 id="-38"><a href="#-38" class="headerlink" title=""></a></h6><p>但是如果以添加逻辑驱动器的形式将分区添加到案件中，是可以解析出完整的分区结构和目录的，所以在不知道密码或者恢复密钥的情况下，是无法对硬盘镜像进行解密的</p>
-
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-171820.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-171820.png">
 <h6 id="-39"><a href="#-39" class="headerlink" title=""></a></h6><p>那我们怎么得到恢复密钥？在系统下可直接使用manage-bde将加密卷的恢复密钥读取出来</p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">manage-bde -protectors -<span class="hljs-built_in">get</span> x:<br></code></pre></td></tr></table></figure>
-
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-172013.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-172013.png">
 <h6 id="-40"><a href="#-40" class="headerlink" title=""></a></h6><p>有时候，常规手段不行那就上强度，爆破！推荐Passware Kit Forensic</p>
-
-<h6 id="-41"><a href="#-41" class="headerlink" title=""></a></h6>
-<h6 id="-42"><a href="#-42" class="headerlink" title=""></a></h6>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-172619.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-172619.png">
+<h6 id="-41"><a href="#-41" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-172634.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-172634.png">
+<h6 id="-42"><a href="#-42" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-172656.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-172656.png">
 <h6 id="-43"><a href="#-43" class="headerlink" title=""></a></h6><p>或者也可以从内存中提取密钥，假设一个情况，涉案机器处于开机状态且允许进入桌面，这个时候内存中会包含大量有价值的数据，比如软件进程，网络连接情况还有历史系统命令操作记录等等，易失性数据要优先固定留存，方便后面的取证工作，这个时候我们通过分析内存镜像尝试寻找Bitlocker的密钥数据，可以借助Elcomsoft Forensic Disk Decryptor工具，它支持导出内存镜像中的各种密钥数据，当然也可以直接进行破解任务</p>
-
-<h6 id="-44"><a href="#-44" class="headerlink" title=""></a></h6>
+<img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-173156.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-173156.png">
+<h6 id="-44"><a href="#-44" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24-173302.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24-173302.png">
 <h6 id="-45"><a href="#-45" class="headerlink" title=""></a></h6><img src="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/2024-03-24_17-41.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-24_17-41.png">
 <h6 id="-46"><a href="#-46" class="headerlink" title=""></a></h6>
                 
