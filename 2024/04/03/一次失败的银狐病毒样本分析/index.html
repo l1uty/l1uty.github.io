@@ -16,12 +16,12 @@
   <meta name="author" content="liuty">
   <meta name="keywords" content="">
   
-    <meta name="description" content="样本基本信息：银狐组织的木马病毒（银狐病毒）  样本的主要行为是从一个可疑的地址下载文件并执行  通过对其网络连接以及流量抓包可知，该程序下载了5个文件   其实，直接通过分析病毒样本，也可以发现该下载行为，从指定的url处分别下载一个exe,一个dat,一个jpg，一个xml,所以这个所谓的“财会人员薪资补贴调整新政策所需材料.exe”文件其实为为木马释放器，并非为直接木马   下载下来以便进行">
+    <meta name="description" content="样本基本信息：银狐组织的木马病毒（银狐病毒）  样本的主要行为是从一个可疑的地址下载文件并执行  通过对其网络连接以及流量抓包可知，该程序下载了5个文件   其实，直接通过分析病毒样本，也可以发现该下载行为，从指定的url处分别下载一个exe,一个dat,一个jpg，一个xml，所以这个所谓的“财会人员薪资补贴调整新政策所需材料.exe”文件其实为为木马释放器，并非为直接木马   下载下来以便进行">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一次失败的银狐病毒样本分析">
 <meta property="og:url" content="http://example.com/2024/04/03/%E4%B8%80%E6%AC%A1%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%93%B6%E7%8B%90%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/index.html">
 <meta property="og:site_name" content="liuty&#39;s blog">
-<meta property="og:description" content="样本基本信息：银狐组织的木马病毒（银狐病毒）  样本的主要行为是从一个可疑的地址下载文件并执行  通过对其网络连接以及流量抓包可知，该程序下载了5个文件   其实，直接通过分析病毒样本，也可以发现该下载行为，从指定的url处分别下载一个exe,一个dat,一个jpg，一个xml,所以这个所谓的“财会人员薪资补贴调整新政策所需材料.exe”文件其实为为木马释放器，并非为直接木马   下载下来以便进行">
+<meta property="og:description" content="样本基本信息：银狐组织的木马病毒（银狐病毒）  样本的主要行为是从一个可疑的地址下载文件并执行  通过对其网络连接以及流量抓包可知，该程序下载了5个文件   其实，直接通过分析病毒样本，也可以发现该下载行为，从指定的url处分别下载一个exe,一个dat,一个jpg，一个xml，所以这个所谓的“财会人员薪资补贴调整新政策所需材料.exe”文件其实为为木马释放器，并非为直接木马   下载下来以便进行">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2024/04/03/%E4%B8%80%E6%AC%A1%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%93%B6%E7%8B%90%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-04-03_16-47.png">
 <meta property="og:image" content="http://example.com/2024/04/03/%E4%B8%80%E6%AC%A1%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%93%B6%E7%8B%90%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-04-03_16-49.png">
@@ -42,7 +42,7 @@
 <meta property="og:image" content="http://example.com/2024/04/03/%E4%B8%80%E6%AC%A1%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%93%B6%E7%8B%90%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-04-03_16-15.png">
 <meta property="og:image" content="http://example.com/2024/04/03/%E4%B8%80%E6%AC%A1%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%93%B6%E7%8B%90%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-04-03_16-25.png">
 <meta property="article:published_time" content="2024-04-03T08:35:32.000Z">
-<meta property="article:modified_time" content="2024-04-03T09:52:25.027Z">
+<meta property="article:modified_time" content="2024-04-03T09:55:22.707Z">
 <meta property="article:author" content="liuty">
 <meta property="article:tag" content="样本分析">
 <meta name="twitter:card" content="summary_large_image">
@@ -335,7 +335,7 @@
 <h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>通过对其网络连接以及流量抓包可知，该程序下载了5个文件</p>
 <img src="/2024/04/03/%E4%B8%80%E6%AC%A1%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%93%B6%E7%8B%90%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-04-01_16-49.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-01_16-49.png">
 <h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><img src="/2024/04/03/%E4%B8%80%E6%AC%A1%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%93%B6%E7%8B%90%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-04-01_16-48.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-01_16-48.png">
-<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>其实，直接通过分析病毒样本，也可以发现该下载行为，从指定的url处分别下载一个exe,一个dat,一个jpg，一个xml,所以这个所谓的“财会人员薪资补贴调整新政策所需材料.exe”文件其实为为木马释放器，并非为直接木马</p>
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>其实，直接通过分析病毒样本，也可以发现该下载行为，从指定的url处分别下载一个exe,一个dat,一个jpg，一个xml，所以这个所谓的“财会人员薪资补贴调整新政策所需材料.exe”文件其实为为木马释放器，并非为直接木马</p>
 <img src="/2024/04/03/%E4%B8%80%E6%AC%A1%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%93%B6%E7%8B%90%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-04-01_17-27.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-01_17-27.png">
 <h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><img src="/2024/04/03/%E4%B8%80%E6%AC%A1%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%93%B6%E7%8B%90%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/2024-04-01_17-05.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-01_17-05.png">
 <h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><p>下载下来以便进行进一步的分析，其中文件2是一个压缩包，尝试解压发现需要密码</p>
