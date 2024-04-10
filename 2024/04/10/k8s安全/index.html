@@ -1,0 +1,910 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="liuty">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="什么是k8skubernetes，简称K8s，是用8代替名字中间的8个字符“ubernete”而成的缩写，是一个开源的用于编排云平台中多个主机上的容器化的应用，目标是让部署容器化的应用能简单并且高效的使用, 提供了应用部署，规划，更新，维护的一种机制。其核心的特点就是能够自主的管理容器来保证云平台中的容器按照用户的期望状态运行着，管理员可以加载一个微型服务，让规划器来找到合适的位置，同时，Kube">
+<meta property="og:type" content="article">
+<meta property="og:title" content="k8s安全">
+<meta property="og:url" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/index.html">
+<meta property="og:site_name" content="liuty&#39;s blog">
+<meta property="og:description" content="什么是k8skubernetes，简称K8s，是用8代替名字中间的8个字符“ubernete”而成的缩写，是一个开源的用于编排云平台中多个主机上的容器化的应用，目标是让部署容器化的应用能简单并且高效的使用, 提供了应用部署，规划，更新，维护的一种机制。其核心的特点就是能够自主的管理容器来保证云平台中的容器按照用户的期望状态运行着，管理员可以加载一个微型服务，让规划器来找到合适的位置，同时，Kube">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/640.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_09-07.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_09-08.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_15-46.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_15-47.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_15-50.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_15-55.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_15-56.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_15-56_1.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_16-02.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_16-05.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_16-09.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_16-11.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_16-14.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_16-17.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_16-18.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_19-56.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-01.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-05.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-06.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-07.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-17.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-53.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-54.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-55.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-58.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_21-16.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_21-18.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_21-18_1.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_14-31.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_14-43.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_14-42.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_14-51.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_14-52.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_14-56.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_15-00.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_15-01.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_15-03.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_15-04.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-40.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-45.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-45_1.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-48.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-49.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-51.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_18-29.png">
+<meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_15-34.png">
+<meta property="article:published_time" content="2024-04-10T00:20:23.000Z">
+<meta property="article:modified_time" content="2024-04-10T06:46:25.460Z">
+<meta property="article:author" content="liuty">
+<meta property="article:tag" content="k8s">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/640.png">
+  
+  
+  
+  <title>k8s安全 - liuty&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":90,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"hCaWnJI7fVuWUvqb3FgzqfKD-gzGzoHsz","app_key":"NJZ1v4tGwTre1rcW3Qdw1WYU","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>liuty&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="k8s安全"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-04-10 08:20" pubdate>
+          2024年4月10日 早上
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          26 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">k8s安全</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="什么是k8s"><a href="#什么是k8s" class="headerlink" title="什么是k8s"></a>什么是k8s</h2><p>kubernetes，简称K8s，是用8代替名字中间的8个字符“ubernete”而成的缩写，是一个开源的用于编排云平台中多个主机上的容器化的应用，目标是让部署容器化的应用能简单并且高效的使用, 提供了应用部署，规划，更新，维护的一种机制。其核心的特点就是能够自主的管理容器来保证云平台中的容器按照用户的期望状态运行着，管理员可以加载一个微型服务，让规划器来找到合适的位置，同时，Kubernetes在系统提升工具以及人性化方面，让用户能够方便的部署自己的应用</p>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs makefile">核心特点：<br><br><span class="hljs-section">1、可移植: 支持公有云，私有云，混合云，多重云（multi-cloud）</span><br><br><span class="hljs-section">2、可扩展: 模块化, 插件化, 可挂载, 可组合</span><br><br><span class="hljs-section">3、自动化: 自动部署，自动重启，自动复制，自动伸缩/扩展</span><br><br>4、快速部署应用，快速扩展应用<br><br>5、无缝对接新的应用功能<br><br>6、节省资源，优化硬件资源的使用<br></code></pre></td></tr></table></figure>
+
+<p>提到k8s不得不提它的组件：master，node(节点)，pod<br>其中master是提供集群的管理控制中心，负责整个集群的决策调度，发现和响应集群的事件，Master组件可以在集群中任何节点上运行，但是为了简单起见，通常在一台VM&#x2F;机器上启动所有Master组件，并且不会在此VM&#x2F;机器上运行用户容器；node是指k8s集群的工作节点，每个集群中至少需要一台Node节点，当某个Node节点出现问题而导致宕机时，Master会自动将该节点上的Pod调度到其他节点；pod是指k8s的基本调度单元，一个pod一般包含一个或多个容器，这样可以保证它们一直位于主机上，并且可以共享资源，k8s中的每个pod都被分配一个唯一的（在集群内的）IP地址这样就可以允许应用程序使用端口，而不会有冲突的风险</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/640.png" srcset="/img/loading.gif" lazyload class="" title="640.png">
+<h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>随着越来越多企业开始上云的产品，并且在攻防演练中常常碰到云相关的场景，例：公有云、私有云、混合云、虚拟化集群等，所以很多时候传统的渗透姿势可能也要改变传统格局，开辟新的适用于云原生的渗透路径</p>
+<figure class="highlight sas"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs sas">参考链接：<br>https://baike.baidu.com/item/kubernetes/22864162?fr=ge_ala<br>https://blog.csdn.net/zouyang920/article/details/122819418<br>https://mp.weixin.qq.com/s?__biz=Mzg2ODYxMzY3OQ==<span class="hljs-variable">&amp;mid</span>=2247510022<span class="hljs-variable">&amp;idx</span>=1<span class="hljs-variable">&amp;sn</span>=4b13dffc44e5cdbc11b39764fd817b0a<span class="hljs-variable">&amp;chksm</span>=ceab4346f9dcca50ed981739d20530c0cd0959302a8f0f7c974db6124260240b10a70da77cd3<span class="hljs-variable">&amp;mpshare</span>=1<span class="hljs-variable">&amp;scene</span>=24<span class="hljs-variable">&amp;srcid</span>=0327HPY9YFYeUhr2O5YD44TX<span class="hljs-variable">&amp;sharer_shareinfo</span>=bd0ab73c01bb8887c96187bc6e5ec71b<span class="hljs-variable">&amp;sharer_shareinfo_first</span>=bd0ab73c01bb8887c96187bc6e5ec71b#rd<br></code></pre></td></tr></table></figure>
+
+<h2 id="k8s攻击面与利用"><a href="#k8s攻击面与利用" class="headerlink" title="k8s攻击面与利用"></a>k8s攻击面与利用</h2><h3 id="信息收集"><a href="#信息收集" class="headerlink" title="信息收集"></a>信息收集</h3><p>k8s中的每个环境都会有很多信息是共享的，包括Secrets、API Keys、配置、服务等等，所以信息收集是关键，当然现在通常情况下会直接用CDK一把梭</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_09-07.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-09_09-07.png">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>获取环境变量，包括 Kubernetes Secret，服务名称、端口等</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_09-08.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-09_09-08.png">
+<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><h3 id="敏感信息泄漏"><a href="#敏感信息泄漏" class="headerlink" title="敏感信息泄漏"></a>敏感信息泄漏</h3><p>近年来Kubernetes敏感信息泄露事件屡见不鲜，通常情况下导致这些原因的一个是配置问题，如果不小心将敏感信息泄露给了错误的配置项，这些信息就可能被未经授权访问，另一个原因是存储问题如果存储的配置不正确，或者使用了不安全的存储后端，攻击者可能通过访问存储后端来获取敏感信息，或者容器共享相同的网络命名空间和文件系统，导致一个容器中的应用程序能够访问其他容器的文件系统或网络通信，那么敏感信息就可能被泄露</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_15-46.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_15-46.png">
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>如上面这个，存在一个git泄漏，这样就可以尝试从网站转储 git存储库</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_15-47.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_15-47.png">
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_15-50.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_15-50.png">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><p>使用git log可以查看代码提交的日志记录</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_15-55.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_15-55.png">
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>然后使用checkout检出指定的提交，说不定会有敏感信息泄漏，比如env环境变量等等</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_15-56.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_15-56.png">
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_15-56_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_15-56_1.png">
+<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><h3 id="DIND的利用"><a href="#DIND的利用" class="headerlink" title="DIND的利用"></a>DIND的利用</h3><p>DIND(docker-in-docker)，简单来说就是在Docker容器中调用和执行宿主机的Docker，通常可以挂载 docker.sock 导致容器逃逸</p>
+<p>假设现在存在一个命令注入的场景，如果要利用DIND进行逃逸，前提是在docker容器运行的时候把docker.sock套接字文件一并挂载到了容器中。当我们拿到容器权限又存在挂载的docker.sock套接字文件，我们就可以通过 Docker Socket与宿主机的Docker服务进行通信，我们可以通过它创建新的容器，并把宿主机的目录挂载到新创建的容器中，这样我们就能访问宿主机的资源了</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_16-02.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_16-02.png">
+<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>通过信息收集发现了本地挂载docker.sock</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_16-05.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_16-05.png">
+<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><p>然后我们下载一个docker可执行程序</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_16-09.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_16-09.png">
+<h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_16-11.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_16-11.png">
+<h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><p>随后就利用docker.sock来访问宿主机系统并在宿主机上执行docker命令</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_16-14.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_16-14.png">
+<h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><h3 id="SSRF"><a href="#SSRF" class="headerlink" title="SSRF"></a>SSRF</h3><p>服务器端请求伪造漏洞是云原生环境的首选攻击方式，通过SSRF可以访问云实例元数据以及内部服务元数据信息</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_16-17.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_16-17.png">
+<h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><p>通常情况下，pod部署的时候5000端口常用来做转发，也可以扫描其他端口，寻找敏感信息</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_16-18.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_16-18.png">
+<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><h3 id="容器逃逸之敏感目录挂载"><a href="#容器逃逸之敏感目录挂载" class="headerlink" title="容器逃逸之敏感目录挂载"></a>容器逃逸之敏感目录挂载</h3><img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_19-56.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_19-56.png">
+<h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><p>通过mount查看挂载信息，可以看到一个host-system的挂载</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-01.png">
+<h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6><p>查看里面的内容，发现像是把宿主机完整的系统都挂载进来了，那么我们可以用chroot切换到宿主机的目录，直接获取对宿主机系统的权限访问</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-05.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-05.png">
+<h6 id="-18"><a href="#-18" class="headerlink" title=""></a></h6><p>可以使用docker ps查看宿主机运行的容器</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-06.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-06.png">
+<h6 id="-19"><a href="#-19" class="headerlink" title=""></a></h6><p>目的是控制整个k8s集群，先查看k8s节点级配置文件</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-07.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-07.png">
+<h6 id="-20"><a href="#-20" class="headerlink" title=""></a></h6><p>随后可以利用配置文件直接获取集群内的所有资源</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vim">kubectl --kubeconfig /etc/kubernetes/kubelet.<span class="hljs-keyword">conf</span>  <span class="hljs-built_in">get</span> <span class="hljs-keyword">all</span> -n kube-<span class="hljs-built_in">system</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-17.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-17.png">
+<h6 id="-21"><a href="#-21" class="headerlink" title=""></a></h6><h3 id="API未授权访问"><a href="#API未授权访问" class="headerlink" title="API未授权访问"></a>API未授权访问</h3><p>容器仓库是存储所有容器镜像的地方，大多数情况下，每个组织都有自己的私有仓库，有时候会因为配置错误，导致仓库处于公共&#x2F;开放状态，此外，如果开发人员因为使用内部私有仓库安全配置不当，可能会在在容器镜像中存储一些敏感信息</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-53.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-53.png">
+<h6 id="-22"><a href="#-22" class="headerlink" title=""></a></h6><p>我们可以利用API文档来测试访问仓库的信息</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">API文档参考：https:<span class="hljs-regexp">//</span>docs.docker.com<span class="hljs-regexp">/registry/</span>spec<span class="hljs-regexp">/api/</span><br></code></pre></td></tr></table></figure>
+<p>列出存储库</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-54.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-54.png">
+<h6 id="-23"><a href="#-23" class="headerlink" title=""></a></h6><p>查看仓库的具体信息，并且可以直接未授权下载下来</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-55.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-55.png">
+<h6 id="-24"><a href="#-24" class="headerlink" title=""></a></h6><p>通过审计，可以发现镜像信息中有API密钥信息和ENV变量等敏感信息泄露</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-58.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-58.png">
+<h6 id="-25"><a href="#-25" class="headerlink" title=""></a></h6><h3 id="挖矿分析"><a href="#挖矿分析" class="headerlink" title="挖矿分析"></a>挖矿分析</h3><p>因为鉴于k8s环境的复杂性和神秘性，我们很难知道其中的容器镜像是基于什么构建的，并且部署了哪些主动监控也都是未知数，所以k8s很容易成为挖矿攻击的目标，遇到此类攻击，我们该如何识别和分析？首先，我们需要确定k8s集群中的所有资源&#x2F;镜像以及作业，一旦我们确定了在k8s集群中运行的作业，就可以通过以下命令，来获取pod信息</p>
+<figure class="highlight actionscript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs actionscript">kubectl describe job batch-check-job<br>kubectl <span class="hljs-keyword">get</span> pods --<span class="hljs-keyword">namespace</span> <span class="hljs-keyword">default</span> -l <span class="hljs-string">&quot;job-name=batch-check-job&quot;</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_21-16.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_21-16.png">
+<h6 id="-26"><a href="#-26" class="headerlink" title=""></a></h6><p>然后进行manifest分析，manifest是一个json或yaml格式的Kubernetes API对象描述</p>
+<figure class="highlight maxima"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs maxima">kubectl <span class="hljs-built_in">get</span> pod <span class="hljs-built_in">batch</span>-check-job-xxxx -o yaml<br></code></pre></td></tr></table></figure>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_21-18.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_21-18.png">
+<h6 id="-27"><a href="#-27" class="headerlink" title=""></a></h6><img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_21-18_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_21-18_1.png">
+<h6 id="-28"><a href="#-28" class="headerlink" title=""></a></h6><p>可以看到Docker镜像名称，然后通过docker history查看镜像的构建历史记录，检查每一层的构建中是否植入了恶意挖矿脚本</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vim">docker <span class="hljs-keyword">history</span> --<span class="hljs-keyword">no</span>-<span class="hljs-built_in">trunc</span> madhuakula/k8s-goat-batch-check<br></code></pre></td></tr></table></figure>
+
+<h3 id="敏感信息提取与恢复"><a href="#敏感信息提取与恢复" class="headerlink" title="敏感信息提取与恢复"></a>敏感信息提取与恢复</h3><p>在容器化世界中，密码、私钥、令牌等很容易被错误处理或者增加了一些看不到的敏感信息文件，我们该如何恢复提取？<br>首先，尽可能多的尝试浏览运行容器中的所有文件、环境变量等</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_14-31.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-09_14-31.png">
+<h6 id="-29"><a href="#-29" class="headerlink" title=""></a></h6><p>通过分析镜像信息，找到敏感信息，我们可以通过镜像反向生成dockerfile</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs routeros">alias <span class="hljs-attribute">dfimage</span>=<span class="hljs-string">&quot;docker run -v /var/run/docker.sock:/var/run/docker.sock --rm alpine/dfimage&quot;</span><br>dfimage <span class="hljs-attribute">-sV</span>=1.36 madhuakula/k8s-goat-hidden-in-layers<br></code></pre></td></tr></table></figure>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_14-43.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-09_14-43.png">
+<h6 id="-30"><a href="#-30" class="headerlink" title=""></a></h6><p>或者使用Dive工具，可以辅助分析镜像的每一层，下载地址：<a target="_blank" rel="noopener" href="https://github.com/wagoodman/dive">https://github.com/wagoodman/dive</a></p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_14-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-09_14-42.png">
+<h6 id="-31"><a href="#-31" class="headerlink" title=""></a></h6><p>通过分析，可以看到&#x2F;root&#x2F;contributions.txt, &#x2F;root&#x2F;secret.txt这两个比较重要和可疑的文件，并且secret.txt在构建的时候被删除了，我们现在来恢复它</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_14-51.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-09_14-51.png">
+<h6 id="-32"><a href="#-32" class="headerlink" title=""></a></h6><p>使用docker save把镜像导出文件并解压，这里因为只有3层，所以很容易提取所有的层并检查内容，找到相对应的id进行二次解压即可得到敏感信息文件</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_14-52.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-09_14-52.png">
+<h6 id="-33"><a href="#-33" class="headerlink" title=""></a></h6><h3 id="RBAC最低权限配置错误"><a href="#RBAC最低权限配置错误" class="headerlink" title="RBAC最低权限配置错误"></a>RBAC最低权限配置错误</h3><p>RBAC是对K8S集群中的一些Pod采取限制，以防止它们访问 API server，从而帮助保护 Kubernetes 集群，但一些错误配置可能导致访问控制薄弱，无法实现最小特权原则，攻击者往往利用绑定到 pod的serviceaccount提供的webhookapikey访问权限来控制和获取敏感资源，默认情况下将所有secrets、tokens和service accounts信息都存储在一个固定的目录，通常是在&#x2F;var&#x2F;run&#x2F;secrets&#x2F;kubernetes.io&#x2F;serviceaccount&#x2F;目录下面</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_14-56.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-09_14-56.png">
+<h6 id="-34"><a href="#-34" class="headerlink" title=""></a></h6><p>可以使用这些信息与 Kubernetes API服务进行交互访问，从而达到获取敏感资源信息的目的</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><code class="hljs routeros">指向内部 API 服务器主机名：<span class="hljs-built_in">export</span> <span class="hljs-attribute">APISERVER</span>=https://$&#123;KUBERNETES_SERVICE_HOST&#125;<br>设置 ServiceAccount令牌的路径：<span class="hljs-built_in">export</span> <span class="hljs-attribute">SERVICEACCOUNT</span>=/var/run/secrets/kubernetes.io/serviceaccount<br>读取 pods namespace并将其设置为变量：<span class="hljs-built_in">export</span> <span class="hljs-attribute">NAMESPACE</span>=$(cat <span class="hljs-variable">$&#123;SERVICEACCOUNT&#125;</span>/namespace)<br>指定读取ServiceAccount持有者令牌：<span class="hljs-built_in">export</span> <span class="hljs-attribute">TOKEN</span>=$(cat <span class="hljs-variable">$&#123;SERVICEACCOUNT&#125;</span>/token)<br>指定在curl请求查询时要使用的证书路径:<span class="hljs-built_in">export</span> <span class="hljs-attribute">CACERT</span>=<span class="hljs-variable">$&#123;SERVICEACCOUNT&#125;</span>/ca.crt<br></code></pre></td></tr></table></figure>
+<p>然后就可以使用令牌和构造的查询来访问 Kubernetes API了</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">curl --cacert <span class="hljs-variable">$&#123;CACERT&#125;</span> --header <span class="hljs-string">&quot;Authorization: Bearer <span class="hljs-variable">$&#123;TOKEN&#125;</span>&quot;</span> -X <span class="hljs-built_in">GET</span> <span class="hljs-variable">$&#123;APISERVER&#125;</span>/api<br></code></pre></td></tr></table></figure>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_15-00.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-09_15-00.png">
+<h6 id="-35"><a href="#-35" class="headerlink" title=""></a></h6><p>因为 Kubernetes本身是利用API服务来创建、删除 pod等操作的，所以接下来的操作就很多了，比如查询default命名空间中的secrets</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl --cacert <span class="hljs-variable">$&#123;CACERT&#125;</span> --header <span class="hljs-string">&quot;Authorization: Bearer <span class="hljs-variable">$&#123;TOKEN&#125;</span>&quot;</span> -X GET <span class="hljs-variable">$&#123;APISERVER&#125;</span>/api/v1/secrets<br></code></pre></td></tr></table></figure>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_15-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-09_15-01.png">
+<h6 id="-36"><a href="#-36" class="headerlink" title=""></a></h6><p>查询特定命名空间的secrets</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl --cacert <span class="hljs-variable">$&#123;CACERT&#125;</span> --header <span class="hljs-string">&quot;Authorization: Bearer <span class="hljs-variable">$&#123;TOKEN&#125;</span>&quot;</span> -X GET <span class="hljs-variable">$&#123;APISERVER&#125;</span>/api/v1/namespaces/<span class="hljs-variable">$&#123;NAMESPACE&#125;</span>/secrets<br></code></pre></td></tr></table></figure>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_15-03.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-09_15-03.png">
+<h6 id="-37"><a href="#-37" class="headerlink" title=""></a></h6><p>获取 k8svaultapikey</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">curl --cacert <span class="hljs-variable">$&#123;CACERT&#125;</span> --header <span class="hljs-string">&quot;Authorization: Bearer <span class="hljs-variable">$&#123;TOKEN&#125;</span>&quot;</span> -X GET <span class="hljs-variable">$&#123;APISERVER&#125;</span>/api/v1/namespaces/<span class="hljs-variable">$&#123;NAMESPACE&#125;</span>/secrets | grep k8svaultapikey<br></code></pre></td></tr></table></figure>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_15-04.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-09_15-04.png">
+<h6 id="-38"><a href="#-38" class="headerlink" title=""></a></h6><h2 id="自动化基线检查与安全评估"><a href="#自动化基线检查与安全评估" class="headerlink" title="自动化基线检查与安全评估"></a>自动化基线检查与安全评估</h2><h3 id="Docker-CIS-安全基线分析"><a href="#Docker-CIS-安全基线分析" class="headerlink" title="Docker CIS 安全基线分析"></a>Docker CIS 安全基线分析</h3><p>场景主要用于在Kubernetes节点之上进行Docker CIS基准分析，以识别可能存在的安全漏洞，首先需要部署docker bench security将它启动为DaemonSet</p>
+<figure class="highlight awk"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs awk">kubectl apply -f scenarios<span class="hljs-regexp">/docker-bench-security/</span>deployment.yaml<br></code></pre></td></tr></table></figure>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-40.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-40.png">
+<h6 id="-39"><a href="#-39" class="headerlink" title=""></a></h6><p>访问docker-bench-security-xxxxx pod 并执行Docker CIS基线测试脚本（如果有多个节点，就依次进入并执行）最后，可以根据 Docker CIS安全基线测试的结果进行进一步的利用或修复</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-45.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-45.png">
+<h6 id="-40"><a href="#-40" class="headerlink" title=""></a></h6><img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-45_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-45_1.png">
+<h6 id="-41"><a href="#-41" class="headerlink" title=""></a></h6><h3 id="Kubernetes-CIS-安全基线分析"><a href="#Kubernetes-CIS-安全基线分析" class="headerlink" title="Kubernetes CIS 安全基线分析"></a>Kubernetes CIS 安全基线分析</h3><p>场景主要用在Kubernetes节点之上进行Kubernetes CIS基线分析，识别可能存在的安全漏洞，首先，我们在节点上部署kube-bench security为Kubernetes job</p>
+<figure class="highlight crmsh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs crmsh">kubectl apply -f scenarios/kube-bench-security/<span class="hljs-keyword">node</span><span class="hljs-title">-job</span>.yaml<br>kubectl apply -f scenarios/kube-bench-security/<span class="hljs-literal">master</span>-job.yaml<br></code></pre></td></tr></table></figure>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-48.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-48.png">
+<h6 id="-42"><a href="#-42" class="headerlink" title=""></a></h6><p>然后获取pod信息和查看jobs列表</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-49.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-49.png">
+<h6 id="-43"><a href="#-43" class="headerlink" title=""></a></h6><p>最后通过查看pod日志进行漏洞分析和修补</p>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-08_20-51.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-08_20-51.png">
+<h6 id="-44"><a href="#-44" class="headerlink" title=""></a></h6><h3 id="KubeAudit审计k8s集群"><a href="#KubeAudit审计k8s集群" class="headerlink" title="KubeAudit审计k8s集群"></a>KubeAudit审计k8s集群</h3><p>kubeaudit是一个命令行工具和一个 Go包，用于审计 Kubernetes集群各种不同的安全问题，下载链接：<a target="_blank" rel="noopener" href="https://github.com/Shopify/kubeaudit">https://github.com/Shopify/kubeaudit</a><br>Kubeaudit会检测在集群中的容器是否运行，并且会审计该集群中的所有Kubernetes资源</p>
+<figure class="highlight ada"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ada">kubeaudit <span class="hljs-keyword">all</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_18-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-09_18-29.png">
+<h6 id="-45"><a href="#-45" class="headerlink" title=""></a></h6><h3 id="Sysdig-Falco安全监控与检测"><a href="#Sysdig-Falco安全监控与检测" class="headerlink" title="Sysdig Falco安全监控与检测"></a>Sysdig Falco安全监控与检测</h3><p>Falco是一个云原生运行时安全工具，旨在检测应用程序中的异常活动，可用于监控Kubernetes应用程序和内部组件的运行时安全性。 仅需为Falco撰写一套规则，即可持续监测并监控容器、应用、主机及网络的异常活动，Falco可在运行时检测意外的应用程序行为并发出威胁警报；使用前需要用helm v3进行部署</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs bash">helm repo add falcosecurity https://falcosecurity.github.io/charts<br>helm repo update<br>helm install falco --<span class="hljs-built_in">set</span> falco.jsonOutput=<span class="hljs-literal">true</span>  falcosecurity/falco<br></code></pre></td></tr></table></figure>
+<img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_15-34.png" srcset="/img/loading.gif" lazyload class="" title="2024-04-09_15-34.png">
+<h6 id="-46"><a href="#-46" class="headerlink" title=""></a></h6><p>Z29vZGJ5ZQo&#x3D;</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E4%BA%91%E5%8E%9F%E7%94%9F%E5%AE%89%E5%85%A8/" class="category-chain-item">云原生安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/k8s/" class="print-no-link">#k8s</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>k8s安全</div>
+      <div>http://example.com/2024/04/10/k8s安全/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>liuty</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年4月10日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/04/03/%E4%B8%80%E6%AC%A1%E5%A4%B1%E8%B4%A5%E7%9A%84%E9%93%B6%E7%8B%90%E7%97%85%E6%AF%92%E6%A0%B7%E6%9C%AC%E5%88%86%E6%9E%90/" title="一次失败的银狐病毒样本分析">
+                        <span class="hidden-mobile">一次失败的银狐病毒样本分析</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+  
+  
+    <article id="comments" lazyload>
+      
+  <div id="valine"></div>
+  <script type="text/javascript">
+    Fluid.utils.loadComments('#valine', function() {
+      Fluid.utils.createScript('https://lib.baomitu.com/valine/1.5.1/Valine.min.js', function() {
+        var options = Object.assign(
+          {"appId":"hCaWnJI7fVuWUvqb3FgzqfKD-gzGzoHsz","appKey":"NJZ1v4tGwTre1rcW3Qdw1WYU","path":"window.location.pathname","placeholder":null,"avatar":"retro","meta":["nick","mail","link"],"requiredFields":[],"pageSize":10,"lang":"zh-CN","highlight":false,"recordIP":false,"serverURLs":"","emojiCDN":null,"emojiMaps":null,"enableQQ":false},
+          {
+            el: "#valine",
+            path: window.location.pathname
+          }
+        )
+        new Valine(options);
+        Fluid.utils.waitElementVisible('#valine .vcontent', () => {
+          var imgSelector = '#valine .vcontent img:not(.vemoji)';
+          Fluid.plugins.imageCaption(imgSelector);
+          Fluid.plugins.fancyBox(imgSelector);
+        })
+      });
+    });
+  </script>
+  <noscript>Please enable JavaScript to view the comments</noscript>
+
+
+    </article>
+  
+
+
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://l1uty.github.io/" target="_blank" rel="nofollow noopener"><span>liuty</span></a> <i class="iconfont icon-love"></i> <a href="https://www.mps.gov.cn/" target="_blank" rel="nofollow noopener"><span>???</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         次
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <script type="text/javascript" src="\js\FunnyTitle.js"></script>
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/diy/love.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+
+  <link rel="stylesheet" href="/dist/APlayer.min.css">
+  <div id="aplayer"></div>
+  <script type="text/javascript" src="/dist/APlayer.min.js"></script>
+  <script type="text/javascript" src="/dist/music.js"></script>
+
+  <script type="text/javascript"
+color="220,220,220" opacity='0.7' zIndex="-2" count="200" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js">
+  </script>
+
+  <script type="text/javascript" src="\js\snow.js"></script>
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
