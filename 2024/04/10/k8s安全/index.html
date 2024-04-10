@@ -71,7 +71,7 @@
 <meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_18-29.png">
 <meta property="og:image" content="http://example.com/2024/04/10/k8s%E5%AE%89%E5%85%A8/2024-04-09_15-34.png">
 <meta property="article:published_time" content="2024-04-10T00:20:23.000Z">
-<meta property="article:modified_time" content="2024-04-10T06:46:25.460Z">
+<meta property="article:modified_time" content="2024-04-10T06:51:17.770Z">
 <meta property="article:author" content="liuty">
 <meta property="article:tag" content="k8s">
 <meta name="twitter:card" content="summary_large_image">
@@ -358,7 +358,7 @@
               <div class="markdown-body">
                 
                 <h2 id="什么是k8s"><a href="#什么是k8s" class="headerlink" title="什么是k8s"></a>什么是k8s</h2><p>kubernetes，简称K8s，是用8代替名字中间的8个字符“ubernete”而成的缩写，是一个开源的用于编排云平台中多个主机上的容器化的应用，目标是让部署容器化的应用能简单并且高效的使用, 提供了应用部署，规划，更新，维护的一种机制。其核心的特点就是能够自主的管理容器来保证云平台中的容器按照用户的期望状态运行着，管理员可以加载一个微型服务，让规划器来找到合适的位置，同时，Kubernetes在系统提升工具以及人性化方面，让用户能够方便的部署自己的应用</p>
-<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs makefile">核心特点：<br><br><span class="hljs-section">1、可移植: 支持公有云，私有云，混合云，多重云（multi-cloud）</span><br><br><span class="hljs-section">2、可扩展: 模块化, 插件化, 可挂载, 可组合</span><br><br><span class="hljs-section">3、自动化: 自动部署，自动重启，自动复制，自动伸缩/扩展</span><br><br>4、快速部署应用，快速扩展应用<br><br>5、无缝对接新的应用功能<br><br>6、节省资源，优化硬件资源的使用<br></code></pre></td></tr></table></figure>
+<figure class="highlight makefile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs makefile">核心特点：<br><br><span class="hljs-section">可移植: 支持公有云，私有云，混合云，多重云（multi-cloud）</span><br><span class="hljs-section">可扩展: 模块化, 插件化, 可挂载, 可组合</span><br><span class="hljs-section">自动化: 自动部署，自动重启，自动复制，自动伸缩/扩展</span><br>快速部署应用，快速扩展应用<br>无缝对接新的应用功能<br>节省资源，优化硬件资源的使用<br></code></pre></td></tr></table></figure>
 
 <p>提到k8s不得不提它的组件：master，node(节点)，pod<br>其中master是提供集群的管理控制中心，负责整个集群的决策调度，发现和响应集群的事件，Master组件可以在集群中任何节点上运行，但是为了简单起见，通常在一台VM&#x2F;机器上启动所有Master组件，并且不会在此VM&#x2F;机器上运行用户容器；node是指k8s集群的工作节点，每个集群中至少需要一台Node节点，当某个Node节点出现问题而导致宕机时，Master会自动将该节点上的Pod调度到其他节点；pod是指k8s的基本调度单元，一个pod一般包含一个或多个容器，这样可以保证它们一直位于主机上，并且可以共享资源，k8s中的每个pod都被分配一个唯一的（在集群内的）IP地址这样就可以允许应用程序使用端口，而不会有冲突的风险</p>
 <img src="/2024/04/10/k8s%E5%AE%89%E5%85%A8/640.png" srcset="/img/loading.gif" lazyload class="" title="640.png">
