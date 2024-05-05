@@ -62,7 +62,7 @@
 <meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_20-14.png">
 <meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_20-17_1.png">
 <meta property="article:published_time" content="2024-05-05T04:25:41.000Z">
-<meta property="article:modified_time" content="2024-05-05T13:01:48.087Z">
+<meta property="article:modified_time" content="2024-05-05T13:03:10.383Z">
 <meta property="article:author" content="liuty">
 <meta property="article:tag" content="总结">
 <meta name="twitter:card" content="summary_large_image">
@@ -348,7 +348,7 @@
             
               <div class="markdown-body">
                 
-                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>我们在日常工作中或者一些攻防项目中，可能会遇到这种情况：我们千辛万苦才拿到的Webshell，but!!!!!!!无法执行命令，并且在很多rt的面试当中也常会问到这种问题，往往特别当我们遇到php站点时，碰到函数都被禁用，将会导致我们无法进行后面的渗透工作，马上就要写完报告了、拿下这个站就可以下班了…要是突然给你来了这么一刀，这滋味只有感受过的人才会知道😭，你会甘心吗？出现这种情况大多是disable_functions的原因，disable_functions其实是放在php.ini（默认位置：）配置文件中的一个设置参数，用来过滤止一些危险函数，但是默认情况下为空，不同开发者面临的需求和能力不同，为了实现某些特殊功能，调用的函数也会不同，当一些系统的关键函数的被禁用掉，像：system，exec,shell_exec,popen等，就会导致我们拿到shell之后，执行不了命令的原因，通常表现为：执行命令返回ret&#x3D;127，如下图</p>
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>我们在日常工作中或者一些攻防项目中，可能会遇到这种情况：我们千辛万苦才拿到的Webshell，but!!!!!!!无法执行命令，并且在很多rt的面试当中也常会问到这种问题，往往特别当我们遇到php站点时，碰到函数都被禁用，将会导致我们无法进行后面的渗透工作，马上就要写完报告了、拿下这个站就可以下班了…要是突然给你来了这么一刀，这滋味只有感受过的人才会知道😭，你会甘心吗？出现这种情况大多是disable_functions的原因，disable_functions其实是放在php.ini配置文件中的一个设置参数，用来过滤止一些危险函数，但是默认情况下为空，不同开发者面临的需求和能力不同，为了实现某些特殊功能，调用的函数也会不同，当一些系统的关键函数的被禁用掉，像：system，exec,shell_exec,popen等，就会导致我们拿到shell之后，执行不了命令的原因，通常表现为：执行命令返回ret&#x3D;127，如下图</p>
 <img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-22.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_09-22.png">
 <h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>当我们想查看disable_functions或者想知道都禁用了哪些函数，可以在php.ini查看，也可以使用phpinfo();</p>
 <img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-12_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_09-12_1.png">
