@@ -16,12 +16,12 @@
   <meta name="author" content="liuty">
   <meta name="keywords" content="">
   
-    <meta name="description" content="drozer是一款针对Android系统的安全测试框架，可以帮助App和设备变得更安全，我们在使用drozer之前需要先把基本的环境做好配置，必要的环境有：jdk,python,java,系统安装配置好adb，drozer,同时模拟器或者测试手机端也需要安装好drozer agent，因为考虑到每个人的测试环境可能不同，有用linux有用windows，有的还有可能用到mac，所以就不再一一演示了">
+    <meta name="description" content="drozer是一款针对Android系统的安全测试框架，可以帮助App和设备变得更安全，我们在使用drozer之前需要先把基本的环境做好配置，必要的环境有：jdk,python,java,系统安装配置好adb，drozer,同时模拟器或者测试手机端也需要安装好drozer agent，因为考虑到每个人的测试环境可能不同，有用linux有用windows，还有用mac的，所以就不再一一演示了，网上的">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Drozer-Android安全测试">
 <meta property="og:url" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/index.html">
 <meta property="og:site_name" content="liuty&#39;s blog">
-<meta property="og:description" content="drozer是一款针对Android系统的安全测试框架，可以帮助App和设备变得更安全，我们在使用drozer之前需要先把基本的环境做好配置，必要的环境有：jdk,python,java,系统安装配置好adb，drozer,同时模拟器或者测试手机端也需要安装好drozer agent，因为考虑到每个人的测试环境可能不同，有用linux有用windows，有的还有可能用到mac，所以就不再一一演示了">
+<meta property="og:description" content="drozer是一款针对Android系统的安全测试框架，可以帮助App和设备变得更安全，我们在使用drozer之前需要先把基本的环境做好配置，必要的环境有：jdk,python,java,系统安装配置好adb，drozer,同时模拟器或者测试手机端也需要安装好drozer agent，因为考虑到每个人的测试环境可能不同，有用linux有用windows，还有用mac的，所以就不再一一演示了，网上的">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081722.jpg">
 <meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081703.jpg">
@@ -48,7 +48,7 @@
 <meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-41.png">
 <meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-46.png">
 <meta property="article:published_time" content="2024-05-08T01:21:50.000Z">
-<meta property="article:modified_time" content="2024-05-08T03:10:01.580Z">
+<meta property="article:modified_time" content="2024-05-08T05:13:53.483Z">
 <meta property="article:author" content="liuty">
 <meta property="article:tag" content="APP">
 <meta name="twitter:card" content="summary_large_image">
@@ -334,7 +334,7 @@
             
               <div class="markdown-body">
                 
-                <p>drozer是一款针对Android系统的安全测试框架，可以帮助App和设备变得更安全，我们在使用drozer之前需要先把基本的环境做好配置，必要的环境有：jdk,python,java,系统安装配置好adb，drozer,同时模拟器或者测试手机端也需要安装好drozer agent，因为考虑到每个人的测试环境可能不同，有用linux有用windows，有的还有可能用到mac，所以就不再一一演示了，网上的教程还是很多的，也都非常easy的</p>
+                <p>drozer是一款针对Android系统的安全测试框架，可以帮助App和设备变得更安全，我们在使用drozer之前需要先把基本的环境做好配置，必要的环境有：jdk,python,java,系统安装配置好adb，drozer,同时模拟器或者测试手机端也需要安装好drozer agent，因为考虑到每个人的测试环境可能不同，有用linux有用windows，还有用mac的，所以就不再一一演示了，网上的教程还是很多的，也都非常easy的</p>
 <p>我是没有用模拟器的，我嫌麻烦，直接从家里翻箱倒柜找出了我家的一部旧手机，首先也是最重要的就是开启开发者模式，每部手机开启的方式不一样，可以根据自己的手机型号进行上网搜查，开启开发者模式之后，切忌要把USB调试打开，否则adb连接不成功</p>
 <img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081722.jpg" srcset="/img/loading.gif" lazyload class="" title="微信图片_20240508081722.jpg">
 <h6 id=""><a href="#" class="headerlink" title=""></a></h6><img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081703.jpg" srcset="/img/loading.gif" lazyload class="" title="微信图片_20240508081703.jpg">
@@ -373,15 +373,15 @@
 <img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-27.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-27.png">
 <h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><p>看到结果先别着急去跑表和字段，先进行手注判断报错信息，看是否真实存在sql注入，因为会存在误检（手注的话需要调用selection和projection参数传递一些简单的sql语句进行测试，我直接万能单引号走起）</p>
 <img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-29.png">
-<h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6><p>可以看到明显的报错信息，接下来可以交给app.provider和scan.provider模块进行自动去跑了，有点像sqlmap</p>
+<h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6><p>可以看到明显的报错信息，接下来可以交给app.provider和scan.provider模块去跑了，有点像sqlmap</p>
 <img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-30.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-30.png">
 <h6 id="-18"><a href="#-18" class="headerlink" title=""></a></h6><img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-31.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-31.png">
 <h6 id="-19"><a href="#-19" class="headerlink" title=""></a></h6><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli"><span class="hljs-params">--projection</span> <span class="hljs-string">&quot;* FROM Key;--&quot;</span> <span class="hljs-string">//</span>可以查询其他数据库<br></code></pre></td></tr></table></figure>
 <img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-33.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-33.png">
-<h6 id="-20"><a href="#-20" class="headerlink" title=""></a></h6><p>还可以用app.provider.read模块以及app.provider.download模块进行文件读取和下载，像经典的&#x2F;etc&#x2F;passwd和&#x2F;etc&#x2F;hosts这些都已经被广大白帽子们用来验证各种rce等漏洞，司空见惯了属于是</p>
+<h6 id="-20"><a href="#-20" class="headerlink" title=""></a></h6><p>还可以用app.provider.read模块以及app.provider.download模块进行文件读取和下载，像经典的&#x2F;etc&#x2F;passwd和&#x2F;etc&#x2F;hosts这些都已经被广大白帽子们用来验证各种rce以及其他漏洞了，司空见惯了属于是</p>
 <img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-38.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-38.png">
 <h6 id="-21"><a href="#-21" class="headerlink" title=""></a></h6><img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-41.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-41.png">
-<h6 id="-22"><a href="#-22" class="headerlink" title=""></a></h6><p>文件下载的话，我就用脱数据库来演示了，其他文件也是同理的</p>
+<h6 id="-22"><a href="#-22" class="headerlink" title=""></a></h6><p>文件下载的话，我就用下载数据库来演示了，其他文件也是同理的</p>
 <img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-46.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-46.png">
 <h6 id="-23"><a href="#-23" class="headerlink" title=""></a></h6><p>如上图，数据库下载下来之后，可以用navicat等工具导入查看，或者直接用sqlite也可以</p>
 
