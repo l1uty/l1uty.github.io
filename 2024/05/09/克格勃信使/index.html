@@ -58,8 +58,9 @@
 <meta property="og:image" content="http://example.com/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240509143641.jpg">
 <meta property="og:image" content="http://example.com/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_10-24.png">
 <meta property="og:image" content="http://example.com/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_10-28.png">
+<meta property="og:image" content="http://example.com/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240509143634.jpg">
 <meta property="article:published_time" content="2024-05-09T10:11:07.000Z">
-<meta property="article:modified_time" content="2024-05-09T10:21:37.504Z">
+<meta property="article:modified_time" content="2024-05-09T10:44:59.237Z">
 <meta property="article:author" content="liuty">
 <meta property="article:tag" content="Android逆向">
 <meta name="twitter:card" content="summary_large_image">
@@ -378,46 +379,47 @@
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_09-22.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_09-22.png">
 <h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><p>此时再重新安装并打开应用程序，就没有弹窗报错提示了</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240509143647.jpg" srcset="/img/loading.gif" lazyload class="" title="微信图片_20240509143647.jpg">
-<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><p>第二个方法就是之前在判断语句之前，赋予两个值，让他判断条件恒成立即可，如下图，我们再来看一下那两个判断，其实条件只需要满足恒等于“Russia”和“2131558400”（也就是RkxBR3s1N0VSTDFOR180UkNIM1J9Cg&#x3D;&#x3D;）即可</p>
+<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><p>第二个方法就是在判断语句之前，赋予两个值，让他判断条件恒成立即可，如下图，我们再来看一下那两个判断，其实条件只需要满足恒等于“Russia”和“2131558400”（也就是RkxBR3s1N0VSTDFOR180UkNIM1J9Cg&#x3D;&#x3D;）即可</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_08-47.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_08-47.png">
 <h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><p>进行赋值</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_14-02.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_14-02.png">
-<h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6><p>赋值之后就是重构apk，同上面的操作一样，不再演示。<br>现在我们开始破解账号和密码，找到LoginActivity，可以看到程序登录验证的代码，发现了一串字符串：2131558450，跟前面一样，先转换为16进制，再层层定位，最终发现了用户名</p>
+<h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6><p>赋值之后就是重构apk，同上面的操作一样，不再演示。<br>现在我们开始破解账号和密码，找到LoginActivity，可以看到程序登录验证的代码，在这段代码中发现了一串字符串：2131558450，和前面的处理方式一样，还是先转换为16进制，再层层定位，最终发现了用户名</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_09-36.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_09-36.png">
 <h6 id="-18"><a href="#-18" class="headerlink" title=""></a></h6><p>用户名知道了，现在就剩想办法找到密码了，开始分析密码的判断条件，发现调用的m532j函数</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_09-37.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_09-37.png">
 <h6 id="-19"><a href="#-19" class="headerlink" title=""></a></h6><p>双击进行定位，跳转到了密码验证的地方，这段代码不难分析出，它会将我们输入的密码和2131558446进行比较</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_09-39.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_09-39.png">
-<h6 id="-20"><a href="#-20" class="headerlink" title=""></a></h6><p>跟前面的操作先将这一串字符转换为十六进制再层层定位，发现name值是password，再定位password得到了一串新的字符，其实是加密的密码</p>
+<h6 id="-20"><a href="#-20" class="headerlink" title=""></a></h6><p>继续重复前面的操作，发现name值是password，最后通过定位password得到了一串新的字符，也就是加密的密码</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_09-41.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_09-41.png">
 <h6 id="-21"><a href="#-21" class="headerlink" title=""></a></h6><p>再往下分析，发现了加密类型：MD5</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_09-52.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_09-52.png">
 <h6 id="-22"><a href="#-22" class="headerlink" title=""></a></h6><p>but!!!但是无法爆破出来……</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_09-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_09-42.png">
-<h6 id="-23"><a href="#-23" class="headerlink" title=""></a></h6><p>重新看了一下任务，人物中写道“this is a “recon” challenge”？？？侦查？？难不成社工？？直接搬出大Google，对用户名进行搜索，搜索到了一篇推特，难不成这就是男主？？？</p>
+<h6 id="-23"><a href="#-23" class="headerlink" title=""></a></h6><p>重新看了一下任务，任务中写道“this is a “recon” challenge”？？？侦查？？难不成社工？？直接搬出大Google，对用户名进行搜索，搜索到了一篇推特，难不成这就是男主？？？</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_09-45.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_09-45.png">
-<h6 id="-24"><a href="#-24" class="headerlink" title=""></a></h6><p>再加上密码password直接再搜索试试，发现了密码Guest，再加上任务中的提示：都是小写，所以密码应该为guest</p>
+<h6 id="-24"><a href="#-24" class="headerlink" title=""></a></h6><p>加上密码password再搜索试试，发现了密码为Guest，再加上任务中的提示：都是小写，所以密码应该为guest</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_09-49.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_09-49.png">
 <h6 id="-25"><a href="#-25" class="headerlink" title=""></a></h6><p>ok,万事俱备，只欠东风，登录！</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240509143644.jpg" srcset="/img/loading.gif" lazyload class="" title="微信图片_20240509143644.jpg">
-<h6 id="-26"><a href="#-26" class="headerlink" title=""></a></h6><h2 id="the-third"><a href="#the-third" class="headerlink" title="the third"></a>the third</h2><p>登录进去之后，发现是一个聊天界面，随便发送信息，是没有反应的，哎，没人理我..继续分析源码，追踪MessageActivity</p>
+<h6 id="-26"><a href="#-26" class="headerlink" title=""></a></h6><h2 id="the-third"><a href="#the-third" class="headerlink" title="the third"></a>the third</h2><p>登录进去之后，发现是一个聊天界面，可是我随便发送了几条信息，都是没有反应的，哎，没人理我..那就继续分析，开始追踪MessageActivity</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_09-54.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_09-54.png">
 <h6 id="-27"><a href="#-27" class="headerlink" title=""></a></h6><img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_17-53.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_17-53.png">
-<h6 id="-28"><a href="#-28" class="headerlink" title=""></a></h6><p>通过分析我们可以发现，每当我们发送消息时，都会调用onSendMessage函数，而且最终的flag就在该函数中生成，而且我们输入的文本会转换成String str，然后str传参到m530a函数里，并且在这里调用了equals函数来检查它是否等于f2548p，定位f2548p</p>
+<h6 id="-28"><a href="#-28" class="headerlink" title=""></a></h6><p>通过分析我们可以发现，每当我们发送消息时，都会调用onSendMessage函数，而且最终的flag就在该函数中生成，而且我们输入的文本会转换成String str，随后str会传参到m530a函数里，并且调用了equals函数来检查它是否等于f2548p，继续定位f2548p</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_10-12.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_10-12.png">
-<h6 id="-29"><a href="#-29" class="headerlink" title=""></a></h6><p>如上图，我们可以看到f2548p的数值，并且往下看就可以看到m530a函数代码</p>
+<h6 id="-29"><a href="#-29" class="headerlink" title=""></a></h6><p>如上图，我们定位到了f2548p的数值，并且往下看就可以看到m530a函数代码</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_10-13.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_10-13.png">
 <h6 id="-30"><a href="#-30" class="headerlink" title=""></a></h6><p>这个函数对我们输入的字符串进行一些异或操作，我们需要写一个脚本来还原字符串</p>
 <figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><code class="hljs stylus"><span class="hljs-selector-tag">p</span> = <span class="hljs-string">&quot;V@]EAASB\022WZF\022e,a$7(&amp;am2(3.\003&quot;</span><br><span class="hljs-selector-tag">p</span> = <span class="hljs-built_in">list</span>(<span class="hljs-built_in">str</span>(p))<br><br><span class="hljs-keyword">for</span> <span class="hljs-selector-tag">i</span> <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(p) <span class="hljs-comment">// 2):</span><br>	<span class="hljs-selector-tag">p</span><span class="hljs-selector-attr">[i]</span> = <span class="hljs-built_in">chr</span>(<span class="hljs-built_in">ord</span>(<span class="hljs-selector-tag">p</span><span class="hljs-selector-attr">[i]</span>) ^ <span class="hljs-number">0</span>x32)<br>	<span class="hljs-selector-tag">p</span><span class="hljs-selector-attr">[len(p) // 2 + 1 + i]</span> = <span class="hljs-built_in">chr</span>(<span class="hljs-built_in">ord</span>(<span class="hljs-selector-tag">p</span><span class="hljs-selector-attr">[len(p) // 2 + 1 + i]</span>) ^ <span class="hljs-number">0</span>x41)<br><br><span class="hljs-selector-tag">p</span><span class="hljs-selector-class">.reverse</span>()<br><span class="hljs-function"><span class="hljs-title">print</span><span class="hljs-params">(<span class="hljs-string">&quot;&quot;</span>.join(p)</span></span>)<br></code></pre></td></tr></table></figure>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_10-18.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_10-18.png">
 <h6 id="-31"><a href="#-31" class="headerlink" title=""></a></h6><img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240509143641.jpg" srcset="/img/loading.gif" lazyload class="" title="微信图片_20240509143641.jpg">
-<h6 id="-32"><a href="#-32" class="headerlink" title=""></a></h6><p>可是Boris嫌我们语气太冲，不好好说话，不给我们…好好好，那就继续分析m529b函数，同理，也是调用了equals函数来检查它是否等于f2550r，审计源码发现了m529b函数的操作</p>
+<h6 id="-32"><a href="#-32" class="headerlink" title=""></a></h6><p>“if you ask nicely”…好好好不给是吧，那就继续分析m529b函数，同理，也是调用了equals函数，来检查它是否等于f2550r，继续审计发现了m529b函数的操作</p>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_10-24.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_10-24.png">
-<h6 id="-33"><a href="#-33" class="headerlink" title=""></a></h6><p>继续写一个脚本来还原字符串</p>
+<h6 id="-33"><a href="#-33" class="headerlink" title=""></a></h6><p>同样，写一个脚本来还原字符串</p>
 <figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> string<br><br>r = <span class="hljs-string">&quot;\000dslp&#125;oQ\000 dks$|M\000h +AYQg\000P*!M$gQ\000&quot;</span><br>r = <span class="hljs-built_in">list</span>(<span class="hljs-built_in">str</span>(r))<br>r.reverse()<br><br><span class="hljs-keyword">for</span> i <span class="hljs-keyword">in</span> <span class="hljs-built_in">range</span>(<span class="hljs-built_in">len</span>(r)):<br>	<span class="hljs-keyword">if</span> i % <span class="hljs-number">8</span> == <span class="hljs-number">0</span>:<br>		<span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;_&quot;</span>, end=<span class="hljs-string">&quot;&quot;</span>)<br>		<span class="hljs-keyword">continue</span><br>	<span class="hljs-keyword">for</span> ch <span class="hljs-keyword">in</span> string.printable:<br>		final_ch = <span class="hljs-built_in">chr</span>((<span class="hljs-built_in">ord</span>(ch) &gt;&gt; (i % <span class="hljs-number">8</span>)) ^ <span class="hljs-built_in">ord</span>(ch))<br>		<span class="hljs-keyword">if</span> final_ch == r[i]:<br>			<span class="hljs-built_in">print</span>(ch, end=<span class="hljs-string">&quot;&quot;</span>)<br><span class="hljs-built_in">print</span>(<span class="hljs-string">&quot;&quot;</span>)<br></code></pre></td></tr></table></figure>
 <img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/2024-05-09_10-28.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-09_10-28.png">
-<h6 id="-34"><a href="#-34" class="headerlink" title=""></a></h6><p>用我们小学英语水平，填字母还原一下，字符串为：May I <em>PLEASE</em> have the password（请告诉我密码），果然语气确实变得温柔多的，至少比刚才有礼貌多了，果不其然Boris也愉快的给了我们的最后一个flag！</p>
-<p>Boris is my friend!!</p>
+<h6 id="-34"><a href="#-34" class="headerlink" title=""></a></h6><p>还原之后，用我们的小学英语水平，填字母还原一下，字符串为：May I <em>PLEASE</em> have the password（请告诉我密码），果然语气确实变得温柔多的，至少比刚才显得有礼貌了，果不其然，Boris也愉快的给了我们最后一个flag！</p>
+<img src="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240509143634.jpg" srcset="/img/loading.gif" lazyload class="" title="微信图片_20240509143634.jpg">
+<h6 id="-35"><a href="#-35" class="headerlink" title=""></a></h6><p>Boris is my friend!!</p>
 
                 
               </div>
