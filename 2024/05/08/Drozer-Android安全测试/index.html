@@ -1,0 +1,797 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="liuty">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="drozer是一款针对Android系统的安全测试框架，可以帮助App和设备变得更安全，我们在使用drozer之前需要先把基本的环境做好配置，必要的环境有：jdk,python,java,系统安装配置好adb，drozer,同时模拟器或者测试手机端也需要安装好drozer agent，因为考虑到每个人的测试环境可能不同，有用linux有用windows，还有用mac的，所以就不再一一演示了，网上的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Drozer-Android安全测试">
+<meta property="og:url" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/index.html">
+<meta property="og:site_name" content="liuty&#39;s blog">
+<meta property="og:description" content="drozer是一款针对Android系统的安全测试框架，可以帮助App和设备变得更安全，我们在使用drozer之前需要先把基本的环境做好配置，必要的环境有：jdk,python,java,系统安装配置好adb，drozer,同时模拟器或者测试手机端也需要安装好drozer agent，因为考虑到每个人的测试环境可能不同，有用linux有用windows，还有用mac的，所以就不再一一演示了，网上的">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081722.jpg">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081703.jpg">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_18-59.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081709.jpg">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_18-59_1.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_18-59_2.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081715.jpg">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081729.jpg">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-05.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-06.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-10.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-13.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-15.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081726.jpg">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-18.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-25.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-27.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-29.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-30.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-31.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-33.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-38.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-41.png">
+<meta property="og:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-46.png">
+<meta property="article:published_time" content="2024-05-08T01:21:50.000Z">
+<meta property="article:modified_time" content="2024-05-08T05:13:53.483Z">
+<meta property="article:author" content="liuty">
+<meta property="article:tag" content="APP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081722.jpg">
+  
+  
+  
+  <title>Drozer-Android安全测试 - liuty&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":90,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"hCaWnJI7fVuWUvqb3FgzqfKD-gzGzoHsz","app_key":"NJZ1v4tGwTre1rcW3Qdw1WYU","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>liuty&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="Drozer-Android安全测试"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-08 09:21" pubdate>
+          2024年5月8日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          12 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">Drozer-Android安全测试</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>drozer是一款针对Android系统的安全测试框架，可以帮助App和设备变得更安全，我们在使用drozer之前需要先把基本的环境做好配置，必要的环境有：jdk,python,java,系统安装配置好adb，drozer,同时模拟器或者测试手机端也需要安装好drozer agent，因为考虑到每个人的测试环境可能不同，有用linux有用windows，还有用mac的，所以就不再一一演示了，网上的教程还是很多的，也都非常easy的</p>
+<p>我是没有用模拟器的，我嫌麻烦，直接从家里翻箱倒柜找出了我家的一部旧手机，首先也是最重要的就是开启开发者模式，每部手机开启的方式不一样，可以根据自己的手机型号进行上网搜查，开启开发者模式之后，切忌要把USB调试打开，否则adb连接不成功</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081722.jpg" srcset="/img/loading.gif" lazyload class="" title="微信图片_20240508081722.jpg">
+<h6 id=""><a href="#" class="headerlink" title=""></a></h6><img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081703.jpg" srcset="/img/loading.gif" lazyload class="" title="微信图片_20240508081703.jpg">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>通过数据线使得手机与电脑连接，然后通过adb进行测试，看是否连接正常，如果成功列出序列号则代表连接成功</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">adb devices</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_18-59.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_18-59.png">
+<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>随后安装代理——drozer agent，可以直接通过adb install传到手机端，也可以直接从网上找到对应的apk包进行安装，安装好之后，启动即可，drozer agent会监听31415端口（drozer默认端口）所有接口传入的tcp连接数据</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081709.jpg" srcset="/img/loading.gif" lazyload class="" title="微信图片_20240508081709.jpg">
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>然后使用adb进行端口转发，转发到刚才代理使用的默认端口31415上</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_18-59_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_18-59_1.png">
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><p>最后通过下面的命令进入调试控制台</p>
+<figure class="highlight arcade"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs arcade">drozer <span class="hljs-built_in">console</span> connect<br></code></pre></td></tr></table></figure>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_18-59_2.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_18-59_2.png">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081715.jpg" srcset="/img/loading.gif" lazyload class="" title="微信图片_20240508081715.jpg">
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>接下来的测试全部以一款Android安全测试APP——sieve进行演示</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081729.jpg" srcset="/img/loading.gif" lazyload class="" title="微信图片_20240508081729.jpg">
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><p>评估的第一步就是先在安卓设备上找到它，可以利用关键词搜索得出包名</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros"><span class="hljs-built_in">run</span> app.package.list -f  关键字<br></code></pre></td></tr></table></figure>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-05.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-05.png">
+<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>可以看到sieve的包名叫com.mwr.example.sieve，随后通过run app.package.info可以查看包的详细信息，比如应用数据目录、apk的路径、UID、GID以及版本和应用程序所允许的权限等信息</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-06.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-06.png">
+<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>我们还可以使用drozer内置的app.package.attacksurface模块进行攻击面的识别，方便进一步的安全测试和漏洞挖掘</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-10.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-10.png">
+<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><p>通过上图我们可以发现，有3个activities，0个broadcast，2个content，2个services，这些都是潜在的风险入口，其中，activities组件通常就是一个单独的界面，它上面可以显示一些控件也可以监听并处理用户的事件做出响应，Activity之间通过Intent进行通信，在Intent的描述结构中，有两个最重要的部分：动作和动作对应的数据。broadcast组件通常是指BroadcastReceive广播接收器，它可以使用它对外部事件进行过滤只对感兴趣的外部事件(如当电话呼入时，或者数据网络可用时)进行接收并做出响应，广播接收器没有用户界面，然而，它们可以启动一个activity或serice 来响应它们收到的信息。content 组件可以为一个应用程序的指定数据集提供给其他应用程序，这些数据可以存储在文件系统中、在一个SQLite数据库、或以其他方式。services组件是一段长生命周期并且没有用户界面的程序，举个例子就是：一个正在从播放列表中播放歌曲的媒体播放器，在一个媒体播放器的应用中，应该会有多个activity，让使用者可以选择歌曲并播放歌曲。接下来通过暴露的这些风险来进行安全测试，首先测试activities exported绕过登陆限制，可以先用app.activity.info检测暴露的Activity信息</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-13.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-13.png">
+<h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><p>其实根据名称就可以猜的差不多，.FileSelectActivity可能是和文件有关，.MainLoginActivity应该就是主界面，.PWList可能和密码有关（PW&#x3D;password），所以要想绕过登陆限制着重应该测试.PWList</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs stylus">run app<span class="hljs-selector-class">.activity</span><span class="hljs-selector-class">.start</span> <span class="hljs-attr">--component</span> 包的名称 .PWList<br></code></pre></td></tr></table></figure>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-15.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-15.png">
+<h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><p>运行之后手机端会直接进行跳转，可以直接进入到软件内部，从而绕过了登录验证，很像我们常见的越权漏洞</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/%E5%BE%AE%E4%BF%A1%E5%9B%BE%E7%89%87_20240508081726.jpg" srcset="/img/loading.gif" lazyload class="" title="微信图片_20240508081726.jpg">
+<h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><p>接下来我们测试content provider，主要会存在数据库泄漏和SQL注入等问题，首先我们通过app.provider.info列举Content Provider所有的信息</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-18.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-18.png">
+<h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><p>通过枚举uri，尽可能找出更多的存在敏感信息的路径，或者可以用drozer自带的扫描器模块进行枚举，并预测可访问内容uri的列表</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-25.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-25.png">
+<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><p>随后通过scanner.provider.injection模块从这些uri中检索信息，看是否存在sql注入，最终发现了三处注入</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-27.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-27.png">
+<h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><p>看到结果先别着急去跑表和字段，先进行手注判断报错信息，看是否真实存在sql注入，因为会存在误检（手注的话需要调用selection和projection参数传递一些简单的sql语句进行测试，我直接万能单引号走起）</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-29.png">
+<h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6><p>可以看到明显的报错信息，接下来可以交给app.provider和scan.provider模块去跑了，有点像sqlmap</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-30.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-30.png">
+<h6 id="-18"><a href="#-18" class="headerlink" title=""></a></h6><img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-31.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-31.png">
+<h6 id="-19"><a href="#-19" class="headerlink" title=""></a></h6><figure class="highlight jboss-cli"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs jboss-cli"><span class="hljs-params">--projection</span> <span class="hljs-string">&quot;* FROM Key;--&quot;</span> <span class="hljs-string">//</span>可以查询其他数据库<br></code></pre></td></tr></table></figure>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-33.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-33.png">
+<h6 id="-20"><a href="#-20" class="headerlink" title=""></a></h6><p>还可以用app.provider.read模块以及app.provider.download模块进行文件读取和下载，像经典的&#x2F;etc&#x2F;passwd和&#x2F;etc&#x2F;hosts这些都已经被广大白帽子们用来验证各种rce以及其他漏洞了，司空见惯了属于是</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-38.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-38.png">
+<h6 id="-21"><a href="#-21" class="headerlink" title=""></a></h6><img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-41.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-41.png">
+<h6 id="-22"><a href="#-22" class="headerlink" title=""></a></h6><p>文件下载的话，我就用下载数据库来演示了，其他文件也是同理的</p>
+<img src="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/2024-05-07_19-46.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-07_19-46.png">
+<h6 id="-23"><a href="#-23" class="headerlink" title=""></a></h6><p>如上图，数据库下载下来之后，可以用navicat等工具导入查看，或者直接用sqlite也可以</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%A7%BB%E5%8A%A8%E5%AE%89%E5%85%A8/" class="category-chain-item">移动安全</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/APP/" class="print-no-link">#APP</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>Drozer-Android安全测试</div>
+      <div>http://example.com/2024/05/08/Drozer-Android安全测试/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>liuty</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年5月8日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/05/09/%E5%85%8B%E6%A0%BC%E5%8B%83%E4%BF%A1%E4%BD%BF/" title="克格勃信使">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">克格勃信使</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/" title="disable_functions绕过">
+                        <span class="hidden-mobile">disable_functions绕过</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://l1uty.github.io/" target="_blank" rel="nofollow noopener"><span>liuty</span></a> <i class="iconfont icon-love"></i> <a href="https://www.mps.gov.cn/" target="_blank" rel="nofollow noopener"><span>???</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         次
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <script type="text/javascript" src="\js\FunnyTitle.js"></script>
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/diy/love.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+
+  <link rel="stylesheet" href="/dist/APlayer.min.css">
+  <div id="aplayer"></div>
+  <script type="text/javascript" src="/dist/APlayer.min.js"></script>
+  <script type="text/javascript" src="/dist/music.js"></script>
+
+  <script type="text/javascript"
+color="220,220,220" opacity='0.7' zIndex="-2" count="200" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js">
+  </script>
+
+  <script type="text/javascript" src="\js\snow.js"></script>
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

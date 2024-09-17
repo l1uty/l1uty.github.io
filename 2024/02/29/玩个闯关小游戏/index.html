@@ -1,0 +1,908 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="liuty">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="昨天中午睡了一觉，一个朋友邀请我来玩一个闯关游戏，发过来一看是一个xss闯关小游戏，虽然早有耳闻，但是说实话一次也没玩过；正好下午没什么事情，就玩玩这个游戏，就当打发时间了..(纯玩玩，毕竟不能耽误我刷抖音😊) 第一关  毕竟第一关，估计最简单，总不能在第一关的boss都打不出血吧，直接看源码  果然所有符号都没过滤，也没有转义，那不直接上payload 1&lt;script&gt;alert">
+<meta property="og:type" content="article">
+<meta property="og:title" content="玩个闯关小游戏">
+<meta property="og:url" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/index.html">
+<meta property="og:site_name" content="liuty&#39;s blog">
+<meta property="og:description" content="昨天中午睡了一觉，一个朋友邀请我来玩一个闯关游戏，发过来一看是一个xss闯关小游戏，虽然早有耳闻，但是说实话一次也没玩过；正好下午没什么事情，就玩玩这个游戏，就当打发时间了..(纯玩玩，毕竟不能耽误我刷抖音😊) 第一关  毕竟第一关，估计最简单，总不能在第一关的boss都打不出血吧，直接看源码  果然所有符号都没过滤，也没有转义，那不直接上payload 1&lt;script&gt;alert">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-01.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-02.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-06.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-11.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-12.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-13.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-14.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-21.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-19.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-24.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-26.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-27.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-29.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-31.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-32.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-35.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-36.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-37_1.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-39.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-40.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-41.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-42.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-43.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-44.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-44_1.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-48.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-48_1.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-49.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-51.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-53.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-53_1.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-54.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-55.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-59.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_09-01.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_09-03.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_11-10.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_11-11.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_11-12.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_11-14.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_11-16.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_11-20.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_12-21.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_12-21_1.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-13.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-13_1.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-14.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-16.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-17.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-19.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-19_1.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-22_1.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-24.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-24_1.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-26.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-27.png">
+<meta property="og:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-32.png">
+<meta property="article:published_time" content="2024-02-29T05:53:04.000Z">
+<meta property="article:modified_time" content="2024-02-29T08:51:49.017Z">
+<meta property="article:author" content="liuty">
+<meta property="article:tag" content="game time">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-01.png">
+  
+  
+  
+  <title>玩个闯关小游戏 - liuty&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":90,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"hCaWnJI7fVuWUvqb3FgzqfKD-gzGzoHsz","app_key":"NJZ1v4tGwTre1rcW3Qdw1WYU","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>liuty&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="玩个闯关小游戏"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-02-29 13:53" pubdate>
+          2024年2月29日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          17 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">玩个闯关小游戏</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <p>昨天中午睡了一觉，一个朋友邀请我来玩一个闯关游戏，发过来一看是一个xss闯关小游戏，虽然早有耳闻，但是说实话一次也没玩过；正好下午没什么事情，就玩玩这个游戏，就当打发时间了..(纯玩玩，毕竟不能耽误我刷抖音😊)</p>
+<p>第一关</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-01.png">
+<h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>毕竟第一关，估计最简单，总不能在第一关的boss都打不出血吧，直接看源码</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-02.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-02.png">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>果然所有符号都没过滤，也没有转义，那不直接上payload</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript"><span class="hljs-title function_">alert</span>(<span class="hljs-string">&quot;xss&quot;</span>)</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-06.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-06.png">
+<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>第二关<br>在输入框中输入测试语句（如下，后面都用这个做测试）可以看到输入框中没有显示出双引号，此处语句应该是被双引号闭合</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> &quot;&#x27;/<span class="hljs-attr">0n</span>&gt;</span><br></code></pre></td></tr></table></figure>
+
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-11.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-11.png">
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>通过观察源码，可以看到输入的参数是被双引号闭合着带入到input标签中</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-12.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-12.png">
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><p>所以需要在开头构造一个”&gt;把签名input标签闭合掉，在结尾构造一个”&lt;把input剩下的尖括号闭合即可</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">&quot;&gt;<span class="hljs-tag">&lt;<span class="hljs-name">script</span>&gt;</span><span class="language-javascript"><span class="hljs-title function_">alert</span>(<span class="hljs-string">&quot;xss&quot;</span>)</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>&lt;&quot;<br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-13.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-13.png">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><p>第三关<br>在输入框中输入测试语句，输入框的内容里没有单引号，此处语句应该是被单引号闭合</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-14.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-14.png">
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>观察源码可知，大小于号和双引号被转义，但是单引号没有被转义且参数是用单引号闭合的</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-21.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-21.png">
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><p>由于大于号被转义，我们需要使用哪些不需要用到标签的语句来触发XSS漏洞比如说用事件触发的形式，同时使用单引号来闭合</p>
+<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs isbl"><span class="hljs-string">&#x27;onmouseover=&#x27;</span><span class="hljs-function"><span class="hljs-title">alert</span>(<span class="hljs-string">&quot;xss&quot;</span>)</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-19.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-19.png">
+<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>第四关<br>在输入框中输入测试语句，发现搜索框里没有小于号，估计是被转义了，内容也是到script截止，说明内容是由双引号闭合的</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-24.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-24.png">
+<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>在网页源代码第17行中可以发现，大小于号已被过滤，引号没有被过滤或转义，参数采用的是双引号的闭合方式</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-26.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-26.png">
+<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><p>payload</p>
+<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs isbl"><span class="hljs-string">&quot;onmouseover=&quot;</span><span class="hljs-function"><span class="hljs-title">alert</span>(/<span class="hljs-variable">xss</span>/)</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-27.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-27.png">
+<h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><p>第五关<br>在输入框中输入测试语句，发现在r与i之间多了一个_符号，猜测是关键字被转义了</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-29.png">
+<h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><p>看源码我们发现两个关键字被转义，大小于号和引号没有被过滤与转义，用双引号闭合方式，可利用其他关键字绕过</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-31.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-31.png">
+<h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><p>尝试img标签</p>
+<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs isbl"><span class="hljs-string">&quot;&gt;&lt;IMG SRC=&quot;</span><span class="hljs-variable">javascript</span>:<span class="hljs-function"><span class="hljs-title">alert</span>(<span class="hljs-string">&#x27;XSS&#x27;</span>);<span class="hljs-string">&quot;&gt;&lt;&quot;</span></span><br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-32.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-32.png">
+<h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><p>虽然…但是无法进行弹窗，尝试修改为a标签，成功弹窗</p>
+<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs isbl"><span class="hljs-string">&quot;&gt;&lt;a href=&quot;</span><span class="hljs-variable">javascript</span>:<span class="hljs-function"><span class="hljs-title">alert</span>(<span class="hljs-string">&#x27;XSS&#x27;</span>);<span class="hljs-string">&quot;&gt;xss&lt;&quot;</span></span><br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-35.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-35.png">
+<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><p>第六关<br>在输入框中输入测试语句，感觉与上一关貌似是一样的</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-36.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-36.png">
+<h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><p>那直接利用上一关的payload，发现href被转义了….啊。。这。。</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-37_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-37_1.png">
+<h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6><img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-39.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-39.png">
+<h6 id="-18"><a href="#-18" class="headerlink" title=""></a></h6><p>采用大小写即可绕过</p>
+<figure class="highlight isbl"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs isbl"><span class="hljs-string">&quot;&gt;&lt;a Href=&quot;</span><span class="hljs-variable">javascript</span>:<span class="hljs-function"><span class="hljs-title">alert</span>(<span class="hljs-string">&#x27;XSS&#x27;</span>);<span class="hljs-string">&quot;&gt;xss&lt;&quot;</span></span><br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-40.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-40.png">
+<h6 id="-19"><a href="#-19" class="headerlink" title=""></a></h6><p>第七关<br>在输入框中输入测试语句，只显示了&lt;括号，猜测可能是script被过滤</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-41.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-41.png">
+<h6 id="-20"><a href="#-20" class="headerlink" title=""></a></h6><p>看源码可以看到script被过滤，采用双引号闭合</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-42.png">
+<h6 id="-21"><a href="#-21" class="headerlink" title=""></a></h6><p>经过尝试可以使用script双写绕过</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">&quot;&gt;<span class="hljs-tag">&lt;<span class="hljs-name">scrscriptipt</span>&gt;</span>alert(/xss/)<span class="hljs-tag">&lt;/<span class="hljs-name">scrscriptipt</span>&gt;</span>&lt;&quot;<br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-43.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-43.png">
+<h6 id="-22"><a href="#-22" class="headerlink" title=""></a></h6><p>第八关<br>在输入框中输入测试语句，输入的值均显示在页面上</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-44.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-44.png">
+<h6 id="-23"><a href="#-23" class="headerlink" title=""></a></h6><p>分析源码可知，大小于号被转义、双引号被转义，语句采用双引号闭合方式，并且在20行可以看到大小于号被转义回来，关键字被插入下划线</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-44_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-44_1.png">
+<h6 id="-24"><a href="#-24" class="headerlink" title=""></a></h6><p>可以使用javascript伪协议，javascript中的script会被转义为scr_ipt，源码中会对部分html实体编码转换为正常的字符，所以尝试采用将script htlm实体编码</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-48.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-48.png">
+<h6 id="-25"><a href="#-25" class="headerlink" title=""></a></h6><figure class="highlight gcode"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gcode">java&amp;<span class="hljs-attr">#x0073</span>;&amp;<span class="hljs-attr">#x0063</span>;&amp;<span class="hljs-attr">#x0072</span>;&amp;<span class="hljs-attr">#x0069</span>;&amp;<span class="hljs-attr">#x0070</span>;&amp;<span class="hljs-attr">#x0074</span>;:alert<span class="hljs-comment">(/xss/)</span><br></code></pre></td></tr></table></figure>
+<p>点击友情链接成功弹窗<br>pass!</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-48_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-48_1.png">
+<h6 id="-26"><a href="#-26" class="headerlink" title=""></a></h6><p>第九关<br>在输入框中输入测试语句，输入的值也是显示在页面上</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-49.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-49.png">
+<h6 id="-27"><a href="#-27" class="headerlink" title=""></a></h6><p>感觉和上一关差不多的情况，大小于号被转义、双引号被转义、、大写变小写，采用双引号闭合，有意思的是：在20行提示“您的链接不合法？有没有！”<br>what??什么鬼？？和链接有关？难不成和http&#x2F;https有关..</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-51.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-51.png">
+<h6 id="-28"><a href="#-28" class="headerlink" title=""></a></h6><p>尝试输入一个正常的链接提交试试，发现返回是合法的</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-53.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-53.png">
+<h6 id="-29"><a href="#-29" class="headerlink" title=""></a></h6><p>所以将http:&#x2F;&#x2F;写入到payload中让他匹配到存在即会返回合法，所以构造pyload</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-53_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-53_1.png">
+<h6 id="-30"><a href="#-30" class="headerlink" title=""></a></h6><figure class="highlight clean"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs clean">java&amp;#x0073;&amp;#x0063;&amp;#x0072;&amp;#x0069;&amp;#x0070;&amp;#x0074;:alert(<span class="hljs-string">&#x27;http://xss&#x27;</span>)<br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-54.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-54.png">
+<h6 id="-31"><a href="#-31" class="headerlink" title=""></a></h6><p>第十关<br>在url中输入测试语句，页面显示看不出什么信息</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-55.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-55.png">
+<h6 id="-32"><a href="#-32" class="headerlink" title=""></a></h6><p>分析源码，发现第15行大小于号被转义、双引号都被转义，语句采用双引号闭合。在第17、18、19行，发现三个输入参数，分别是t_link、t_history、t_sort</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_08-59.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_08-59.png">
+<h6 id="-33"><a href="#-33" class="headerlink" title=""></a></h6><p>输入测试语句</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">?t_history=<span class="hljs-tag">&lt;<span class="hljs-name">script</span> &quot;&#x27;/<span class="hljs-attr">0n</span>&gt;</span><span class="language-javascript">&amp;t_sort=<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> &quot;&#x27;/<span class="hljs-attr">0n</span>&gt;</span></span>&amp;t_link=<span class="language-xml"><span class="language-handlebars"><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> &quot;&#x27;/<span class="hljs-attr">0n</span>&gt;</span></span></span></span></span><br></code></pre></td></tr></table></figure>
+<p>发现只有t_sort有值，大小于号被过滤，采用双引号闭合</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_09-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_09-01.png">
+<h6 id="-34"><a href="#-34" class="headerlink" title=""></a></h6><p>那payload构造的时候，就不需要用&gt;&lt;的事件触发方式构造语句</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs routeros">?<span class="hljs-attribute">t_sort</span>=sb&quot; <span class="hljs-attribute">type</span>=<span class="hljs-string">&quot;button&quot;</span> <span class="hljs-attribute">onclick</span>=<span class="hljs-string">&quot;alert(/xss/)</span><br><span class="hljs-string"></span><br><span class="hljs-string"># ?t_sort=表示参数是传递给谁</span><br><span class="hljs-string"># sb&quot;</span>给input赋值同时闭合双引号<br><span class="hljs-comment"># 修改type属性为按钮方便事件触发</span><br><span class="hljs-comment"># onclik则表示点击时触发事件</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_09-03.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_09-03.png">
+<h6 id="-35"><a href="#-35" class="headerlink" title=""></a></h6><p>第十一关<br>在url中输入测试语句，页面显示看不出什么信息</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_11-10.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_11-10.png">
+<h6 id="-36"><a href="#-36" class="headerlink" title=""></a></h6><p>查看源码，发现第15行大小于号被转义、双引号都被转义，语句采用双引号闭合，在第17、18、19、20行，发现另外四个输入参数，分别是t_link、t_history、t_sort、t_ref，考虑将测试语句传入进行测试</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_11-11.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_11-11.png">
+<h6 id="-37"><a href="#-37" class="headerlink" title=""></a></h6><p>构造访问</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">?t_history=<span class="hljs-tag">&lt;<span class="hljs-name">script</span> &quot;&#x27;/<span class="hljs-attr">0n</span>&gt;</span><span class="language-javascript">&amp;t_sort=<span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> &quot;&#x27;/<span class="hljs-attr">0n</span>&gt;</span></span>&amp;t_link=<span class="language-xml"><span class="language-handlebars"><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> &quot;&#x27;/<span class="hljs-attr">0n</span>&gt;</span></span></span></span>&amp;t_ref=<span class="language-xml"><span class="language-handlebars"><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> &quot;&#x27;/<span class="hljs-attr">0n</span>&gt;</span></span></span></span></span><br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_11-12.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_11-12.png">
+<h6 id="-38"><a href="#-38" class="headerlink" title=""></a></h6><p>可以看到大小于号被转义、双引号都被转义，语句采用双引号闭合，然后我尝试了很多绕过都不行，终究还是太菜了…尝试其余参数入手试试吧，可以发现其余参通过url地址栏传递无法传递，这时候就在想t_ref根据命令规则是不是就是http的referer头部信息，抓包尝试一下,发现没有任何过滤</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_11-14.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_11-14.png">
+<h6 id="-39"><a href="#-39" class="headerlink" title=""></a></h6><p>okkkk，那就直接改referer头部信息，但是没有..手动加个referer<br>pass!</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs dts"><span class="hljs-symbol">referer:</span> referer:click me!<span class="hljs-string">&quot; type=&quot;</span>button<span class="hljs-string">&quot; onclick=&quot;</span>alert(<span class="hljs-keyword">/xss/</span>)<br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_11-16.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_11-16.png">
+<h6 id="-40"><a href="#-40" class="headerlink" title=""></a></h6><img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_11-20.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_11-20.png">
+<h6 id="-41"><a href="#-41" class="headerlink" title=""></a></h6><p>第十二关<br>与关卡11类似，修改t_ua值进行绕过，也就是修改数据包中的UA头，不再多说</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_12-21.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_12-21.png">
+<h6 id="-42"><a href="#-42" class="headerlink" title=""></a></h6><img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_12-21_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_12-21_1.png">
+<h6 id="-43"><a href="#-43" class="headerlink" title=""></a></h6><img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-13.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_13-13.png">
+<h6 id="-44"><a href="#-44" class="headerlink" title=""></a></h6><p>第十三关<br>与关卡11、12类似，修改值进行绕过，也不再多说</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-13_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_13-13_1.png">
+<h6 id="-45"><a href="#-45" class="headerlink" title=""></a></h6><img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-14.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_13-14.png">
+<h6 id="-46"><a href="#-46" class="headerlink" title=""></a></h6><p>payload</p>
+<figure class="highlight dts"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs dts"><span class="hljs-symbol">Cookie:</span> <span class="hljs-attr">user</span><span class="hljs-operator">=</span>click me!<span class="hljs-string">&quot; type=&quot;</span>button<span class="hljs-string">&quot; onclick=&quot;</span>alert(<span class="hljs-keyword">/xss/</span>)<br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-16.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_13-16.png">
+<h6 id="-47"><a href="#-47" class="headerlink" title=""></a></h6><img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-17.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_13-17.png">
+<h6 id="-48"><a href="#-48" class="headerlink" title=""></a></h6><p>第十四关<br>额…第十四关咋啥东西也没有，就一个跳转，还是404！！源码也没啥东西，我也不知道是要考啥，捣鼓半天放弃..直接下一题吧</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-19.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_13-19.png">
+<h6 id="-49"><a href="#-49" class="headerlink" title=""></a></h6><img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-19_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_13-19_1.png">
+<h6 id="-50"><a href="#-50" class="headerlink" title=""></a></h6><p>第十五关<br>分析源码发现URL的src参数回显在下面的ng-include</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-22_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_13-22_1.png">
+<h6 id="-51"><a href="#-51" class="headerlink" title=""></a></h6><p>ng-include相当于php的include函数，所以我们只要包含一个有XSS漏洞的URL就可触发这里的XSS，那我们这里包含第一关的XSS试试</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">?src=&#x27;level1.php?name=<span class="hljs-tag">&lt;<span class="hljs-name">img</span> <span class="hljs-attr">src</span>=<span class="hljs-string">x</span> <span class="hljs-attr">onerror</span>=<span class="hljs-string">alert(1)</span>&gt;</span>&#x27;<br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-24.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_13-24.png">
+<h6 id="-52"><a href="#-52" class="headerlink" title=""></a></h6><p>第十六关<br>在url中输入测试语句，可以看到script被过滤了</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-24_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_13-24_1.png">
+<h6 id="-53"><a href="#-53" class="headerlink" title=""></a></h6><p>可以看到script被过滤了、并且空格和&#x2F;被转义了</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-26.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_13-26.png">
+<h6 id="-54"><a href="#-54" class="headerlink" title=""></a></h6><p>用img绕过并且空格用%0a替换</p>
+<figure class="highlight llvm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs llvm">?keyword<span class="hljs-operator">=</span>&lt;img<span class="hljs-variable">%0</span>asrc<span class="hljs-operator">=</span><span class="hljs-keyword">x</span><span class="hljs-variable">%0</span>aonerror<span class="hljs-operator">=</span>alert(<span class="hljs-number">1</span>)&gt;<br></code></pre></td></tr></table></figure>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-27.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_13-27.png">
+<h6 id="-55"><a href="#-55" class="headerlink" title=""></a></h6><p>到了下一关发现提示“该插件不支持”，这时候我盲猜应该是考Flash XSS，既然提示我没有且加载不出来，那就到此为止吧，也不知道后面有多少关，本来一开始就是打着做着玩的心态，打发一下时间，也就不在这上面浪费时间了，说不定哪天又碰到了或者想起来了，到时候再搞搞玩吧！嗯嗯..就这样</p>
+<img src="/2024/02/29/%E7%8E%A9%E4%B8%AA%E9%97%AF%E5%85%B3%E5%B0%8F%E6%B8%B8%E6%88%8F/2024-02-29_13-32.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-29_13-32.png">
+<h6 id="-56"><a href="#-56" class="headerlink" title=""></a></h6><p>继续刷我抖音了～#$%@……^&amp;*(-+)😊</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/Game/" class="category-chain-item">Game</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/game-time/" class="print-no-link">#game time</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>玩个闯关小游戏</div>
+      <div>http://example.com/2024/02/29/玩个闯关小游戏/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>liuty</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年2月29日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/03/03/fastjson%E6%BC%8F%E6%B4%9E%E6%80%BB%E7%BB%93/" title="fastjson漏洞总结">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">fastjson漏洞总结</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/02/18/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%BA%8C%EF%BC%89/" title="Docker安全（二）">
+                        <span class="hidden-mobile">Docker安全（二）</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://l1uty.github.io/" target="_blank" rel="nofollow noopener"><span>liuty</span></a> <i class="iconfont icon-love"></i> <a href="https://www.mps.gov.cn/" target="_blank" rel="nofollow noopener"><span>???</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         次
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <script type="text/javascript" src="\js\FunnyTitle.js"></script>
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/diy/love.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+
+  <link rel="stylesheet" href="/dist/APlayer.min.css">
+  <div id="aplayer"></div>
+  <script type="text/javascript" src="/dist/APlayer.min.js"></script>
+  <script type="text/javascript" src="/dist/music.js"></script>
+
+  <script type="text/javascript"
+color="220,220,220" opacity='0.7' zIndex="-2" count="200" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js">
+  </script>
+
+  <script type="text/javascript" src="\js\snow.js"></script>
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

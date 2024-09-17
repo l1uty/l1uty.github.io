@@ -1,0 +1,804 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="liuty">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言现如今越来越多的站点使用前端数据加密，从之前传统的base64、md5变向AES、RSA、或SM2&#x2F;SM4(国产替代RSA)加密，有时候或干脆进行签名校验，这就需要我们逆向提取加密算法以及密钥，过程相对繁琐复杂，并且越来越多行业的内部系统使用了加密技术对HTTP的请求体加密, 时间戳, RequestId等防止进行数据包的抓包改包，这样一来增大了安全测试人员的测试难度，也使得很多不懂">
+<meta property="og:type" content="article">
+<meta property="og:title" content="前端JS加密抗衡">
+<meta property="og:url" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/index.html">
+<meta property="og:site_name" content="liuty&#39;s blog">
+<meta property="og:description" content="前言现如今越来越多的站点使用前端数据加密，从之前传统的base64、md5变向AES、RSA、或SM2&#x2F;SM4(国产替代RSA)加密，有时候或干脆进行签名校验，这就需要我们逆向提取加密算法以及密钥，过程相对繁琐复杂，并且越来越多行业的内部系统使用了加密技术对HTTP的请求体加密, 时间戳, RequestId等防止进行数据包的抓包改包，这样一来增大了安全测试人员的测试难度，也使得很多不懂">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-29_15-49.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-29_15-57.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-29_16-04.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_11-42.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-29_16-12.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-29_16-17.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_09-43.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_09-49.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_14-40.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_10-12.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_10-31.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_10-39.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_10-59.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_11-01.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_11-05.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_11-12.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_11-34.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_11-44.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_14-45.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_14-48.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_14-55.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_14-56.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_14-19.png">
+<meta property="og:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_14-16.png">
+<meta property="article:published_time" content="2024-06-29T07:32:42.000Z">
+<meta property="article:modified_time" content="2024-06-30T00:30:57.223Z">
+<meta property="article:author" content="liuty">
+<meta property="article:tag" content="总结">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-29_15-49.png">
+  
+  
+  
+  <title>前端JS加密抗衡 - liuty&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":90,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"hCaWnJI7fVuWUvqb3FgzqfKD-gzGzoHsz","app_key":"NJZ1v4tGwTre1rcW3Qdw1WYU","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>liuty&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="前端JS加密抗衡"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-06-29 15:32" pubdate>
+          2024年6月29日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          21 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">前端JS加密抗衡</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>现如今越来越多的站点使用前端数据加密，从之前传统的base64、md5变向AES、RSA、或SM2&#x2F;SM4(国产替代RSA)加密，有时候或干脆进行签名校验，这就需要我们逆向提取加密算法以及密钥，过程相对繁琐复杂，并且越来越多行业的内部系统使用了加密技术对HTTP的请求体加密, 时间戳, RequestId等防止进行数据包的抓包改包，这样一来增大了安全测试人员的测试难度，也使得很多不懂加密测试的人员望而却步</p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>从测试人员的角度出发，当我们拿到一个站点，在抓包时我们都希望碰到的是明文传输，因为简单且清晰明了，方便我们做测试，如下图</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-29_15-49.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-29_15-49.png">
+<h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>但是现如今这样的站点是少之又少，大多数都进行了加密处理，这就要求我们对JS逆向和前端调试有一定的了解，说起JS逆向，那都是老生常谈了，想找到JS中的加解密的方法，需要我们首先快速定位到加解密函数和明文点的位置，以下面这个站点为例，一个很常规很普通很常见的登录</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-29_15-57.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-29_15-57.png">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>在开始之前给大家推荐一款Google浏览器插件：v_jstools，能够一键监测JS中指定函数的调用，下载好之后，本地导入插件即可，在配置v_jstools的时候一定要注意不要全部勾选，根据实际情况选择需要挂钩的函数即可，否则信息流太大干扰我们测试</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-29_16-04.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-29_16-04.png">
+<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>一切都配置好后，打开挂钩功能，并F12打开浏览器控制台，此时刷新页面，如果出现“inject start!”则表示插件生效了</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_11-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_11-42.png">
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>当我们输入账号密码发送数据时，针对请求包，v_jstools帮我们找到了请求的明文点</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-29_16-12.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-29_16-12.png">
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><p>既然定位到了请求的明文点，那就跟进对应的JS文件，并在该代码处（JSON.stringify）打上断点跟踪</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-29_16-17.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-29_16-17.png">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><p>当我们重新发送数据包，点击步过一次，就可以很容易的发现n变量就是我们提交的账号密码明文内容</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_09-43.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_09-43.png">
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>继续点击步过，经过t.data&#x3D;l(n)后，data内容为密文，并且通过对作用域中的请求包比较，发现t.data即为加密后的内容，那么l()函数即为加密函数</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_09-49.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_09-49.png">
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_14-40.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_14-40.png">
+<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>说干就干！我们跟进l()函数中看看，发现l函数即为加密函数，并且在附近也发现了解密函数，其中t参数为原始的内容，f参数为密钥，h为密码</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_10-12.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_10-12.png">
+<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>再返回看，我们也可以发现requestID算法，时间戳算法和签名算法</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_10-31.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_10-31.png">
+<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><p>假设现在我们知道了正确的账号密码：test&#x2F;123，我们如何修改数据包，这里有三种解决方案，第一种方案就是直接在明文点修改，进入到调试中，走到加密前的一步，直接在作用域中修改</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_10-39.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_10-39.png">
+<h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><p>不过这种方式可能会引文加密方式和一些签名的限制，可能修改无效，有很大的局限性，赌一赌还是可以的。第二种方式需要用到JS-forward，大致的原理就是在明文点处插入一段JS代码，这段代码会通过AJAX请求发送给bp，bp做拦截处理并修改内容后，会将数值返回到原始变量中，首先确定明文变量名，通过调试，可以判定明文变量就是t.data</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_10-59.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_10-59.png">
+<h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><p>随后启动JS-forward，输入变量名、数据类型、请求标识（REQUEST），输入$end 结束后，会开启2个端口进行监听，分别是38080和28080，并且会生成一段js代码，这段代码就是我们即将插入到明文点的代码</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_11-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_11-01.png">
+<h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><p>在插入修改JS代码之前，要注意的是，我们需要新创一个文件夹，然后F12,找到对应的源代码进行替换，否则是无法直接进行修改JS中的代码，成功的话，右下角会有一个紫色圆的标识</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_11-05.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_11-05.png">
+<h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><p>然后将刚才生成的JS代码复制到明文点函数的第一行，最后保存</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_11-12.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_11-12.png">
+<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><p>关闭F12，刷新页面再次发包时bp即可接收到明文信息</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_11-34.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_11-34.png">
+<h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><p>第三种方式是通过JSrpc注入，主动主动发包加解密，需要借助工具JS-RPC，这款工具的工作原理就是在浏览器控制台中执行一段代码，通过websocket与本地的python服务端进行连接，当我们想要执行代码，只需要通过RPC调用控制台中的函数即可，打开客户端，然后在控制台中输入JSrpc的注入代码，代码如下</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-keyword">function</span> <span class="hljs-title function_">Hlclient</span>(<span class="hljs-params">wsURL</span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">wsURL</span> = wsURL;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">handlers</span> = &#123;<br>        <span class="hljs-attr">_execjs</span>: <span class="hljs-keyword">function</span> (<span class="hljs-params">resolve, param</span>) &#123;<br>            <span class="hljs-keyword">var</span> res = <span class="hljs-built_in">eval</span>(param)<br>            <span class="hljs-keyword">if</span> (!res) &#123;<br>                <span class="hljs-title function_">resolve</span>(<span class="hljs-string">&quot;没有返回值&quot;</span>)<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                <span class="hljs-title function_">resolve</span>(res)<br>            &#125;<br><br>        &#125;<br>    &#125;;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">socket</span> = <span class="hljs-literal">undefined</span>;<br>    <span class="hljs-keyword">if</span> (!wsURL) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&#x27;wsURL can not be empty!!&#x27;</span>)<br>    &#125;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">connect</span>()<br>&#125;<br><br><span class="hljs-title class_">Hlclient</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">connect</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;begin of connect to wsURL: &#x27;</span> + <span class="hljs-variable language_">this</span>.<span class="hljs-property">wsURL</span>);<br>    <span class="hljs-keyword">var</span> _this = <span class="hljs-variable language_">this</span>;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-variable language_">this</span>.<span class="hljs-property">socket</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">WebSocket</span>(<span class="hljs-variable language_">this</span>.<span class="hljs-property">wsURL</span>);<br>        <span class="hljs-variable language_">this</span>.<span class="hljs-property">socket</span>.<span class="hljs-property">onmessage</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">e</span>) &#123;<br>            _this.<span class="hljs-title function_">handlerRequest</span>(e.<span class="hljs-property">data</span>)<br>        &#125;<br>    &#125; <span class="hljs-keyword">catch</span> (e) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;connection failed,reconnect after 10s&quot;</span>);<br>        <span class="hljs-built_in">setTimeout</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>            _this.<span class="hljs-title function_">connect</span>()<br>        &#125;, <span class="hljs-number">10000</span>)<br>    &#125;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">socket</span>.<span class="hljs-property">onclose</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&#x27;rpc已关闭&#x27;</span>);<br>        <span class="hljs-built_in">setTimeout</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params"></span>) &#123;<br>            _this.<span class="hljs-title function_">connect</span>()<br>        &#125;, <span class="hljs-number">10000</span>)<br>    &#125;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">socket</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;open&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;rpc连接成功&quot;</span>);<br>    &#125;);<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">socket</span>.<span class="hljs-title function_">addEventListener</span>(<span class="hljs-string">&#x27;error&#x27;</span>, <span class="hljs-function">(<span class="hljs-params">event</span>) =&gt;</span> &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">error</span>(<span class="hljs-string">&#x27;rpc连接出错,请检查是否打开服务端:&#x27;</span>, event.<span class="hljs-property">error</span>);<br>    &#125;);<br><br>&#125;;<br><span class="hljs-title class_">Hlclient</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">send</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">msg</span>) &#123;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">socket</span>.<span class="hljs-title function_">send</span>(msg)<br>&#125;<br><br><span class="hljs-title class_">Hlclient</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">regAction</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">func_name, func</span>) &#123;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> func_name !== <span class="hljs-string">&#x27;string&#x27;</span>) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;an func_name must be string&quot;</span>);<br>    &#125;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> func !== <span class="hljs-string">&#x27;function&#x27;</span>) &#123;<br>        <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">Error</span>(<span class="hljs-string">&quot;must be function&quot;</span>);<br>    &#125;<br>    <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;register func_name: &quot;</span> + func_name);<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-property">handlers</span>[func_name] = func;<br>    <span class="hljs-keyword">return</span> <span class="hljs-literal">true</span><br><br>&#125;<br><br><span class="hljs-comment">//收到消息后这里处理，</span><br><span class="hljs-title class_">Hlclient</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">handlerRequest</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">requestJson</span>) &#123;<br>    <span class="hljs-keyword">var</span> _this = <span class="hljs-variable language_">this</span>;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-keyword">var</span> result = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(requestJson)<br>    &#125; <span class="hljs-keyword">catch</span> (error) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;catch error&quot;</span>, requestJson);<br>        result = <span class="hljs-title function_">transjson</span>(requestJson)<br>    &#125;<br>    <span class="hljs-comment">//console.log(result)</span><br>    <span class="hljs-keyword">if</span> (!result[<span class="hljs-string">&#x27;action&#x27;</span>]) &#123;<br>        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">sendResult</span>(<span class="hljs-string">&#x27;&#x27;</span>, <span class="hljs-string">&#x27;need request param &#123;action&#125;&#x27;</span>);<br>        <span class="hljs-keyword">return</span><br>    &#125;<br>    <span class="hljs-keyword">var</span> action = result[<span class="hljs-string">&quot;action&quot;</span>]<br>    <span class="hljs-keyword">var</span> theHandler = <span class="hljs-variable language_">this</span>.<span class="hljs-property">handlers</span>[action];<br>    <span class="hljs-keyword">if</span> (!theHandler) &#123;<br>        <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">sendResult</span>(action, <span class="hljs-string">&#x27;action not found&#x27;</span>);<br>        <span class="hljs-keyword">return</span><br>    &#125;<br>    <span class="hljs-keyword">try</span> &#123;<br>        <span class="hljs-keyword">if</span> (!result[<span class="hljs-string">&quot;param&quot;</span>]) &#123;<br>            <span class="hljs-title function_">theHandler</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">response</span>) &#123;<br>                _this.<span class="hljs-title function_">sendResult</span>(action, response);<br>            &#125;)<br>            <span class="hljs-keyword">return</span><br>        &#125;<br>        <span class="hljs-keyword">var</span> param = result[<span class="hljs-string">&quot;param&quot;</span>]<br>        <span class="hljs-keyword">try</span> &#123;<br>            param = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(param)<br>        &#125; <span class="hljs-keyword">catch</span> (e) &#123;&#125;<br>        <span class="hljs-title function_">theHandler</span>(<span class="hljs-keyword">function</span> (<span class="hljs-params">response</span>) &#123;<br>            _this.<span class="hljs-title function_">sendResult</span>(action, response);<br>        &#125;, param)<br><br>    &#125; <span class="hljs-keyword">catch</span> (e) &#123;<br>        <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;error: &quot;</span> + e);<br>        _this.<span class="hljs-title function_">sendResult</span>(action, e);<br>    &#125;<br>&#125;<br><br><span class="hljs-title class_">Hlclient</span>.<span class="hljs-property"><span class="hljs-keyword">prototype</span></span>.<span class="hljs-property">sendResult</span> = <span class="hljs-keyword">function</span> (<span class="hljs-params">action, e</span>) &#123;<br>    <span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> e === <span class="hljs-string">&#x27;object&#x27;</span> &amp;&amp; e !== <span class="hljs-literal">null</span>) &#123;<br>        <span class="hljs-keyword">try</span> &#123;<br>            e = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(e)<br>        &#125; <span class="hljs-keyword">catch</span> (v) &#123;<br>            <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(v)<span class="hljs-comment">//不是json无需操作</span><br>        &#125;<br>    &#125;<br>    <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">send</span>(action + <span class="hljs-title function_">atob</span>(<span class="hljs-string">&quot;aGxeX14&quot;</span>) + e);<br>&#125;<br><br><span class="hljs-keyword">function</span> <span class="hljs-title function_">transjson</span>(<span class="hljs-params">formdata</span>) &#123;<br>    <span class="hljs-keyword">var</span> regex = <span class="hljs-regexp">/&quot;action&quot;:(?&lt;actionName&gt;.*?),/g</span><br>    <span class="hljs-keyword">var</span> actionName = regex.<span class="hljs-title function_">exec</span>(formdata).<span class="hljs-property">groups</span>.<span class="hljs-property">actionName</span><br>    stringfystring = formdata.<span class="hljs-title function_">match</span>(<span class="hljs-regexp">/&#123;..data..:.*..\w+..:\s...*?..&#125;/g</span>).<span class="hljs-title function_">pop</span>()<br>    stringfystring = stringfystring.<span class="hljs-title function_">replace</span>(<span class="hljs-regexp">/\\&quot;/g</span>, <span class="hljs-string">&#x27;&quot;&#x27;</span>)<br>    paramstring = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(stringfystring)<br>    tens = <span class="hljs-string">`&#123;&quot;action&quot;:`</span> + actionName + <span class="hljs-string">`,&quot;param&quot;:&#123;&#125;&#125;`</span><br>    tjson = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">parse</span>(tens)<br>    tjson.<span class="hljs-property">param</span> = paramstring<br>    <span class="hljs-keyword">return</span> tjson<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>然后进行连接</p>
+<figure class="highlight haxe"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs haxe"><span class="hljs-keyword">var</span> liuty = <span class="hljs-keyword">new</span> <span class="hljs-type">Hlclient</span>(<span class="hljs-string">&quot;ws://127.0.0.1:12080/ws?group=liuty111&quot;</span>); <span class="hljs-comment">//名字随意</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_11-44.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_11-44.png">
+<h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6><p>首先还是调试到加密那里，前面我们也已经知道了加密函数为l()，然后在控制台中输入window.enc &#x3D; l, 控制台会显示当前函数信息，并注册保存非形参的参数，那我们可以主动调用enc()函数, 随便做个测试，就123吧，查看是否有效</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_14-45.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_14-45.png">
+<h6 id="-18"><a href="#-18" class="headerlink" title=""></a></h6><p>可以看到是没问题的，那我们就向JSrpc中注册这些函数</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs javascript">demo.<span class="hljs-title function_">regAction</span>(<span class="hljs-string">&quot;enc&quot;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">resolve, param</span>) &#123;<br>    <span class="hljs-keyword">var</span> res = <span class="hljs-title function_">enc</span>(<span class="hljs-title class_">String</span>(param));<br>    <span class="hljs-title function_">resolve</span>(res);<br>&#125;)<br></code></pre></td></tr></table></figure>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_14-48.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_14-48.png">
+<h6 id="-19"><a href="#-19" class="headerlink" title=""></a></h6><p>显示“true”则代表成功，那我们就可以通过mitmproxy将原始请求发送到JS-RPC中进行加密后修改原始数据包内容, 再进行发包(mitmproxy是一款代理工具, 想bp一样可以进行拦截,改包等操作)<br>再分析一遍JS，加上前面的分析和理解，不难做出判断：r很明显就是时间戳，n是将数据请求经过v()函数处理后再进行JSON编码，i是使用p函数生成requestId，s是使用MD5()函数并通过n+i+r字符串拼接的方式生成HASH，最后对变量n使用l()函数进行加密，知道这些之后，我们开始打上断点进行调试，首先记录这些函数</p>
+<figure class="highlight stylus"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs stylus">时间戳：<br>window<span class="hljs-selector-class">.time</span> = Date<span class="hljs-selector-class">.parse</span><br>requestId：<br>window<span class="hljs-selector-class">.id</span> = <span class="hljs-selector-tag">p</span><br>v函数：<br>window<span class="hljs-selector-class">.v1</span> = v<br>签名：<br>window<span class="hljs-selector-class">.m</span> = <span class="hljs-selector-tag">a</span><span class="hljs-selector-class">.a</span><span class="hljs-selector-class">.MD5</span><br>加密：<br>window<span class="hljs-selector-class">.enc</span> = l<br></code></pre></td></tr></table></figure>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_14-55.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_14-55.png">
+<h6 id="-20"><a href="#-20" class="headerlink" title=""></a></h6><p>随后进行注册</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><code class="hljs javascript"><span class="hljs-comment">//md5函数</span><br>demo.<span class="hljs-title function_">regAction</span>(<span class="hljs-string">&quot;req&quot;</span>, <span class="hljs-keyword">function</span> (<span class="hljs-params">resolve,param</span>) &#123;<br>    <span class="hljs-comment">//请求头</span><br>    <span class="hljs-keyword">let</span> timestamp = <span class="hljs-title function_">time</span>(<span class="hljs-keyword">new</span> <span class="hljs-title class_">Date</span>());<br>    <span class="hljs-keyword">let</span> requestid = <span class="hljs-title function_">id</span>();<br>    <span class="hljs-keyword">let</span> v_data = <span class="hljs-title class_">JSON</span>.<span class="hljs-title function_">stringify</span>(<span class="hljs-title function_">v1</span>(param));<br>    <span class="hljs-keyword">let</span> sign = <span class="hljs-title function_">m</span>(v_data + requestid + timestamp).<span class="hljs-title function_">toString</span>();<br>    <span class="hljs-comment">//加密请求体</span><br>    <span class="hljs-keyword">let</span> encstr = <span class="hljs-title function_">enc</span>(v_data);<br><br>    <span class="hljs-keyword">let</span> res = &#123;<br>        <span class="hljs-string">&quot;timestamp&quot;</span>:timestamp,<br>        <span class="hljs-string">&quot;requestid&quot;</span>:requestid,<br>        <span class="hljs-string">&quot;encstr&quot;</span>:encstr,<br>        <span class="hljs-string">&quot;sign&quot;</span>:sign<br>    &#125;;<br>    <span class="hljs-title function_">resolve</span>(res);<br>&#125;)<br></code></pre></td></tr></table></figure>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_14-56.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_14-56.png">
+<h6 id="-21"><a href="#-21" class="headerlink" title=""></a></h6><p>这样一来，我们就可以一次性获取所有请求的需求了，对于mitmproxy我就不多说了，现在我们构建mitmproxy的脚本，通过前面的分析我们的代码逻辑为: 提取原始请求体后, 向请求头中添加requestId, timestamp, sign字段并且替换原始请求体为加密后的内容</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><code class="hljs python"><span class="hljs-keyword">import</span> json<br><span class="hljs-keyword">import</span> time<br><span class="hljs-keyword">import</span> hashlib<br><span class="hljs-keyword">import</span> uuid<br><span class="hljs-keyword">from</span> mitmproxy <span class="hljs-keyword">import</span> http<br><span class="hljs-keyword">import</span> requests<br><span class="hljs-keyword">import</span> requests<br><br><br><span class="hljs-keyword">def</span> <span class="hljs-title function_">request</span>(<span class="hljs-params">flow: http.HTTPFlow</span>) -&gt; <span class="hljs-literal">None</span>:<br>    <span class="hljs-keyword">if</span> flow.request.pretty_url.startswith(<span class="hljs-string">&quot;http://测试IP&quot;</span>):<br>        <span class="hljs-comment"># 提取原始请求体</span><br>        original_body = flow.request.content.decode(<span class="hljs-string">&#x27;utf-8&#x27;</span>)<br>        data = &#123;<span class="hljs-string">&quot;group&quot;</span>: <span class="hljs-string">&quot;zzz&quot;</span>, <span class="hljs-string">&quot;action&quot;</span>: <span class="hljs-string">&quot;req&quot;</span>, <span class="hljs-string">&quot;param&quot;</span>: original_body&#125;<br>        res = requests.post(<span class="hljs-string">&quot;http://127.0.0.1:12080/go&quot;</span>,data=data)<br>        res_json = json.loads(res.text)[<span class="hljs-string">&quot;data&quot;</span>]<br>        data_json = json.loads(res_json)<br>        <span class="hljs-built_in">print</span>(data_json)<br>        <span class="hljs-comment"># 对请求体进行加密处理（这里假设加密方法是简单的哈希）</span><br>        encrypted_body = data_json[<span class="hljs-string">&quot;encstr&quot;</span>]<br><br>        <span class="hljs-comment"># 替换请求体</span><br>        flow.request.text = encrypted_body<br><br>        <span class="hljs-comment"># 生成 requestId，sign 和 timestamp</span><br>        request_id = data_json[<span class="hljs-string">&quot;requestid&quot;</span>]<br>        timestamp = data_json[<span class="hljs-string">&quot;timestamp&quot;</span>]<br>        sign = data_json[<span class="hljs-string">&quot;sign&quot;</span>]<br><br>        <span class="hljs-comment"># 添加或替换请求头</span><br>        flow.request.headers[<span class="hljs-string">&quot;requestId&quot;</span>] = request_id<br>        flow.request.headers[<span class="hljs-string">&quot;timestamp&quot;</span>] = <span class="hljs-built_in">str</span>(timestamp)<br>        flow.request.headers[<span class="hljs-string">&quot;sign&quot;</span>] = sign<br></code></pre></td></tr></table></figure>
+<p>然后运行mitmproxy时加载这个脚本并开启一个监听端口即可，但别忘了bp的upstream也要设为mitmproxy一样的的监听端口</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_14-19.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_14-19.png">
+<h6 id="-22"><a href="#-22" class="headerlink" title=""></a></h6><p>下面做个测试，浏览器做好代理后，当bp发送明文数据包时, 在经过mitm处理后，会自动加密，okkkkk,success! 解密同理</p>
+<img src="/2024/06/29/%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-06-28_14-16.png" srcset="/img/loading.gif" lazyload class="" title="2024-06-28_14-16.png">
+<h6 id="-23"><a href="#-23" class="headerlink" title=""></a></h6><p>好了，就分享到这了<br>大考就要开始了，该收拾行李去了</p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%B8%97%E9%80%8F/" class="category-chain-item">渗透</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%80%BB%E7%BB%93/" class="print-no-link">#总结</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>前端JS加密抗衡</div>
+      <div>http://example.com/2024/06/29/前端js加密抗衡/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>liuty</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年6月29日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/" title="再谈前端js加密抗衡">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">再谈前端js加密抗衡</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/06/05/%E6%89%93%E5%86%B7%E8%A1%A5%E4%B8%81%E4%BF%AE%E6%94%B9jar%E5%8C%85/" title="打补丁修改jar包">
+                        <span class="hidden-mobile">打补丁修改jar包</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://l1uty.github.io/" target="_blank" rel="nofollow noopener"><span>liuty</span></a> <i class="iconfont icon-love"></i> <a href="https://www.mps.gov.cn/" target="_blank" rel="nofollow noopener"><span>???</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         次
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <script type="text/javascript" src="\js\FunnyTitle.js"></script>
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/diy/love.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+
+  <link rel="stylesheet" href="/dist/APlayer.min.css">
+  <div id="aplayer"></div>
+  <script type="text/javascript" src="/dist/APlayer.min.js"></script>
+  <script type="text/javascript" src="/dist/music.js"></script>
+
+  <script type="text/javascript"
+color="220,220,220" opacity='0.7' zIndex="-2" count="200" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js">
+  </script>
+
+  <script type="text/javascript" src="\js\snow.js"></script>
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

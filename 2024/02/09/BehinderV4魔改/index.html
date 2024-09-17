@@ -1,0 +1,790 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="liuty">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="Behinder介绍“冰蝎”(Behinder)是一个动态二进制加密网站管理客户端，相比较于传统的老牌工具“菜刀”而言，对webshell的流量进行了相应的加密。”冰蝎”客户端基于JAVA，所以可以跨平台使用，随着版本的升级，兼容性也随之提升。主要功能为：基本信息、命令执行、虚拟终端、文件管理、Socks代理、反弹shell、数据库管理、自定义代码等，功能非常强大，是现如今必不可少的渗透测试工具之">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BehinderV4魔改">
+<meta property="og:url" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/index.html">
+<meta property="og:site_name" content="liuty&#39;s blog">
+<meta property="og:description" content="Behinder介绍“冰蝎”(Behinder)是一个动态二进制加密网站管理客户端，相比较于传统的老牌工具“菜刀”而言，对webshell的流量进行了相应的加密。”冰蝎”客户端基于JAVA，所以可以跨平台使用，随着版本的升级，兼容性也随之提升。主要功能为：基本信息、命令执行、虚拟终端、文件管理、Socks代理、反弹shell、数据库管理、自定义代码等，功能非常强大，是现如今必不可少的渗透测试工具之">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_23-37.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_22-29.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_22-29_1.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-09_14-09.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-09_14-16.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_09-19.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-20.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-38.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-39.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-52.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-55.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-41.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-15.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-42.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_21-49.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_21-22.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-09_15-13.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-09_15-22.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-09_15-27.png">
+<meta property="og:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/688463846a03d520af12793620365b4.png">
+<meta property="article:published_time" content="2024-02-09T07:39:45.000Z">
+<meta property="article:modified_time" content="2024-05-05T05:59:40.990Z">
+<meta property="article:author" content="liuty">
+<meta property="article:tag" content="test">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_23-37.png">
+  
+  
+  
+  <title>BehinderV4魔改 - liuty&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":90,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"hCaWnJI7fVuWUvqb3FgzqfKD-gzGzoHsz","app_key":"NJZ1v4tGwTre1rcW3Qdw1WYU","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>liuty&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="BehinderV4魔改"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-02-09 15:39" pubdate>
+          2024年2月9日 下午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          1.6k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          14 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">BehinderV4魔改</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="Behinder介绍"><a href="#Behinder介绍" class="headerlink" title="Behinder介绍"></a>Behinder介绍</h2><p>“冰蝎”(Behinder)是一个动态二进制加密网站管理客户端，相比较于传统的老牌工具“菜刀”而言，对webshell的流量进行了相应的加密。”冰蝎”客户端基于JAVA，所以可以跨平台使用，随着版本的升级，兼容性也随之提升。主要功能为：基本信息、命令执行、虚拟终端、文件管理、Socks代理、反弹shell、数据库管理、自定义代码等，功能非常强大，是现如今必不可少的渗透测试工具之一</p>
+<h2 id="时光荏苒"><a href="#时光荏苒" class="headerlink" title="时光荏苒"></a>时光荏苒</h2><p>攻防技术一直都在不断发展的，随着防守技术日趋成熟和完善，攻击手段也就需要不断地更新、创新。而”冰蝎”早已不再更新。因此现已被各大厂商的检测系统及WAF对其特征进行了记载与分析，所以这也是为什么在实战中经常碰到“落地成盒”的原因，马子刚传上去就die了, 就更别说拿shell了。因此我们需要在原版的基础上进行改造从而适应当今全新的攻防世界</p>
+<h2 id="魔改"><a href="#魔改" class="headerlink" title="魔改"></a>魔改</h2><p>可以通过更改流量特征以及添加自己的加密协议，从而达到免杀的效果，因为强特征很容易被杀毒软件识别，当我们修改了特征它就无法判断是否为恶意流量，更改协议也是一个道理，杀毒软件病毒库里面已经存放了冰蝎中内置的6个加密协议，所以需要我们自定义协议来绕过查杀，而冰蝎v4开放了传输协议的自定义功能，使得流量魔改更为简单方便</p>
+<p>首先将冰蝎的jar包进行反编译拿到源码</p>
+<img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_23-37.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-08_23-37.png">
+<h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>拿到源码之后，新建一个目录把源码和冰蝎4（单放在一个目录里面）放在同一目录</p>
+<img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_22-29.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-08_22-29.png">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_22-29_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-08_22-29_1.png">
+<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>打开ide，在刚才的目录中创建一个新项目，并将冰蝎的jar包导入模块中，并设置好主类，这里的主类一定不要弄错：net.rebeyond.behinder.ui<br>（注：jdk版本1.8，并且还要把原文件中的数据库文件复制到主文件中，否则过会运行会报错）</p>
+<img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-09_14-09.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-09_14-09.png">
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>在修改之前，我们先看一下behinder数据包原先的样子</p>
+<img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-09_14-16.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-09_14-16.png">
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><p>其中Accept、Accept-Language特征最为明显，并且UA头是内置的且随机，所以考虑先把一些强特征进行修改，要注意的是：所有的修改不能直接在文件中改需要把整个路径复制到src文件中，把不需要修改的文件可以删掉，不然构建的时候会很慢</p>
+<p>我们通过accept特征进行全局搜索，找到了net下的constants文件，而数据包中ua特征和其他特征都在shell文件中，因此就先对这两个文件进行魔改</p>
+<img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_09-19.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-08_09-19.png">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-20.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-08_20-20.png">
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-38.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-08_20-38.png">
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-39.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-08_20-39.png">
+<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>并且冰蝎中有个固定的Content-type字段：Content-type: application&#x2F;x-www-form-urlencoded</p>
+<img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-52.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-08_20-52.png">
+<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>同样这个特征也可以改，因为这里只有php和aspx的，我们可以添加上jsp和asp</p>
+<img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-55.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-08_20-55.png">
+<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><p>全部改完之后，构建工程和模块重新运行一下看看结果</p>
+<img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-41.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-08_20-41.png">
+<h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-15.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-08_20-15.png">
+<h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_20-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-08_20-42.png">
+<h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><p>可以发现基本的强特征都已经被修改，数据包中的ua头和其他关键特征也已经被修改。接下来对数据协议进行自定义加密，绕过主流杀软和waf等安全设备的检测，冰蝎4内置了六种传输协议，但早已被记载</p>
+<img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_21-49.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-08_21-49.png">
+<h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><p>这里分享两种加密，第一种是key-value格式+unicode加密，以jsp脚本类型为例<br>加密</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-type">byte</span>[] Encrypt(<span class="hljs-type">byte</span>[] data) <span class="hljs-keyword">throws</span> Exception &#123;<br> <span class="hljs-type">String</span> <span class="hljs-variable">content</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;id=1&amp;content=DaYer0&amp;token=1452178369&amp;status=00000&quot;</span>;<br> <span class="hljs-type">String</span> <span class="hljs-variable">result</span> <span class="hljs-operator">=</span><br>java.util.Base64.getEncoder().encodeToString(data).replace(<span class="hljs-string">&quot;+&quot;</span>, <span class="hljs-string">&quot;&lt;&quot;</span>).replace(<span class="hljs-string">&quot;/&quot;</span>,<br><span class="hljs-string">&quot;&gt;&quot;</span>);<br> <span class="hljs-type">String</span> <span class="hljs-variable">str</span> <span class="hljs-operator">=</span> <span class="hljs-string">&quot;&quot;</span>;<br> <span class="hljs-type">StringBuffer</span> <span class="hljs-variable">unicode</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuffer</span>();<br> <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; result.length(); i++) &#123;<br>   <span class="hljs-type">char</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> result.charAt(i);<br>   unicode.append(<span class="hljs-string">&quot;\\u00&quot;</span> + Integer.toHexString(c));<br> &#125;<br> content = content.replace(<span class="hljs-string">&quot;DaYer0&quot;</span>, unicode.toString());<br><br> <span class="hljs-comment">// ROT13 encryption</span><br> <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">encryptedContent</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();<br> <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; content.length(); i++) &#123;<br>   <span class="hljs-type">char</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> content.charAt(i);<br>   <span class="hljs-keyword">if</span> (c &gt;= <span class="hljs-string">&#x27;a&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;z&#x27;</span>) &#123;<br>     c = (<span class="hljs-type">char</span>) (((c - <span class="hljs-string">&#x27;a&#x27;</span>) + <span class="hljs-number">13</span>) % <span class="hljs-number">26</span> + <span class="hljs-string">&#x27;a&#x27;</span>);<br>   &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (c &gt;= <span class="hljs-string">&#x27;A&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;Z&#x27;</span>) &#123;<br>     c = (<span class="hljs-type">char</span>) (((c - <span class="hljs-string">&#x27;A&#x27;</span>) + <span class="hljs-number">13</span>) % <span class="hljs-number">26</span> + <span class="hljs-string">&#x27;A&#x27;</span>);<br>   &#125;<br>   encryptedContent.append(c);<br> &#125;<br> <span class="hljs-keyword">return</span> encryptedContent.toString().getBytes();<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>解密</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><code class="hljs java"><span class="hljs-keyword">private</span> <span class="hljs-type">byte</span>[] Decrypt(<span class="hljs-type">byte</span>[] data) <span class="hljs-keyword">throws</span> Exception &#123;<br> <span class="hljs-type">String</span> <span class="hljs-variable">content</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(data);<br> <span class="hljs-comment">// Reverse ROT13 decryption</span><br> <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">decryptedContent</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();<br> <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>; i &lt; content.length(); i++) &#123;<br>   <span class="hljs-type">char</span> <span class="hljs-variable">c</span> <span class="hljs-operator">=</span> content.charAt(i);<br>   <span class="hljs-keyword">if</span> (c &gt;= <span class="hljs-string">&#x27;a&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;z&#x27;</span>) &#123;<br>     c = (<span class="hljs-type">char</span>) (((c - <span class="hljs-string">&#x27;a&#x27;</span>) + <span class="hljs-number">13</span>) % <span class="hljs-number">26</span> + <span class="hljs-string">&#x27;a&#x27;</span>);<br>   &#125; <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (c &gt;= <span class="hljs-string">&#x27;A&#x27;</span> &amp;&amp; c &lt;= <span class="hljs-string">&#x27;Z&#x27;</span>) &#123;<br>     c = (<span class="hljs-type">char</span>) (((c - <span class="hljs-string">&#x27;A&#x27;</span>) + <span class="hljs-number">13</span>) % <span class="hljs-number">26</span> + <span class="hljs-string">&#x27;A&#x27;</span>);<br>   &#125;<br>   decryptedContent.append(c);<br> &#125;<br><br> <span class="hljs-type">String</span> <span class="hljs-variable">decodedString</span> <span class="hljs-operator">=</span> decryptedContent.toString();<br> java.io.<span class="hljs-type">ByteArrayOutputStream</span> <span class="hljs-variable">bos</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">java</span>.io.ByteArrayOutputStream();<br> bos.write(decodedString.getBytes(), <span class="hljs-number">13</span>, decodedString.length() - <span class="hljs-number">43</span>);<br> <span class="hljs-type">String</span> <span class="hljs-variable">unicode</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">String</span>(bos.toByteArray());<br> <span class="hljs-type">StringBuilder</span> <span class="hljs-variable">sb</span> <span class="hljs-operator">=</span> <span class="hljs-keyword">new</span> <span class="hljs-title class_">StringBuilder</span>();<br> <span class="hljs-type">int</span> <span class="hljs-variable">i</span> <span class="hljs-operator">=</span> -<span class="hljs-number">1</span>;<br> <span class="hljs-type">int</span> <span class="hljs-variable">pos</span> <span class="hljs-operator">=</span> <span class="hljs-number">0</span>;<br> <span class="hljs-keyword">while</span> ((i = unicode.indexOf(<span class="hljs-string">&quot;\\u&quot;</span>, pos)) != -<span class="hljs-number">1</span>) &#123;<br>   sb.append(unicode.substring(pos, i));<br>   <span class="hljs-keyword">if</span> (i + <span class="hljs-number">5</span> &lt; unicode.length()) &#123;<br>     pos = i + <span class="hljs-number">6</span>;<br>     sb.append((<span class="hljs-type">char</span>) Integer.parseInt(unicode.substring(i + <span class="hljs-number">2</span>, i + <span class="hljs-number">6</span>),<br><span class="hljs-number">16</span>));<br>   &#125;<br> &#125;<br> <span class="hljs-type">byte</span>[] decryptedData =<br>java.util.Base64.getDecoder().decode(sb.toString().replace(<span class="hljs-string">&quot;&lt;&quot;</span>, <span class="hljs-string">&quot;+&quot;</span>).replace(<span class="hljs-string">&quot;&gt;&quot;</span>,<br><span class="hljs-string">&quot;/&quot;</span>));<br> <span class="hljs-keyword">return</span> decryptedData;<br>&#125;<br></code></pre></td></tr></table></figure>
+
+<p>最后可以使用冰蝎的传输协议进行测试，如果提示“保存成功”就说明解密加密一致</p>
+<img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-08_21-22.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-08_21-22.png">
+<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><p>修改完后同样的我们要把文件放在src目录下，确保文件和之前所在目录一致，我们生成服务端测试一下效果</p>
+<img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-09_15-13.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-09_15-13.png">
+<h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><p>可以看到流量包中的数据已经被加密。第二种是multipart格式+hex加密<br>加密</p>
+<figure class="highlight processing"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><code class="hljs processing"><span class="hljs-keyword">private</span> <span class="hljs-type">byte</span>[] <span class="hljs-title function_">Encrypt</span>(<span class="hljs-type">byte</span>[] data) <span class="hljs-keyword">throws</span> Exception<br>&#123;<br>    <span class="hljs-built_in">String</span> upload=<span class="hljs-string">&quot;-----------------------------7e6103b1815de Content-Disposition:form-data;name=\&quot;uploadFile\&quot;;filename=\&quot;test.png\&quot; Content-Type:application/octet-stream  DaYer0 -----------------------------7e6103b1815de--&quot;</span>;<br>    <span class="hljs-built_in">String</span> <span class="hljs-built_in">str</span> = <span class="hljs-string">&quot;&quot;</span>;<br>    <span class="hljs-built_in">String</span> result = java.<span class="hljs-property">util</span>.<span class="hljs-property">Base64</span>.<span class="hljs-property">getEncoder</span>().<span class="hljs-property">encodeToString</span>(data).<span class="hljs-property">replace</span>(<span class="hljs-string">&quot;+&quot;</span>,<span class="hljs-string">&quot;&lt;&quot;</span>).<span class="hljs-property">replace</span>(<span class="hljs-string">&quot;/&quot;</span>,<span class="hljs-string">&quot;&gt;&quot;</span>);<br>        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i=<span class="hljs-number">0</span>;i&lt;result.<span class="hljs-property">length</span>();i++)&#123;<br>        <span class="hljs-type">int</span> ch = (<span class="hljs-type">int</span>)result.<span class="hljs-property">charAt</span>(i);<br>        <span class="hljs-built_in">String</span> s4 = Integer.<span class="hljs-property">toHexString</span>(ch);<br>        <span class="hljs-built_in">str</span> = <span class="hljs-built_in">str</span> + s4;<br>    &#125;<br>    upload=upload.<span class="hljs-property">replace</span>(<span class="hljs-string">&quot;DaYer0&quot;</span>,<span class="hljs-built_in">str</span>);<br>    <span class="hljs-keyword">return</span> upload.<span class="hljs-property">getBytes</span>();<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>解密</p>
+<figure class="highlight gradle"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><code class="hljs gradle"><span class="hljs-keyword">private</span> <span class="hljs-keyword">byte</span>[] Decrypt(<span class="hljs-keyword">byte</span>[] data) <span class="hljs-keyword">throws</span> Exception<br>&#123;<br>    java.io.ByteArrayOutputStream bos=<span class="hljs-keyword">new</span> java.io.ByteArrayOutputStream();<br>    bos.<span class="hljs-keyword">write</span>(data,<span class="hljs-number">150</span>,data.length-<span class="hljs-number">195</span>);<br>        String s= <span class="hljs-keyword">new</span> String(bos.toByteArray());<br>        <span class="hljs-keyword">byte</span>[] baKeyword = <span class="hljs-keyword">new</span> <span class="hljs-keyword">byte</span>[s.length()/<span class="hljs-number">2</span>];<br>        <span class="hljs-keyword">for</span>(<span class="hljs-keyword">int</span> i = <span class="hljs-number">0</span>; i &lt; baKeyword.length; i++)&#123;<br>        <span class="hljs-keyword">try</span>&#123;<br>            baKeyword[i] = (<span class="hljs-keyword">byte</span>)(<span class="hljs-number">0</span>xff &amp; Integer.parseInt(s.substring(i*<span class="hljs-number">2</span>, i*<span class="hljs-number">2</span>+<span class="hljs-number">2</span>),<span class="hljs-number">16</span>));<br>        &#125;<span class="hljs-keyword">catch</span>(Exception e)&#123;<br>            e.printStackTrace();<br>        &#125;<br>        &#125;<br>        <span class="hljs-keyword">try</span>&#123;<br>        s = <span class="hljs-keyword">new</span> String(baKeyword, <span class="hljs-string">&quot;utf-8&quot;</span>);<br>        &#125;<span class="hljs-keyword">catch</span> (Exception e1)&#123;<br>        e1.printStackTrace();<br>        &#125;<br>        <span class="hljs-keyword">return</span> java.util.Base64.getDecoder().decode(s.replace(<span class="hljs-string">&quot;&lt;&quot;</span>,<span class="hljs-string">&quot;+&quot;</span>).replace(<span class="hljs-string">&quot;&gt;&quot;</span>,<span class="hljs-string">&quot;/&quot;</span>));<br><br>&#125;<br></code></pre></td></tr></table></figure>
+
+<img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-09_15-22.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-09_15-22.png">
+<h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6><p>测试一下效果</p>
+<img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/2024-02-09_15-27.png" srcset="/img/loading.gif" lazyload class="" title="2024-02-09_15-27.png">
+<h6 id="-18"><a href="#-18" class="headerlink" title=""></a></h6><p>最后做一下免杀测试，因为我的win虚拟机上就装了一个火绒，就先做火绒的测试吧，其他自测就好</p>
+<img src="/2024/02/09/BehinderV4%E9%AD%94%E6%94%B9/688463846a03d520af12793620365b4.png" srcset="/img/loading.gif" lazyload class="" title="688463846a03d520af12793620365b4.png">
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%9E%8E%E6%90%9E/" class="category-chain-item">瞎搞</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/test/" class="print-no-link">#test</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>BehinderV4魔改</div>
+      <div>http://example.com/2024/02/09/BehinderV4魔改/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>liuty</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年2月9日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2024/02/13/Docker%E5%AE%89%E5%85%A8%EF%BC%88%E4%B8%80%EF%BC%89/" title="Docker安全（一）">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">Docker安全（一）</span>
+                        <span class="visible-mobile">上一篇</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/02/06/CSRF%E6%80%BB%E7%BB%93/" title="CSRF总结">
+                        <span class="hidden-mobile">CSRF总结</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://l1uty.github.io/" target="_blank" rel="nofollow noopener"><span>liuty</span></a> <i class="iconfont icon-love"></i> <a href="https://www.mps.gov.cn/" target="_blank" rel="nofollow noopener"><span>???</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         次
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <script type="text/javascript" src="\js\FunnyTitle.js"></script>
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/diy/love.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+
+  <link rel="stylesheet" href="/dist/APlayer.min.css">
+  <div id="aplayer"></div>
+  <script type="text/javascript" src="/dist/APlayer.min.js"></script>
+  <script type="text/javascript" src="/dist/music.js"></script>
+
+  <script type="text/javascript"
+color="220,220,220" opacity='0.7' zIndex="-2" count="200" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js">
+  </script>
+
+  <script type="text/javascript" src="\js\snow.js"></script>
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
