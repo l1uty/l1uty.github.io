@@ -19,37 +19,37 @@
     <meta name="description" content="前言上一篇我们提到了，在遇到js加密的时候，我们可以通过js-forward、jsrpc注入或者mitmproxy做中间代理进行数据转发等方式进行前端加密的抗衡，最近有些师傅给我推荐了另一种解决方案：jsEncrypter（burp插件）+phantomjs，说实话，之前还真没实践过，果然还是技术太菜，跟不上时代步伐！ 正文用小皮开个测试环境  一个简易的web登陆框，并且可以进行base64,m">
 <meta property="og:type" content="article">
 <meta property="og:title" content="再谈前端js加密抗衡">
-<meta property="og:url" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/index.html">
+<meta property="og:url" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/index.html">
 <meta property="og:site_name" content="liuty&#39;s blog">
 <meta property="og:description" content="前言上一篇我们提到了，在遇到js加密的时候，我们可以通过js-forward、jsrpc注入或者mitmproxy做中间代理进行数据转发等方式进行前端加密的抗衡，最近有些师傅给我推荐了另一种解决方案：jsEncrypter（burp插件）+phantomjs，说实话，之前还真没实践过，果然还是技术太菜，跟不上时代步伐！ 正文用小皮开个测试环境  一个简易的web登陆框，并且可以进行base64,m">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-16.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-17.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-18.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-30.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-22.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_18-52.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_18-53.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-01.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-00.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-15.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-16.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-17.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-25.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-28.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-13.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_18-59.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-01.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-02.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-10.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-11.png">
-<meta property="og:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-15.png">
-<meta property="article:published_time" content="2024-09-17T11:40:09.000Z">
-<meta property="article:modified_time" content="2024-09-17T13:10:10.268Z">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-16.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-17.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-18.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-30.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-22.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_18-52.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_18-53.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-01.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-00.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-15.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-16.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-17.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-25.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-28.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-13.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_18-59.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-01.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-02.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-10.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-11.png">
+<meta property="og:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-15.png">
+<meta property="article:published_time" content="2024-09-18T06:40:09.000Z">
+<meta property="article:modified_time" content="2024-09-18T07:54:55.958Z">
 <meta property="article:author" content="liuty">
 <meta property="article:tag" content="总结">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-16.png">
+<meta name="twitter:image" content="http://example.com/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-16.png">
   
   
   
@@ -258,8 +258,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-09-17 19:40" pubdate>
-          2024年9月17日 晚上
+        <time datetime="2024-09-18 14:40" pubdate>
+          2024年9月18日 下午
         </time>
       </span>
     
@@ -333,50 +333,50 @@
                 
                 <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>上一篇我们提到了，在遇到js加密的时候，我们可以通过js-forward、jsrpc注入或者mitmproxy做中间代理进行数据转发等方式进行前端加密的抗衡，最近有些师傅给我推荐了另一种解决方案：jsEncrypter（burp插件）+phantomjs，说实话，之前还真没实践过，果然还是技术太菜，跟不上时代步伐！</p>
 <h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>用小皮开个测试环境</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-16.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_16-16.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-16.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_16-16.png">
 <h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>一个简易的web登陆框，并且可以进行base64,md5,RSA等加密方式</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-17.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_16-17.png">
-<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-18.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_16-18.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-17.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_16-17.png">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-18.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_16-18.png">
 <h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>工具：<br>phantomjs：<a target="_blank" rel="noopener" href="https://phantomjs.org/download.html">https://phantomjs.org/download.html</a><br>burp插件jsEncrypter：<a target="_blank" rel="noopener" href="https://github.com/c0ny1/jsEncrypter/releases">https://github.com/c0ny1/jsEncrypter/releases</a></p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-30.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_16-30.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_16-30.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_16-30.png">
 <h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>（这里我将这两个工具放在一个目录下了）</p>
 <p>PhantomJS是一个基于webkit的javaScript API。jsEncrypter依赖phantomjs，启动前端加密函数对数据进行加密，phantomjs会返回加密结果传给burp，因此此插件需要启动phantomjs开启服务，burp去读取结果。</p>
 <p>先看一下md5加密：抓包，，嗯还是熟悉的味道..</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-22.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-22.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-22.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-22.png">
 <h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><p>使用f12大法，过滤关键词password定位可疑加密函数，并打上断点发送数据包</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_18-52.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_18-52.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_18-52.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_18-52.png">
 <h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><p>通过单步调试，发现定位到了一个md5.js</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_18-53.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_18-53.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_18-53.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_18-53.png">
 <h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>将加密的js代码复制下来，另存为本地，与phantomjs和jsEncrypter放在一个目录下</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-01.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-01.png">
 <h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><p>修改phantomjs_server.js文件，这里要改两个地方，第一个，引入刚才的js加密文件即md5.js，第二个，加上调用文件中的主函数</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-00.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-00.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-00.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-00.png">
 <h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>保存好之后，启动phantomjs，但是我报错了….(当时排查半天，就是一个劲的报错)</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-15.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-15.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-15.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-15.png">
 <h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>上网一搜，才找到解决方案：在环境变量中加入如下值，使phantomjs能够找到指定的文件</p>
 <figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros"><span class="hljs-built_in">export</span> <span class="hljs-attribute">OPENSSL_CONF</span>=/etc/ssl<br></code></pre></td></tr></table></figure>
 <p>再次启动phantomjs并指定phantomjs_server.js文件运行，ok</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-16.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-16.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-16.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-16.png">
 <h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><p>我们可以发现开了一个端口并启动了一个服务端，打开burp加载插件，并连接phantomjs启动的webserver，如果显示绿色True，则表示连接成功，test测试一下，左边的字典确实转成md5加密了</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-17.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-17.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-17.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-17.png">
 <h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><p>加入字典后，在intruder模块中加载该插件（Invoke Burp extension）</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-25.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-25.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-25.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-25.png">
 <h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><p>最后开始爆破，可以看到是成功的</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-28.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-28.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_17-28.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_17-28.png">
 <h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><p>其他加密方式也是同理的，接下来再简单说说RSA，现在抓个包看一下，嗯..依旧是熟悉的味道</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-13.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_19-13.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-13.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_19-13.png">
 <h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><p>假设现在有这么一个场景：通过js敏感信息泄漏，泄漏了一个公钥（额..现在几乎很少出现公钥泄漏的情况了，主要是看方法）</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_18-59.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_18-59.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_18-59.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_18-59.png">
 <h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><p>然后还是老样子，找加密函数、打断点，发现定位到了一个jsencrypt.js</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_19-01.png">
-<h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-02.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_19-02.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_19-01.png">
+<h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-02.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_19-02.png">
 
 <p>依旧老样子复制加密代码，保存本地，随后编辑phantomjs_server.js文件，这里添加调用文件中主函数的写法和其他加密算法有一点不同，需要加入公钥</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-10.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_19-10.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-10.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_19-10.png">
 <h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6><p>随后burp连接phantomjs，并且可以看到字典都进行了RSA加密，ok</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-11.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_19-11.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-11.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_19-11.png">
 <h6 id="-18"><a href="#-18" class="headerlink" title=""></a></h6><p>爆破当然也是ok的</p>
-<img src="/2024/09/17/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-15.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_19-15.png">
+<img src="/2024/09/18/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/2024-09-17_19-15.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-17_19-15.png">
 <h6 id="-19"><a href="#-19" class="headerlink" title=""></a></h6>
                 
               </div>
@@ -423,7 +423,7 @@
   <div class="license-box my-3">
     <div class="license-title">
       <div>再谈前端js加密抗衡</div>
-      <div>http://example.com/2024/09/17/再谈前端js加密抗衡/</div>
+      <div>http://example.com/2024/09/18/再谈前端js加密抗衡/</div>
     </div>
     <div class="license-meta">
       
@@ -435,7 +435,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年9月17日</div>
+          <div>2024年9月18日</div>
         </div>
       
       
