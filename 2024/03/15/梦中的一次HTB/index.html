@@ -255,7 +255,7 @@
   
 
 <div id="banner" class="banner" parallax=true
-     style="background: url('/img/bizhi.html') no-repeat center center; background-size: cover;">
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
   <div class="full-bg-img">
     <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
       <div class="banner-text text-center fade-in-up">
@@ -407,7 +407,7 @@
 <img src="/2024/03/15/%E6%A2%A6%E4%B8%AD%E7%9A%84%E4%B8%80%E6%AC%A1HTB/2024-03-14_20-55.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-14_20-55.png">
 <h6 id="-28"><a href="#-28" class="headerlink" title=""></a></h6><img src="/2024/03/15/%E6%A2%A6%E4%B8%AD%E7%9A%84%E4%B8%80%E6%AC%A1HTB/2024-03-15_08-32.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-15_08-32.png">
 <h6 id="-29"><a href="#-29" class="headerlink" title=""></a></h6><img src="/2024/03/15/%E6%A2%A6%E4%B8%AD%E7%9A%84%E4%B8%80%E6%AC%A1HTB/2024-03-15_08-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-15_08-42.png">
-<h6 id="-30"><a href="#-30" class="headerlink" title=""></a></h6><p>不难发现当前横向到的这个用户是位于GPO组内的，而GPO Manager组成员很可能被授予了修改、创建或链接组策略对象的权限，由于GPO <a href="mailto:&#77;&#65;&#x4e;&#x45;&#82;&#x47;&#x45;&#x52;&#83;&#64;&#x4f;&#x46;&#70;&#x49;&#67;&#x45;&#x2e;&#72;&#x54;&#x42;">&#77;&#65;&#x4e;&#x45;&#82;&#x47;&#x45;&#x52;&#83;&#64;&#x4f;&#x46;&#70;&#x49;&#67;&#x45;&#x2e;&#72;&#x54;&#x42;</a>这个组为AD中的安全组，因此可能可以利用GPO来进行横向移动，于是列出域中的所有GPO</p>
+<h6 id="-30"><a href="#-30" class="headerlink" title=""></a></h6><p>不难发现当前横向到的这个用户是位于GPO组内的，而GPO Manager组成员很可能被授予了修改、创建或链接组策略对象的权限，由于GPO <a href="mailto:&#x4d;&#x41;&#78;&#69;&#x52;&#x47;&#69;&#x52;&#83;&#64;&#79;&#70;&#x46;&#x49;&#x43;&#69;&#x2e;&#72;&#x54;&#x42;">&#x4d;&#x41;&#78;&#69;&#x52;&#x47;&#69;&#x52;&#83;&#64;&#79;&#70;&#x46;&#x49;&#x43;&#69;&#x2e;&#72;&#x54;&#x42;</a>这个组为AD中的安全组，因此可能可以利用GPO来进行横向移动，于是列出域中的所有GPO</p>
 <img src="/2024/03/15/%E6%A2%A6%E4%B8%AD%E7%9A%84%E4%B8%80%E6%AC%A1HTB/2024-03-14_10-11.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-14_10-11.png">
 <h6 id="-31"><a href="#-31" class="headerlink" title=""></a></h6><p>这个时候就有思路了，使用SharpGPOAbuse在Active Directory环境中通过修改“Default Domain Controllers Policy”这个组策略对象，将当前用户账户添加为所有受此GPO影响的域控本地管理员，使得当前用户获得对这些域控制器的高级访问权限</p>
 <img src="/2024/03/15/%E6%A2%A6%E4%B8%AD%E7%9A%84%E4%B8%80%E6%AC%A1HTB/2024-03-14_10-34.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-14_10-34.png">
