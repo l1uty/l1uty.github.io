@@ -407,7 +407,7 @@
 <img src="/2024/03/15/%E6%A2%A6%E4%B8%AD%E7%9A%84%E4%B8%80%E6%AC%A1HTB/2024-03-14_20-55.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-14_20-55.png">
 <h6 id="-28"><a href="#-28" class="headerlink" title=""></a></h6><img src="/2024/03/15/%E6%A2%A6%E4%B8%AD%E7%9A%84%E4%B8%80%E6%AC%A1HTB/2024-03-15_08-32.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-15_08-32.png">
 <h6 id="-29"><a href="#-29" class="headerlink" title=""></a></h6><img src="/2024/03/15/%E6%A2%A6%E4%B8%AD%E7%9A%84%E4%B8%80%E6%AC%A1HTB/2024-03-15_08-42.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-15_08-42.png">
-<h6 id="-30"><a href="#-30" class="headerlink" title=""></a></h6><p>不难发现当前横向到的这个用户是位于GPO组内的，而GPO Manager组成员很可能被授予了修改、创建或链接组策略对象的权限，由于GPO <a href="mailto:&#x4d;&#x41;&#78;&#69;&#x52;&#x47;&#69;&#x52;&#83;&#64;&#79;&#70;&#x46;&#x49;&#x43;&#69;&#x2e;&#72;&#x54;&#x42;">&#x4d;&#x41;&#78;&#69;&#x52;&#x47;&#69;&#x52;&#83;&#64;&#79;&#70;&#x46;&#x49;&#x43;&#69;&#x2e;&#72;&#x54;&#x42;</a>这个组为AD中的安全组，因此可能可以利用GPO来进行横向移动，于是列出域中的所有GPO</p>
+<h6 id="-30"><a href="#-30" class="headerlink" title=""></a></h6><p>不难发现当前横向到的这个用户是位于GPO组内的，而GPO Manager组成员很可能被授予了修改、创建或链接组策略对象的权限，由于GPO <a href="mailto:&#x4d;&#65;&#x4e;&#x45;&#x52;&#x47;&#69;&#x52;&#x53;&#x40;&#79;&#70;&#x46;&#x49;&#x43;&#x45;&#46;&#72;&#84;&#66;">&#x4d;&#65;&#x4e;&#x45;&#x52;&#x47;&#69;&#x52;&#x53;&#x40;&#79;&#70;&#x46;&#x49;&#x43;&#x45;&#46;&#72;&#84;&#66;</a>这个组为AD中的安全组，因此可能可以利用GPO来进行横向移动，于是列出域中的所有GPO</p>
 <img src="/2024/03/15/%E6%A2%A6%E4%B8%AD%E7%9A%84%E4%B8%80%E6%AC%A1HTB/2024-03-14_10-11.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-14_10-11.png">
 <h6 id="-31"><a href="#-31" class="headerlink" title=""></a></h6><p>这个时候就有思路了，使用SharpGPOAbuse在Active Directory环境中通过修改“Default Domain Controllers Policy”这个组策略对象，将当前用户账户添加为所有受此GPO影响的域控本地管理员，使得当前用户获得对这些域控制器的高级访问权限</p>
 <img src="/2024/03/15/%E6%A2%A6%E4%B8%AD%E7%9A%84%E4%B8%80%E6%AC%A1HTB/2024-03-14_10-34.png" srcset="/img/loading.gif" lazyload class="" title="2024-03-14_10-34.png">
@@ -507,9 +507,9 @@
                   <article class="post-prev col-6">
                     
                     
-                      <a href="/2024/03/24/%E4%B8%80%E6%AC%A1%E9%80%9A%E8%BF%87%E7%BB%84%E5%90%88%E6%8B%B3%E6%8B%BF%E5%88%B0cookie%E7%9A%84%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/" title="一次通过组合拳拿到cookie的学习记录">
+                      <a href="/2024/03/20/Docker%E5%8F%96%E8%AF%81%E5%B0%8Ftip/" title="Docker取证小tip">
                         <i class="iconfont icon-arrowleft"></i>
-                        <span class="hidden-mobile">一次通过组合拳拿到cookie的学习记录</span>
+                        <span class="hidden-mobile">Docker取证小tip</span>
                         <span class="visible-mobile">上一篇</span>
                       </a>
                     
