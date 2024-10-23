@@ -1,0 +1,841 @@
+
+
+<!DOCTYPE html>
+<html lang="zh-CN" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/fluid.png">
+  <link rel="icon" href="/img/fluid.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="author" content="liuty">
+  <meta name="keywords" content="">
+  
+    <meta name="description" content="前文内存马是一种仅在内存中执行，不写入硬盘的恶意程序，其能够隐蔽地进行攻击，同时躲避常规的病毒检测手段。是当今攻防模式下常见的攻击形式，最常见的就是java内存马，常分为以下几个部分：传统web型、spring系列框架型、中间件型、其他内存马、Agent型内存马等，常见的四个类型为：Listener型、Filter型、Servlet型以及Agent型，本文主要深度剖析一下前三种类型 Servlet">
+<meta property="og:type" content="article">
+<meta property="og:title" content="剖析Java内存马1">
+<meta property="og:url" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/index.html">
+<meta property="og:site_name" content="liuty&#39;s blog">
+<meta property="og:description" content="前文内存马是一种仅在内存中执行，不写入硬盘的恶意程序，其能够隐蔽地进行攻击，同时躲避常规的病毒检测手段。是当今攻防模式下常见的攻击形式，最常见的就是java内存马，常分为以下几个部分：传统web型、spring系列框架型、中间件型、其他内存马、Agent型内存马等，常见的四个类型为：Listener型、Filter型、Servlet型以及Agent型，本文主要深度剖析一下前三种类型 Servlet">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-23_08-45.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_16-01.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_16-04.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_16-00.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_16-06.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_16-07.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_16-09.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_17-28.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_17-59.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_18-01.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_18-05.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_18-11.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_22-12.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_18-46.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_18-52.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_18-58.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-04.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-06.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-20.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-23.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-33.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-37.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-39.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-40.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-41.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-50.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-52.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-54.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-56.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-56_1.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_22-14.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_20-00.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_20-02.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_20-06.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_20-08.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_20-17.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_20-19.png">
+<meta property="og:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_20-26.png">
+<meta property="article:published_time" content="2024-10-23T01:45:20.000Z">
+<meta property="article:modified_time" content="2024-10-23T07:35:34.248Z">
+<meta property="article:author" content="liuty">
+<meta property="article:tag" content="Javamemoryshell">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-23_08-45.png">
+  
+  
+  
+  <title>剖析Java内存马1 - liuty&#39;s blog</title>
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/twitter-bootstrap/4.6.1/css/bootstrap.min.css" />
+
+
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/github-markdown-css/4.0.0/github-markdown.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/hint.css/2.7.0/hint.min.css" />
+
+  <link  rel="stylesheet" href="https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.css" />
+
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+<!-- Do not modify the link that theme dependent icons -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_hj8rtnfg7um.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_lbnruvf0jn.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+
+  <link id="highlight-css" rel="stylesheet" href="/css/highlight.css" />
+  
+    <link id="highlight-css-dark" rel="stylesheet" href="/css/highlight-dark.css" />
+  
+
+
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    Fluid.ctx = Object.assign({}, Fluid.ctx)
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.9.7","typing":{"enable":true,"typeSpeed":90,"cursorChar":"_","loop":false,"scope":[]},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"left","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"code_language":{"enable":true,"default":"TEXT"},"copy_btn":true,"image_caption":{"enable":true},"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"placement":"right","headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":true,"follow_dnt":true,"baidu":null,"google":{"measurement_id":null},"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":"hCaWnJI7fVuWUvqb3FgzqfKD-gzGzoHsz","app_key":"NJZ1v4tGwTre1rcW3Qdw1WYU","server_url":null,"path":"window.location.pathname","ignore_local":false}},"search_path":"/local-search.xml","include_content_in_search":true};
+
+    if (CONFIG.web_analytics.follow_dnt) {
+      var dntVal = navigator.doNotTrack || window.doNotTrack || navigator.msDoNotTrack;
+      Fluid.ctx.dnt = dntVal && (dntVal.startsWith('1') || dntVal.startsWith('yes') || dntVal.startsWith('on'));
+    }
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+  
+
+  
+
+  
+    <!-- Google tag (gtag.js) -->
+    <script async>
+      if (!Fluid.ctx.dnt) {
+        Fluid.utils.createScript("https://www.googletagmanager.com/gtag/js?id=", function() {
+          window.dataLayer = window.dataLayer || [];
+          function gtag() {
+            dataLayer.push(arguments);
+          }
+          gtag('js', new Date());
+          gtag('config', '');
+        });
+      }
+    </script>
+  
+
+  
+
+  
+
+  
+
+  
+    
+  
+
+
+
+  
+<meta name="generator" content="Hexo 7.1.1"></head>
+
+<body>
+  
+
+  <header>
+    
+
+<div class="header-inner" style="height: 70vh;">
+  <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>liuty&#39;s blog</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/" target="_self">
+                <i class="iconfont icon-home-fill"></i>
+                <span>首页</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/" target="_self">
+                <i class="iconfont icon-archive-fill"></i>
+                <span>归档</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/" target="_self">
+                <i class="iconfont icon-category-fill"></i>
+                <span>分类</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/" target="_self">
+                <i class="iconfont icon-tags-fill"></i>
+                <span>标签</span>
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/" target="_self">
+                <i class="iconfont icon-user-fill"></i>
+                <span>关于</span>
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              <i class="iconfont icon-search"></i>
+            </a>
+          </li>
+          
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">
+              <i class="iconfont icon-dark" id="color-toggle-icon"></i>
+            </a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+  
+
+<div id="banner" class="banner" parallax=true
+     style="background: url('/img/default.png') no-repeat center center; background-size: cover;">
+  <div class="full-bg-img">
+    <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+      <div class="banner-text text-center fade-in-up">
+        <div class="h2">
+          
+            <span id="subtitle" data-typed-text="剖析Java内存马1"></span>
+          
+        </div>
+
+        
+          
+  <div class="mt-3">
+    
+    
+      <span class="post-meta">
+        <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+        <time datetime="2024-10-23 09:45" pubdate>
+          2024年10月23日 上午
+        </time>
+      </span>
+    
+  </div>
+
+  <div class="mt-1">
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-chart"></i>
+        
+          2.4k 字
+        
+      </span>
+    
+
+    
+      <span class="post-meta mr-2">
+        <i class="iconfont icon-clock-fill"></i>
+        
+        
+        
+          21 分钟
+        
+      </span>
+    
+
+    
+    
+      
+        <span id="leancloud-page-views-container" class="post-meta" style="display: none">
+          <i class="iconfont icon-eye" aria-hidden="true"></i>
+          <span id="leancloud-page-views"></span> 次
+        </span>
+        
+      
+    
+  </div>
+
+
+        
+      </div>
+
+      
+    </div>
+  </div>
+</div>
+
+</div>
+
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+
+    </div>
+
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div id="board">
+          <article class="post-content mx-auto">
+            <h1 id="seo-header">剖析Java内存马1</h1>
+            
+            
+              <div class="markdown-body">
+                
+                <h2 id="前文"><a href="#前文" class="headerlink" title="前文"></a>前文</h2><p>内存马是一种仅在内存中执行，不写入硬盘的恶意程序，其能够隐蔽地进行攻击，同时躲避常规的病毒检测手段。是当今攻防模式下常见的攻击形式，最常见的就是java内存马，常分为以下几个部分：传统web型、spring系列框架型、中间件型、其他内存马、Agent型内存马等，常见的四个类型为：Listener型、Filter型、Servlet型以及Agent型，本文主要深度剖析一下前三种类型</p>
+<h2 id="Servlet"><a href="#Servlet" class="headerlink" title="Servlet"></a>Servlet</h2><p>我们先了解一下Servlet容器架构。Tomcat 设计了 4 种容器，分别是 Engine、Host、Context 和 Wrapper，这4种容器不是相互独立的关系，而是父子关系，逐层包含，如下图所示：</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-23_08-45.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-23_08-45.png">
+<h6 id=""><a href="#" class="headerlink" title=""></a></h6><p>一个Service最多只能有一个Engine，Engine表示引擎，用来管理多个虚拟主机的；Host代表就是一个虚拟主机，可以给Tomcat配置多个虚拟主机，一个虚拟主机下面可以部署多个Web应用；一个Context就表示一个Web应用，Web应用中会有多个Servlet，Wrapper就表示一个Servlet。这一点可以从Tomcat的配置文件server.xml中看出来</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><code class="hljs xml"><span class="hljs-meta">&lt;?xml version=<span class="hljs-string">&quot;1.0&quot;</span> encoding=<span class="hljs-string">&quot;UTF-8&quot;</span>?&gt;</span><br><br><span class="hljs-comment">&lt;!-- 顶层组件，可以包含多个Service --&gt;</span><br><span class="hljs-tag">&lt;<span class="hljs-name">Server</span> <span class="hljs-attr">port</span>=<span class="hljs-string">&quot;8005&quot;</span> <span class="hljs-attr">shutdown</span>=<span class="hljs-string">&quot;SHUTDOWN&quot;</span>&gt;</span><br><br>   <span class="hljs-comment">&lt;!-- 顶层组件，可以包含一个Engine，多个连接器 --&gt;</span><br>  <span class="hljs-tag">&lt;<span class="hljs-name">Service</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;Catalina&quot;</span>&gt;</span><br>      <span class="hljs-comment">&lt;!-- HTTP协议的连接器 --&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">Connector</span> <span class="hljs-attr">port</span>=<span class="hljs-string">&quot;8080&quot;</span> <span class="hljs-attr">protocol</span>=<span class="hljs-string">&quot;HTTP/1.1&quot;</span></span><br><span class="hljs-tag">               <span class="hljs-attr">connectionTimeout</span>=<span class="hljs-string">&quot;20000&quot;</span></span><br><span class="hljs-tag">               <span class="hljs-attr">redirectPort</span>=<span class="hljs-string">&quot;8443&quot;</span> /&gt;</span><br>      <span class="hljs-comment">&lt;!-- AJP协议的连接器 --&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">Connector</span> <span class="hljs-attr">port</span>=<span class="hljs-string">&quot;8009&quot;</span> <span class="hljs-attr">protocol</span>=<span class="hljs-string">&quot;AJP/1.3&quot;</span> <span class="hljs-attr">redirectPort</span>=<span class="hljs-string">&quot;8443&quot;</span> /&gt;</span><br>      <span class="hljs-comment">&lt;!-- 一个Engine组件处理Service中的所有请求 --&gt;</span><br>    <span class="hljs-tag">&lt;<span class="hljs-name">Engine</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;Catalina&quot;</span> <span class="hljs-attr">defaultHost</span>=<span class="hljs-string">&quot;localhost&quot;</span>&gt;</span><br>		<span class="hljs-comment">&lt;!-- 处理特定的Host下的请求，可以包含多个Context --&gt;</span><br>      <span class="hljs-tag">&lt;<span class="hljs-name">Host</span> <span class="hljs-attr">name</span>=<span class="hljs-string">&quot;localhost&quot;</span>  <span class="hljs-attr">appBase</span>=<span class="hljs-string">&quot;webapps&quot;</span></span><br><span class="hljs-tag">            <span class="hljs-attr">unpackWARs</span>=<span class="hljs-string">&quot;true&quot;</span> <span class="hljs-attr">autoDeploy</span>=<span class="hljs-string">&quot;true&quot;</span>&gt;</span><br>        <span class="hljs-tag">&lt;<span class="hljs-name">Valve</span> <span class="hljs-attr">className</span>=<span class="hljs-string">&quot;org.apache.catalina.valves.AccessLogValve&quot;</span> <span class="hljs-attr">directory</span>=<span class="hljs-string">&quot;logs&quot;</span></span><br><span class="hljs-tag">               <span class="hljs-attr">prefix</span>=<span class="hljs-string">&quot;localhost_access_log&quot;</span> <span class="hljs-attr">suffix</span>=<span class="hljs-string">&quot;.txt&quot;</span></span><br><span class="hljs-tag">               <span class="hljs-attr">pattern</span>=<span class="hljs-string">&quot;%h %l %u %t <span class="hljs-symbol">&amp;quot;</span>%r<span class="hljs-symbol">&amp;quot;</span> %s %b&quot;</span> /&gt;</span><br>          <span class="hljs-tag">&lt;<span class="hljs-name">context</span>&gt;</span><span class="hljs-tag">&lt;/<span class="hljs-name">context</span>&gt;</span> <span class="hljs-comment">&lt;!-- 为特定的Web应用处理所有的请求 --&gt;</span><br>      <span class="hljs-tag">&lt;/<span class="hljs-name">Host</span>&gt;</span><br>    <span class="hljs-tag">&lt;/<span class="hljs-name">Engine</span>&gt;</span><br>  <span class="hljs-tag">&lt;/<span class="hljs-name">Service</span>&gt;</span><br><span class="hljs-tag">&lt;/<span class="hljs-name">Server</span>&gt;</span><br></code></pre></td></tr></table></figure>
+<p>如果说我们要访问<a target="_blank" rel="noopener" href="https://xxxx:8080/user/list%EF%BC%8C%E9%82%A3tomcat%E6%98%AF%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E8%AF%B7%E6%B1%82%E5%AE%9A%E4%BD%8D%E5%88%B0%E5%85%B7%E4%BD%93%E7%9A%84servlet%E7%9A%84%E5%91%A2%EF%BC%9F%E4%B8%BA%E6%AD%A4tomcat%E8%AE%BE%E8%AE%A1%E4%BA%86Mapper%EF%BC%8C%E5%85%B6%E4%B8%AD%E4%BF%9D%E5%AD%98%E4%BA%86%E5%AE%B9%E5%99%A8%E7%BB%84%E4%BB%B6%E4%B8%8E%E8%AE%BF%E9%97%AE%E8%B7%AF%E5%BE%84%E7%9A%84%E6%98%A0%E5%B0%84%E5%85%B3%E7%B3%BB%EF%BC%8C%E6%AD%A5%E9%AA%A4%E4%B8%BA%EF%BC%9A">https://xxxx:8080/user/list，那tomcat是如何实现请求定位到具体的servlet的呢？为此tomcat设计了Mapper，其中保存了容器组件与访问路径的映射关系，步骤为：</a></p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-number">1</span>、根据协议和端口号选定Service和Engine<br><span class="hljs-number">2</span>、根据域名选定Host<br><span class="hljs-number">3</span>、根据url路径找到Context组件<br><span class="hljs-number">4</span>、根据url路径找到<span class="hljs-keyword">Wrapper</span>（Servlet）<br></code></pre></td></tr></table></figure>
+<p>我们先设计一个简单的Servlet（tomcat9.0.96）<br>Main.java</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_16-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_16-01.png">
+<h6 id="-1"><a href="#-1" class="headerlink" title=""></a></h6><p>HelloServlet.java</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_16-04.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_16-04.png">
+<h6 id="-2"><a href="#-2" class="headerlink" title=""></a></h6><img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_16-00.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_16-00.png">
+<h6 id="-3"><a href="#-3" class="headerlink" title=""></a></h6><p>我们在org.apache.catalina.core.StandardWrapper#setServletClass处打断点进行调试</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_16-06.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_16-06.png">
+<h6 id="-4"><a href="#-4" class="headerlink" title=""></a></h6><p>并追踪它的上层调用位置，我们可以发现为org.apache.catalina.startup.ContextConfig#configureContext</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_16-07.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_16-07.png">
+<h6 id="-5"><a href="#-5" class="headerlink" title=""></a></h6><img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_16-09.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_16-09.png">
+<h6 id="-6"><a href="#-6" class="headerlink" title=""></a></h6><p>追踪configureContext，查看代码</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_17-28.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_17-28.png">
+<h6 id="-7"><a href="#-7" class="headerlink" title=""></a></h6><img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_17-59.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_17-59.png">
+<h6 id="-8"><a href="#-8" class="headerlink" title=""></a></h6><p>概括一下上述的代码，也就是servlet初始化的六步</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">创建Wapper对象；<br>设置Servlet的LoadOnStartUp的值；<br>设置Servlet的名称；<br>设置Servlet的<span class="hljs-keyword">class</span>；<br>将配置好的<span class="hljs-keyword">Wrapper</span>添加到Context中；<br>将url和servlet类做映射<br></code></pre></td></tr></table></figure>
+<p>那servlet是如何进行装载的呢，我们在org.apache.catalina.core.StandardWrapper#loadServlet这里打下断点进行调试，重点关注一下startInternal</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_18-01.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_18-01.png">
+<h6 id="-9"><a href="#-9" class="headerlink" title=""></a></h6><p>可以清晰看到，装载的顺序为：Listener、Filter、Servlet</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_18-05.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_18-05.png">
+<h6 id="-10"><a href="#-10" class="headerlink" title=""></a></h6><p>并且我们可以发现，调用了org.apache.catalina.core.StandardContext#loadOnStartup，跟进该方法</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_18-11.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_18-11.png">
+<h6 id="-11"><a href="#-11" class="headerlink" title=""></a></h6><p>先创建一个TreeMap，然后遍历传入的Container数组，将每个Servlet的loadOnStartup值作为键，将对应的Wrapper对象存储在相应的列表中；如果这个loadOnStartup值是负数，除非你请求访问它，否则就不会加载；如果是非负数，那么就按照这个loadOnStartup的升序的顺序来加载，这就是servlet装载流程</p>
+<h2 id="Filter"><a href="#Filter" class="headerlink" title="Filter"></a>Filter</h2><p>同理，我们先了解一下Filter容器，Filter容器是用于对请求和响应进行过滤和处理的，我用PPT潦草画个图</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_22-12.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_22-12.png">
+<h6 id="-12"><a href="#-12" class="headerlink" title=""></a></h6><p>filter可以理解为一道门，客户端的请求在经过filter会经过servlet，那么如果我们动态创建一个filter并且将其放在最前面，我们的filter就会最先执行，当我们在filter中添加恶意代码，就可以实现命令执行，从而形成内存马。先写个简单的Filter（tomcat9.0.96）</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_18-46.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_18-46.png">
+<h6 id="-13"><a href="#-13" class="headerlink" title=""></a></h6><p>效果就是跑起来后，控制台输出Filter初始化start，当我们访问&#x2F;test正确路由的时候，控制台继续输出Filter路由成功访问，当我们结束tomcat的时候，会触发destroy方法，从而输出Filter已结束</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_18-52.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_18-52.png">
+<h6 id="-14"><a href="#-14" class="headerlink" title=""></a></h6><p>我们在上面的demo中的doFilter函数这里下断点进行调试，并跟进org.apache.catalina.core.StandardWrapperValve#invoke</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_18-58.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_18-58.png">
+<h6 id="-15"><a href="#-15" class="headerlink" title=""></a></h6><img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-04.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_19-04.png">
+<h6 id="-16"><a href="#-16" class="headerlink" title=""></a></h6><p>继续跟进变量filterChain，找到定义处的代码：</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs pgsql">ApplicationFilterChain filterChain = ApplicationFilterFactory.createFilterChain(request, <span class="hljs-keyword">wrapper</span>, servlet);<br></code></pre></td></tr></table></figure>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-06.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_19-06.png">
+<h6 id="-17"><a href="#-17" class="headerlink" title=""></a></h6><p>查看createFilterChain方法</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-20.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_19-20.png">
+<h6 id="-18"><a href="#-18" class="headerlink" title=""></a></h6><p>代码有点长，不再一一截了，直接粘过来</p>
+<figure class="highlight pgsql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><code class="hljs pgsql"><span class="hljs-built_in">public</span> static ApplicationFilterChain createFilterChain(ServletRequest request, <span class="hljs-keyword">Wrapper</span> <span class="hljs-keyword">wrapper</span>, Servlet servlet) &#123;<br>    <span class="hljs-keyword">if</span> (servlet == <span class="hljs-keyword">null</span>) &#123;<br>        <span class="hljs-keyword">return</span> <span class="hljs-keyword">null</span>;<br>    &#125; <span class="hljs-keyword">else</span> &#123;<br>        ApplicationFilterChain filterChain = <span class="hljs-keyword">null</span>;<br>        <span class="hljs-keyword">if</span> (request instanceof Request) &#123;<br>            Request req = (Request)request;<br>            <span class="hljs-keyword">if</span> (Globals.IS_SECURITY_ENABLED) &#123;<br>                filterChain = <span class="hljs-built_in">new</span> ApplicationFilterChain();<br>            &#125; <span class="hljs-keyword">else</span> &#123;<br>                filterChain = (ApplicationFilterChain)req.getFilterChain();<br>                <span class="hljs-keyword">if</span> (filterChain == <span class="hljs-keyword">null</span>) &#123;<br>                    filterChain = <span class="hljs-built_in">new</span> ApplicationFilterChain();<br>                    req.setFilterChain(filterChain);<br>                &#125;<br>            &#125;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            filterChain = <span class="hljs-built_in">new</span> ApplicationFilterChain();<br>        &#125;<br><br>        filterChain.setServlet(servlet);<br>        filterChain.setServletSupportsAsync(<span class="hljs-keyword">wrapper</span>.isAsyncSupported());<br>        StandardContext context = (StandardContext)<span class="hljs-keyword">wrapper</span>.getParent();<br>        FilterMap[] filterMaps = context.findFilterMaps();<br>        <span class="hljs-keyword">if</span> (filterMaps != <span class="hljs-keyword">null</span> &amp;&amp; filterMaps.length != <span class="hljs-number">0</span>) &#123;<br>            DispatcherType dispatcher = (DispatcherType)request.getAttribute(&quot;org.apache.catalina.core.DISPATCHER_TYPE&quot;);<br>            String requestPath = <span class="hljs-keyword">null</span>;<br>            <span class="hljs-keyword">Object</span> <span class="hljs-keyword">attribute</span> = request.getAttribute(&quot;org.apache.catalina.core.DISPATCHER_REQUEST_PATH&quot;);<br>            <span class="hljs-keyword">if</span> (<span class="hljs-keyword">attribute</span> != <span class="hljs-keyword">null</span>) &#123;<br>                requestPath = <span class="hljs-keyword">attribute</span>.toString();<br>            &#125;<br><br>            String servletName = <span class="hljs-keyword">wrapper</span>.getName();<br>            FilterMap[] var10 = filterMaps;<br>            <span class="hljs-type">int</span> var11 = filterMaps.length;<br><br>            <span class="hljs-type">int</span> var12;<br>            FilterMap filterMap;<br>            ApplicationFilterConfig filterConfig;<br>            <span class="hljs-keyword">for</span>(var12 = <span class="hljs-number">0</span>; var12 &lt; var11; ++var12) &#123;<br>                filterMap = var10[var12];<br>                <span class="hljs-keyword">if</span> (matchDispatcher(filterMap, dispatcher) &amp;&amp; matchFiltersURL(filterMap, requestPath)) &#123;<br>                    filterConfig = (ApplicationFilterConfig)context.findFilterConfig(filterMap.getFilterName());<br>                    <span class="hljs-keyword">if</span> (filterConfig != <span class="hljs-keyword">null</span>) &#123;<br>                        filterChain.addFilter(filterConfig);<br>                    &#125;<br>                &#125;<br>            &#125;<br><br>            var10 = filterMaps;<br>            var11 = filterMaps.length;<br><br>            <span class="hljs-keyword">for</span>(var12 = <span class="hljs-number">0</span>; var12 &lt; var11; ++var12) &#123;<br>                filterMap = var10[var12];<br>                <span class="hljs-keyword">if</span> (matchDispatcher(filterMap, dispatcher) &amp;&amp; matchFiltersServlet(filterMap, servletName)) &#123;<br>                    filterConfig = (ApplicationFilterConfig)context.findFilterConfig(filterMap.getFilterName());<br>                    <span class="hljs-keyword">if</span> (filterConfig != <span class="hljs-keyword">null</span>) &#123;<br>                        filterChain.addFilter(filterConfig);<br>                    &#125;<br>                &#125;<br>            &#125;<br><br>            <span class="hljs-keyword">return</span> filterChain;<br>        &#125; <span class="hljs-keyword">else</span> &#123;<br>            <span class="hljs-keyword">return</span> filterChain;<br>        &#125;<br>    &#125;<br>&#125;<br></code></pre></td></tr></table></figure>
+<p>这段代码是用于创建过滤器链的静态方法，它的主要功能是根据请求、包装器和Servlet的状态，构建一个包含适当过滤器的ApplicationFilterChain对象，首先检查是否为空值，如果传入的Servlet为null，直接返回null，表示没有可处理的请求，然后检查请求是否是Request的实例，如果是，则根据安全设置或已存在的过滤器链进行创建，然后将Servlet和异步支持设置到过滤器链中，再从wrapper中获取StandardContext，并查找相关的过滤器映射，再通过循环检查过滤器映射，根据请求的调度类型和路径进行过滤器的匹配，于此同时使用matchDispatcher和matchFiltersURL等方法来检查过滤器是否适用于当前请求，在所有匹配的过滤器都添加后，返回构建好的过滤器链</p>
+<p>回过头来，再跟进刚才的filterChain.doFilter方法（org.apache.catalina.core.ApplicationFilterChain#doFilter）</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-23.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_19-23.png">
+<h6 id="-19"><a href="#-19" class="headerlink" title=""></a></h6><p>可以看到调用了internalDoFilter方法，跟进该方法可以发现会依次拿到filterConfig和filter</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-33.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_19-33.png">
+<h6 id="-20"><a href="#-20" class="headerlink" title=""></a></h6><p>但要是想打入内存马，也就是要动态地创建一个Filter，刚才我们发现在createFilterChain那个函数里面有两个关键点：org.apache.catalina.core.StandardContext#findFilterMaps和org.apache.catalina.core.StandardContext#findFilterConfig</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-37.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_19-37.png">
+<h6 id="-21"><a href="#-21" class="headerlink" title=""></a></h6><img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-39.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_19-39.png">
+<h6 id="-22"><a href="#-22" class="headerlink" title=""></a></h6><p>二者的实现代码</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-40.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_19-40.png">
+<h6 id="-23"><a href="#-23" class="headerlink" title=""></a></h6><img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-41.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_19-41.png">
+<h6 id="-24"><a href="#-24" class="headerlink" title=""></a></h6><p>这样一来，查找到现有的context，然后往里面插入我们自定义的恶意过滤器映射和过滤器配置，就可以实现动态添加过滤器了，但是如何添加filterMap和filterConfig? 尝试搜索addFilterMap关键词，发现StandardContext中有两个相关的方法</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-50.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_19-50.png">
+<h6 id="-25"><a href="#-25" class="headerlink" title=""></a></h6><p>addFilterMap是在一组映射末尾添加新的我们自定义的新映射；而addFilterMapBefore则会自动把我们创建的filterMap自动排到第一位，而且addFilterMapBefore函数中第一步是先执行validateFilterMap这个函数，继续跟进</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-52.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_19-52.png">
+<h6 id="-26"><a href="#-26" class="headerlink" title=""></a></h6><p>filterName和filterDef，必须对应得到，因此我们需要自定义filterDef并把它加入到filterDefs，这就需要用到addFilterDef方法</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-54.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_19-54.png">
+
+<p>当我们继续去看filterConfig如何添加时，通过搜索，发现找不到类似上面的addFilterConfig这种，但是有filterStart和filterStop这两个方法</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-56.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_19-56.png">
+<h6 id="-27"><a href="#-27" class="headerlink" title=""></a></h6><img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_19-56_1.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_19-56_1.png">
+<h6 id="-28"><a href="#-28" class="headerlink" title=""></a></h6><p>ok, 也就是说，只能通过反射的方法去获取相关属性并添加进去</p>
+<h2 id="Listener"><a href="#Listener" class="headerlink" title="Listener"></a>Listener</h2><p>我们最后再来说一下Listenner，还是先看看我用PPT画的潦草图</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_22-14.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_22-14.png">
+<h6 id="-29"><a href="#-29" class="headerlink" title=""></a></h6><p>Listener是最先被加载的，所以动态注册一个恶意的Listener，就又可以形成一种内存马了。常见的listener有：ServletContextListener、ServletRequestListener、HttpSessionListener、HttpSessionAttributeListener。其中，ServletRequestListener是最适合做内存马的，利用条件很低：只要访问服务就可触发</p>
+<p>我们先写一个简单的Listener（tomcat9.0.96）</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_20-00.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_20-00.png">
+<h6 id="-30"><a href="#-30" class="headerlink" title=""></a></h6><img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_20-02.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_20-02.png">
+<h6 id="-31"><a href="#-31" class="headerlink" title=""></a></h6><p>我们在如下图所示的两个地方打断点进行调试</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_20-06.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_20-06.png">
+<h6 id="-32"><a href="#-32" class="headerlink" title=""></a></h6><p>通过上图，可以看到org.apache.catalina.core.StandardContext#listenerStart方法的调用，跟进查看代码，可以发现主要干两个事情:一是通过findApplicationListeners找到这些Listerner的名字；二是实例化这些listener</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_20-08.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_20-08.png">
+<h6 id="-33"><a href="#-33" class="headerlink" title=""></a></h6><p>接着就是分类放置，我们的ServletRequestListener被放在了eventListeners里面，分类放置之后，还做了一个动作：eventListeners.addAll(Arrays.asList(getApplicationEventListeners()));</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_20-17.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_20-17.png">
+<h6 id="-34"><a href="#-34" class="headerlink" title=""></a></h6><p>Arrays.asList就是将数组转换为列表；eventListeners.addAll就是将括号里面的内容添加到之前实例化的监听器列表eventListeners中。至于括号里面的这个getApplicationEventListeners方法，我们跟进查看代码</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_20-19.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_20-19.png">
+<h6 id="-35"><a href="#-35" class="headerlink" title=""></a></h6><p>就是把applicationEventListenersList转换成一个包含任意类型对象的数组，我们完全可以使其变成包含各种类型的应用程序事件监听器的数组，从而进行利用。而Listener可以有两个来源，一是根据web.xml文件或者@WebListener注解实例化得到的Listener；二就是applicationEventListenersList中的Listener，如果想打内存马的话，前者肯定不合适，更适合开发人员使用，因此我们需要找找有没有类似之前我们用到的addFilterConfig这种函数，通过查找，找到了一个方法叫addApplicationEventListener，在StandardContext.java里面</p>
+<img src="/2024/10/23/%E5%89%96%E6%9E%90Java%E5%86%85%E5%AD%98%E9%A9%AC1/2024-10-22_20-26.png" srcset="/img/loading.gif" lazyload class="" title="2024-10-22_20-26.png">
+<h6 id="-36"><a href="#-36" class="headerlink" title=""></a></h6><p>跟进该方法，查看代码，正好符合我们利用内存马的需求</p>
+<figure class="highlight typescript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs typescript"><span class="hljs-keyword">public</span> <span class="hljs-built_in">void</span> <span class="hljs-title function_">addApplicationEventListener</span>(<span class="hljs-params"><span class="hljs-built_in">Object</span> listener</span>) &#123;<br>    applicationEventListenersList.<span class="hljs-title function_">add</span>(listener);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+
+                
+              </div>
+            
+            <hr/>
+            <div>
+              <div class="post-metas my-3">
+  
+    <div class="post-meta mr-3 d-flex align-items-center">
+      <i class="iconfont icon-category"></i>
+      
+
+<span class="category-chains">
+  
+  
+    
+      <span class="category-chain">
+        
+  <a href="/categories/%E7%9E%8E%E6%90%9E/" class="category-chain-item">瞎搞</a>
+  
+  
+
+      </span>
+    
+  
+</span>
+
+    </div>
+  
+  
+    <div class="post-meta">
+      <i class="iconfont icon-tags"></i>
+      
+        <a href="/tags/Javamemoryshell/" class="print-no-link">#Javamemoryshell</a>
+      
+    </div>
+  
+</div>
+
+
+              
+  
+
+  <div class="license-box my-3">
+    <div class="license-title">
+      <div>剖析Java内存马1</div>
+      <div>http://example.com/2024/10/23/剖析Java内存马1/</div>
+    </div>
+    <div class="license-meta">
+      
+        <div class="license-meta-item">
+          <div>作者</div>
+          <div>liuty</div>
+        </div>
+      
+      
+        <div class="license-meta-item license-meta-date">
+          <div>发布于</div>
+          <div>2024年10月23日</div>
+        </div>
+      
+      
+      
+        <div class="license-meta-item">
+          <div>许可协议</div>
+          <div>
+            
+              
+              
+                <a class="print-no-link" target="_blank" href="https://creativecommons.org/licenses/by/4.0/">
+                  <span class="hint--top hint--rounded" aria-label="BY - 署名">
+                    <i class="iconfont icon-by"></i>
+                  </span>
+                </a>
+              
+            
+          </div>
+        </div>
+      
+    </div>
+    <div class="license-icon iconfont"></div>
+  </div>
+
+
+
+              
+                <div class="post-prevnext my-3">
+                  <article class="post-prev col-6">
+                    
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2024/09/19/%E5%86%8D%E8%B0%88%E5%89%8D%E7%AB%AFjs%E5%8A%A0%E5%AF%86%E6%8A%97%E8%A1%A1/" title="再谈前端js加密抗衡">
+                        <span class="hidden-mobile">再谈前端js加密抗衡</span>
+                        <span class="visible-mobile">下一篇</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+
+    <div class="side-col d-none d-lg-block col-lg-2">
+      
+  <aside class="sidebar" style="margin-left: -1rem">
+    <div id="toc">
+  <p class="toc-header">
+    <i class="iconfont icon-list"></i>
+    <span>目录</span>
+  </p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+
+
+  </aside>
+
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">搜索</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v" for="local-search-input">关键词</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+    
+
+    
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+  
+    <div class="footer-content">
+       <a href="https://l1uty.github.io/" target="_blank" rel="nofollow noopener"><span>liuty</span></a> <i class="iconfont icon-love"></i> <a href="https://www.mps.gov.cn/" target="_blank" rel="nofollow noopener"><span>???</span></a> 
+    </div>
+  
+  
+    <div class="statistics">
+  
+  
+
+  
+    
+      <span id="leancloud-site-pv-container" style="display: none">
+        总访问量 
+        <span id="leancloud-site-pv"></span>
+         次
+      </span>
+    
+    
+      <span id="leancloud-site-uv-container" style="display: none">
+        总访客数 
+        <span id="leancloud-site-uv"></span>
+         次
+      </span>
+    
+    
+
+  
+</div>
+
+  
+  
+  
+</div>
+
+  </footer>
+
+  <script type="text/javascript" src="\js\FunnyTitle.js"></script>
+  
+  <script  src="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://lib.baomitu.com/nprogress/0.2.0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://lib.baomitu.com/jquery/3.6.4/jquery.min.js" ></script>
+<script  src="https://lib.baomitu.com/twitter-bootstrap/4.6.1/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+
+  <script  src="https://lib.baomitu.com/typed.js/2.0.12/typed.min.js" ></script>
+  <script>
+    (function (window, document) {
+      var typing = Fluid.plugins.typing;
+      var subtitle = document.getElementById('subtitle');
+      if (!subtitle || !typing) {
+        return;
+      }
+      var text = subtitle.getAttribute('data-typed-text');
+      
+        typing(text);
+      
+    })(window, document);
+  </script>
+
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/tocbot/4.20.1/tocbot.min.js', function() {
+    var toc = jQuery('#toc');
+    if (toc.length === 0 || !window.tocbot) { return; }
+    var boardCtn = jQuery('#board-ctn');
+    var boardTop = boardCtn.offset().top;
+
+    window.tocbot.init(Object.assign({
+      tocSelector     : '#toc-body',
+      contentSelector : '.markdown-body',
+      linkClass       : 'tocbot-link',
+      activeLinkClass : 'tocbot-active-link',
+      listClass       : 'tocbot-list',
+      isCollapsedClass: 'tocbot-is-collapsed',
+      collapsibleClass: 'tocbot-is-collapsible',
+      scrollSmooth    : true,
+      includeTitleTags: true,
+      headingsOffset  : -boardTop,
+    }, CONFIG.toc));
+    if (toc.find('.toc-list-item').length > 0) {
+      toc.css('visibility', 'visible');
+    }
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('tocbot' in window) {
+        tocbot.refresh();
+        var toc = jQuery('#toc');
+        if (toc.length === 0 || !tocbot) {
+          return;
+        }
+        if (toc.find('.toc-list-item').length > 0) {
+          toc.css('visibility', 'visible');
+        }
+      }
+    });
+  });
+</script>
+
+
+  <script src=https://lib.baomitu.com/clipboard.js/2.0.11/clipboard.min.js></script>
+
+  <script>Fluid.plugins.codeWidget();</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/anchor-js/4.3.1/anchor.min.js', function() {
+    window.anchors.options = {
+      placement: CONFIG.anchorjs.placement,
+      visible  : CONFIG.anchorjs.visible
+    };
+    if (CONFIG.anchorjs.icon) {
+      window.anchors.options.icon = CONFIG.anchorjs.icon;
+    }
+    var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+    var res = [];
+    for (var item of el) {
+      res.push('.markdown-body > ' + item.trim());
+    }
+    if (CONFIG.anchorjs.placement === 'left') {
+      window.anchors.options.class = 'anchorjs-link-left';
+    }
+    window.anchors.add(res.join(', '));
+
+    Fluid.events.registerRefreshCallback(function() {
+      if ('anchors' in window) {
+        anchors.removeAll();
+        var el = (CONFIG.anchorjs.element || 'h1,h2,h3,h4,h5,h6').split(',');
+        var res = [];
+        for (var item of el) {
+          res.push('.markdown-body > ' + item.trim());
+        }
+        if (CONFIG.anchorjs.placement === 'left') {
+          anchors.options.class = 'anchorjs-link-left';
+        }
+        anchors.add(res.join(', '));
+      }
+    });
+  });
+</script>
+
+
+  
+<script>
+  Fluid.utils.createScript('https://lib.baomitu.com/fancybox/3.5.7/jquery.fancybox.min.js', function() {
+    Fluid.plugins.fancyBox();
+  });
+</script>
+
+
+  <script>Fluid.plugins.imageCaption();</script>
+
+  <script defer src="/js/leancloud.js" ></script>
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+
+  
+<script src="/js/diy/love.js"></script>
+
+
+
+<!-- 主题的启动项，将它保持在最底部 -->
+<!-- the boot of the theme, keep it at the bottom -->
+<script  src="/js/boot.js" ></script>
+
+
+  
+  <noscript>
+    <div class="noscript-warning">博客在允许 JavaScript 运行的环境下浏览效果更佳</div>
+  </noscript>
+
+  <link rel="stylesheet" href="/dist/APlayer.min.css">
+  <div id="aplayer"></div>
+  <script type="text/javascript" src="/dist/APlayer.min.js"></script>
+  <script type="text/javascript" src="/dist/music.js"></script>
+
+  <script type="text/javascript"
+color="220,220,220" opacity='0.7' zIndex="-2" count="200" src="//cdn.bootcss.com/canvas-nest.js/1.0.0/canvas-nest.min.js">
+  </script>
+
+  <script type="text/javascript" src="\js\snow.js"></script>
+  <script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"model":{"jsonPath":"/live2dw/assets/tororo.model.json"},"display":{"position":"right","width":150,"height":300},"mobile":{"show":true},"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
